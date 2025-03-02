@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
+// ai generated
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,7 +11,7 @@ const LoginScreen = () => {
     console.log('Email:', email);
     console.log('Password:', password);
   };
-
+// ai generated
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
