@@ -25,7 +25,13 @@ function HomeScreen({ navigation }) {
       {user ? (
         <>
           <Text>Welcome, {user.email}</Text>
-          <Button title="Logout" onPress={() => signOut(auth)} />
+          <Button
+            title="Logout"
+            onPress={() => {
+              signOut(auth);
+              navigation.navigate("Login");
+            }}
+          />
           <Button title="My Account" onPress={() => navigation.navigate("My Account")} />
           <Button title="Tropicana Parking" onPress={() => navigation.navigate("Tropicana Parking")} />
           <Button title="Cottage Grove Parking" onPress={() => navigation.navigate("Cottage Grove Parking")} />

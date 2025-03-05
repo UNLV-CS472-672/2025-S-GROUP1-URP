@@ -13,7 +13,7 @@ const LoginScreen = ({ navigation }) => { // Add navigation prop
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       Alert.alert("Account created successfully!");
-      navigation.replace("Home"); // Navigate to Home after sign-up
+      navigation.navigate("Home"); // Navigate to Home after sign-up
     } catch (error) {
       Alert.alert(error.message);
     }
@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => { // Add navigation prop
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert("Login successful!");
-      navigation.replace("Home"); // Navigate to Home after login
+      navigation.navigate("Home"); // Navigate to Home after login
     } catch (error) {
       Alert.alert(error.message);
     }
