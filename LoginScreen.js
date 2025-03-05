@@ -3,8 +3,7 @@ import { View, TextInput, Button, Text, Alert, TouchableOpacity, StyleSheet } fr
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig"; 
 
-// chat helped with login screen
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => { // Add navigation prop
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +13,7 @@ const LoginScreen = () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       Alert.alert("Account created successfully!");
+      navigation.replace("Home"); // Navigate to Home after sign-up
     } catch (error) {
       Alert.alert(error.message);
     }
@@ -24,6 +24,7 @@ const LoginScreen = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert("Login successful!");
+      navigation.replace("Home"); // Navigate to Home after login
     } catch (error) {
       Alert.alert(error.message);
     }
@@ -64,6 +65,7 @@ const LoginScreen = () => {
     </View>
   );
 };
+
 // Styles
 const styles = StyleSheet.create({
   container: {
