@@ -3,6 +3,7 @@ import { View, TextInput, Button, Text, Alert, TouchableOpacity, StyleSheet } fr
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig"; 
 
+// chat helped with login screen
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,7 +64,7 @@ const LoginScreen = () => {
     </View>
   );
 };
-
+// Styles
 const styles = StyleSheet.create({
   container: {
     padding: 20,
