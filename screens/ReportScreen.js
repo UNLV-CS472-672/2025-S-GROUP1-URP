@@ -36,7 +36,7 @@ export default function ReportScreen() {
       <View style={styles.content}>
         <Text style={styles.text}>Report</Text>
          {/* Vehicle Number Input */}
-         <Text style={styles.label}>Liscense Plate Number:</Text>
+         <Text style={styles.label}>License Plate Number:</Text>
          {/* Color Input */}
          <Text style={styles.label}>Color:</Text>
          {/* Make Input */}
