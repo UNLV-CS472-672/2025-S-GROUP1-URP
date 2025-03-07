@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoginScreen from "./LoginScreen";
+import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 
 const Stack = createStackNavigator();
 
@@ -77,13 +78,13 @@ function GatewayParkingScreen() {
   );
 }
 
-function ReportScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Report</Text>
-    </View>
-  );
-}
+//function ReportScreen() {
+  //return (
+    //<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      //<Text>Report</Text>
+    //</View>
+ // );
+//}
 
 export default function App() {
   return (
