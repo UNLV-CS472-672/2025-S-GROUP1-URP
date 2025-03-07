@@ -35,6 +35,14 @@ export default function ReportScreen() {
       {/* Main Content */}
       <View style={styles.content}>
         <Text style={styles.text}>Report</Text>
+         {/* Vehicle Number Input */}
+         <Text style={styles.label}>Liscense Plate Number:</Text>
+         {/* Color Input */}
+         <Text style={styles.label}>Color:</Text>
+         {/* Make Input */}
+         <Text style={styles.label}>Make/Model:</Text>
+         {/* Comments */}
+         <Text style={styles.label}>Comments:</Text>
       </View>
     </View>
   );
