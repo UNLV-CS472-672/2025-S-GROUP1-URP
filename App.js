@@ -7,6 +7,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoginScreen from "./LoginScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
+import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
 
 const Stack = createStackNavigator();
 
@@ -49,28 +50,17 @@ function HomeScreen({ navigation }) {
 
 
 function TropicanaScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Tropicana Parking</Text>
-    </View>
-  );
+  return <ParkingMap parkingLot="Tropicana Parking" />;
 }
 
 function CottageGroveParkingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Cottage Grove Parking</Text>
-    </View>
-  );
+  return <ParkingMap parkingLot="Cottage Grove Parking" />;
 }
 
 function GatewayParkingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Gateway Parking</Text>
-    </View>
-  );
+  return <ParkingMap parkingLot="Gateway Parking" />;
 }
+
 
 //function ReportScreen() {
   //return (
