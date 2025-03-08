@@ -7,6 +7,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoginScreen from "./LoginScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
+import ParkingLotMapScreen from "./screens/ParkingLotMapScreen";
 
 const Stack = createStackNavigator();
 
@@ -87,7 +88,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="My Account" component={MyAccountScreen} />
-        <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} />
+        <Stack.Screen name="Tropicana Parking" component={ParkingLotMapScreen} />
         <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} />
         <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} />
         <Stack.Screen name="Report" component={ReportScreen} />
