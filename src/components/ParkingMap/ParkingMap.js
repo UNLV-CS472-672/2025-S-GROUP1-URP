@@ -69,9 +69,9 @@ const ParkingMap = ({ parkingLot }) => {
 
       {/* Action Buttons */}
       <View style={{ flexDirection: "row", marginTop: 20 }}>
-        <TouchableOpacity style={{ backgroundColor: "blue", padding: 10, margin: 5, borderRadius: 5 }}>
+        {/* <TouchableOpacity style={{ backgroundColor: "blue", padding: 10, margin: 5, borderRadius: 5 }}>
           <Text style={{ color: "white" }}>Back</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={{ backgroundColor: "red", padding: 10, margin: 5, borderRadius: 5 }}>
           <Text style={{ color: "white" }}>Reserve</Text>
         </TouchableOpacity>
