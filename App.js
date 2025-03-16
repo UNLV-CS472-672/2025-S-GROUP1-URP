@@ -6,6 +6,7 @@ import { auth } from "./firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoginScreen from "./LoginScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
+import MyAccountScreen from "./screens/MyAccountScreen";
 
 const Stack = createStackNavigator();
 
@@ -46,13 +47,6 @@ function HomeScreen({ navigation }) {
   );
 }
 
-function MyAccountScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>My Account</Text>
-    </View>
-  );
-}
 
 function TropicanaScreen() {
   return (
