@@ -1,30 +1,48 @@
-// import React from "react";
-// import { View, Text, StyleSheet } from "react-native";
-
-// export default function ReportScreen() {
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.text}>Report</Text>
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     backgroundColor: "#fff",
-//   },
-//   text: {
-//     fontSize: 20,
-//     fontWeight: "bold",
-//   },
-// });
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // Import serverTimestamp
+import { db, auth } from "../firebaseConfig"; // Import Firestore and Auth
 
 export default function ReportScreen() {
+  const [licensePlate, setLicensePlate] = useState("");
+  const [color, setColor] = useState("");
+  const [makeModel, setMakeModel] = useState("");
+  const [comments, setComments] = useState("");
+
+  const handleSubmit = async () => {
+    if (!licensePlate || !color || !makeModel) {
+      Alert.alert("Error", "Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Error", "You must be logged in to submit a report.");
+        return;
+      }
+
+      await addDoc(collection(db, "reports"), {
+        licensePlate,
+        color,
+        makeModel,
+        comments,
+        userId: user.uid, // Automatically assign the logged-in user’s ID
+        timestamp: serverTimestamp(), // Automatically generate a timestamp
+      });
+
+      Alert.alert("Success", "Report submitted successfully!");
+      setLicensePlate("");
+      setColor("");
+      setMakeModel("");
+      setComments("");
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      Alert.alert("Error", "Failed to submit report.");
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -34,21 +52,58 @@ export default function ReportScreen() {
 
       {/* Main Content */}
       <View style={styles.content}>
-        <Text style={styles.text}>Report</Text>
-         {/* Vehicle Number Input */}
+         {/* Vehicle Number Section */}
          <Text style={styles.label}>License Plate Number:</Text>
-         {/* Color Input */}
+
+        {/* License Plate # input Section */}
+         <TextInput 
+          style={styles.input}
+          placeholder="Enter license plate"
+          value={licensePlate}
+          onChangeText={setLicensePlate}
+        />
+
+         {/* Vehicle Color Section */}
          <Text style={styles.label}>Color:</Text>
-         {/* Make Input */}
+
+        {/* Vechicle Color input Section */}
+         <TextInput 
+          style={styles.input}
+          placeholder="Enter vehicle color"
+          value={color}
+          onChangeText={setColor}
+        />
+
+         {/* Make/Model Section */}
          <Text style={styles.label}>Make/Model:</Text>
-         {/* Comments */}
+
+        {/* Make/Model Section input*/}
+         <TextInput 
+          style={styles.input}
+          placeholder="Enter vehicle make and model"
+          value={makeModel}
+          onChangeText={setMakeModel}
+        />
+         {/* Comments Section*/}
          <Text style={styles.label}>Comments:</Text>
+
+        {/* Comments input*/}
+         <TextInput 
+          style={[styles.input, styles.commentInput]}
+          placeholder="Additional comments (optional)"
+          value={comments}
+          onChangeText={setComments}
+          multiline
+        />
+
+        <Button title="Submit Report" onPress={handleSubmit} color="red" />
       </View>
     </View>
   );
 }
 
 // the following is the title for report page
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -72,13 +127,25 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 3, height: 1 }, // Offset to create the outline
     textShadowRadius: 10, // Controls the thickness of the outline
   },
-  content: {
+   content: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 20,
   },
-  text: {
-    fontSize: 20,
+  label: {
+    fontSize: 16,
     fontWeight: "bold",
+    marginTop: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginTop: 5,
+  },
+  commentInput: {
+    height: 80,
+    textAlignVertical: "top",
   },
 });
