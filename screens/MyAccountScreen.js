@@ -51,7 +51,10 @@ export default function MyAccountScreen({ navigation }) {
         <View style={styles.container}>
             {existingData ? (
                 <View style={styles.infoContainer}>
-                    <Text>Vehicle Information:</Text>
+                    <Text style = {{fontSize: 18}}>User Information:</Text>
+                    <Text>Email: {auth.currentUser.email}</Text>
+                    <Text></Text>
+                    <Text style = {{fontSize: 18}}>Vehicle Information:</Text>
                     <Text>Make: {existingData.make}</Text>
                     <Text>Model: {existingData.model}</Text>
                     <Text>Year: {existingData.year}</Text>
