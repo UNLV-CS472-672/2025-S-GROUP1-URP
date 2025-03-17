@@ -51,10 +51,10 @@ export default function MyAccountScreen({ navigation }) {
         <View style={styles.container}>
             {existingData ? (
                 <View style={styles.infoContainer}>
-                    <Text style = {{fontSize: 18}}>User Information:</Text>
+                    <Text style = {{fontSize: 18, fontWeight: 'bold'}}>User Information:</Text>
                     <Text>Email: {auth.currentUser.email}</Text>
                     <Text></Text>
-                    <Text style = {{fontSize: 18}}>Vehicle Information:</Text>
+                    <Text style = {{fontSize: 18, fontWeight: 'bold'}}>Vehicle Information:</Text>
                     <Text>Make: {existingData.make}</Text>
                     <Text>Model: {existingData.model}</Text>
                     <Text>Year: {existingData.year}</Text>
@@ -62,6 +62,8 @@ export default function MyAccountScreen({ navigation }) {
                 </View>
             ) : (
                 <View>
+                    <Text style = {{fontSize: 16, fontWeight: 'bold'}}>Enter the car information that you would like to register with UNLV Reserve Parking:</Text>
+                    <Text></Text>
                     <TextInput
                         placeholder="Make"
                         value={make}
@@ -87,7 +89,9 @@ export default function MyAccountScreen({ navigation }) {
                         onChangeText={setLicensePlate}
                         style={styles.input}
                     />
-                    <Button title="Save" onPress={handleSave} />
+                    <Button title="Save" onPress={handleSave} color="red"/>
+                    <Text></Text>
+                    <Text style = {{fontSize: 12}}>This information will be saved under <Text style = {{fontSize: 14, fontWeight: 'bold'}}>{auth.currentUser.email}</Text></Text>
                 </View>
             )}
         </View>
@@ -109,7 +113,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         padding: 10,
         borderWidth: 1,
-        borderColor: "gray",
+        borderColor: "red",
         backgroundColor: "#f0f0f0",
     },
 });
