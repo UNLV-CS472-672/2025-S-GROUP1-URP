@@ -2,6 +2,8 @@ import { useState } from "react";
 import { View, TextInput, Button, Text, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig"; 
+import { sendPasswordResetEmail } from "firebase/auth"; // Import Firebase password reset function
+
 
 const LoginScreen = ({ navigation }) => { // Add navigation prop
   const [email, setEmail] = useState("");
@@ -29,6 +31,22 @@ const LoginScreen = ({ navigation }) => { // Add navigation prop
       Alert.alert(error.message);
     }
   };
+
+  // Forgot Password function
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert("Enter your email", "Please enter your registered email to reset your password.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert("Password Reset Email Sent", "Check your inbox and follow the instructions.");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+
 
   return (
     <View style={styles.container}>
@@ -58,6 +76,9 @@ const LoginScreen = ({ navigation }) => { // Add navigation prop
 
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.forgotButton} onPress={handleForgotPassword}>
+        <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
@@ -91,6 +112,14 @@ const styles = StyleSheet.create({
   showPassword: {
     marginLeft: 10,
     color: 'blue',
+  },
+  forgotButton: {
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  forgotText: {
+    color: 'blue',
+    fontSize: 14,
   },
   button: {
     backgroundColor: '#ADD8E6',
