@@ -7,6 +7,8 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoginScreen from "./LoginScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
+import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
+import ReservationStatusScreen from "./screens/ReservationStatusScreen";
 
 const Stack = createStackNavigator();
 
@@ -38,6 +40,7 @@ function HomeScreen({ navigation }) {
           <Button title="Tropicana Parking" onPress={() => navigation.navigate("Tropicana Parking")} />
           <Button title="Cottage Grove Parking" onPress={() => navigation.navigate("Cottage Grove Parking")} />
           <Button title="Gateway Parking" onPress={() => navigation.navigate("Gateway Parking")} />
+          <Button title="Reservation Status" onPress={() => navigation.navigate("Reservation Status")} />
           <Button title="Report" onPress={() => navigation.navigate("Report")} />
         </>
       ) : (
@@ -49,28 +52,17 @@ function HomeScreen({ navigation }) {
 
 
 function TropicanaScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Tropicana Parking</Text>
-    </View>
-  );
+  return <ParkingMap parkingLot="Tropicana Parking" />;
 }
 
 function CottageGroveParkingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Cottage Grove Parking</Text>
-    </View>
-  );
+  return <ParkingMap parkingLot="Cottage Grove Parking" />;
 }
 
 function GatewayParkingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Gateway Parking</Text>
-    </View>
-  );
+  return <ParkingMap parkingLot="Gateway Parking" />;
 }
+
 
 //function ReportScreen() {
   //return (
@@ -90,6 +82,7 @@ export default function App() {
         <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} />
         <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} />
         <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} />
+        <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} />
         <Stack.Screen name="Report" component={ReportScreen} />
       </Stack.Navigator>
     </NavigationContainer>
