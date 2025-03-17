@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   forgotText: {
-    color: 'blue',
+    color: 'red',
     fontSize: 14,
   },
   button: {
