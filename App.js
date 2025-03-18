@@ -83,7 +83,11 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUpScreen} /> 
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} /> 
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{ headerLeft: () => null }} 
+        />
         <Stack.Screen name="My Account" component={MyAccountScreen} />
         <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} />
         <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} />
