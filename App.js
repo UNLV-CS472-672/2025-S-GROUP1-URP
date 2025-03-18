@@ -22,7 +22,7 @@ function HomeScreen({ navigation }) {
     return unsubscribe;
   }, []);
 
-    //ai-gen start (ChatGPT-3.5, 2)
+  //ai-gen start (ChatGPT-3.5, 2)
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       {user ? (
