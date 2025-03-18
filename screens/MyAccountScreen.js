@@ -4,10 +4,12 @@ import { db } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { auth } from "../firebaseConfig";
 
+// MyAccountScreen component
 export default function MyAccountScreen({ navigation }) {
-    const [vehicles, setVehicles] = useState([]);
+    const [vehicles, setVehicles] = useState([]); // State to store user's vehicles
 
     useEffect(() => {
+        // Fetch vehicle information when the component mounts
         const fetchVehicleInfo = async () => {
             const user = auth.currentUser;
             if (user) {
@@ -19,17 +21,24 @@ export default function MyAccountScreen({ navigation }) {
                     const userVehicles = data.vehicles || [];
                     setVehicles(userVehicles);
 
+                    // Navigate to AddVehicle screen if no vehicles are found
                     if (userVehicles.length === 0) {
-                        navigation.navigate("AddVehicle");
+                        setTimeout(() => {
+                            navigation.navigate("AddVehicle");
+                        }, 1000); // 1 second delay
                     }
                 } else {
-                    navigation.navigate("AddVehicle");
+                    // Navigate to AddVehicle screen if no document is found
+                    setTimeout(() => {
+                        navigation.navigate("AddVehicle");
+                    }, 1000); // 1 second delay
                 }
             }
         };
         fetchVehicleInfo();
     }, [navigation]);
 
+    // Handle navigation to AddVehicle screen
     const handleAddAnotherVehicle = () => {
         navigation.navigate("AddVehicle");
     };

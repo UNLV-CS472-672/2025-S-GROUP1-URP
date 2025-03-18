@@ -4,11 +4,13 @@ import { db } from "../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { auth } from "../firebaseConfig";
 
+// RemoveVehicleScreen component
 export default function RemoveVehicleScreen({ route, navigation }) {
     const { vehicles } = route.params; // Retrieve vehicles from navigation parameters
-    const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const [selectedVehicle, setSelectedVehicle] = useState(null); // State to store selected vehicle
     const user = auth.currentUser;
 
+    // Handle vehicle removal
     const handleRemove = async () => {
         if (selectedVehicle && user) {
             try {

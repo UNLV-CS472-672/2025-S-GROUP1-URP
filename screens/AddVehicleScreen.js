@@ -4,12 +4,14 @@ import { db } from "../firebaseConfig";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth } from "../firebaseConfig";
 
+// AddVehicleScreen component
 export default function AddVehicleScreen({ navigation }) {
-    const [make, setMake] = useState("");
-    const [model, setModel] = useState("");
-    const [year, setYear] = useState("");
-    const [licensePlate, setLicensePlate] = useState("");
+    const [make, setMake] = useState(""); // State to store vehicle make
+    const [model, setModel] = useState(""); // State to store vehicle model
+    const [year, setYear] = useState(""); // State to store vehicle year
+    const [licensePlate, setLicensePlate] = useState(""); // State to store vehicle license plate
 
+    // Handle saving vehicle information
     const handleSave = async () => {
         const user = auth.currentUser;
         if (user) {
