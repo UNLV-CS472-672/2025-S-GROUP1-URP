@@ -4,7 +4,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import LoginScreen from "./LoginScreen";
+import LoginScreen from "./screens/LoginScreen";
+import ResetPasswordScreen from "./screens/ResetPasswordScreen";
+import SignUpScreen from "./screens/signUpScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
 import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
@@ -77,6 +79,8 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} /> 
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} /> 
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="My Account" component={MyAccountScreen} />
         <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} />
