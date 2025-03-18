@@ -12,10 +12,10 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Login successful!");
+      // Alert.alert("Login successful!");
       navigation.navigate("Home");
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Login failed", "Invalid email or password. Please try again.");
     }
   };
 
