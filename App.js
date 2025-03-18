@@ -9,6 +9,8 @@ import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
 import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
 import ReservationStatusScreen from "./screens/ReservationStatusScreen";
+import AddVehicleScreen from './screens/AddVehicleScreen';
+import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
 
 const Stack = createStackNavigator();
 
@@ -60,7 +62,7 @@ function CottageGroveParkingScreen() {
 }
 
 function GatewayParkingScreen() {
-  return <ParkingMap parkingLot="Gateway Parking" />;
+  return <ParkingMap parkingLot="Gateway Parking" />
 }
 
 
@@ -84,6 +86,8 @@ export default function App() {
         <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} />
         <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} />
         <Stack.Screen name="Report" component={ReportScreen} />
+        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} />
+        <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
