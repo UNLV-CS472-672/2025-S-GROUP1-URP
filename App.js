@@ -13,6 +13,7 @@ import ParkingMap from "./src/components/ParkingMap/ParkingMap";
 import ReservationStatusScreen from "./screens/ReservationStatusScreen";
 import AddVehicleScreen from './screens/AddVehicleScreen';
 import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
+import { Alert } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -34,12 +35,27 @@ function HomeScreen({ navigation }) {
         <>
           <Text>Welcome, {user.email}</Text>
           <Button
-            title="Logout"
-            onPress={() => {
-              signOut(auth);
-              navigation.navigate("Login");
-            }}
-          />
+  title="Logout"
+  onPress={() => {
+    Alert.alert(
+      "Confirm Logout", 
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes, Logout",
+          onPress: () => {
+            signOut(auth);
+            navigation.navigate("Login");
+          },
+        },
+      ]
+    );
+  }}
+/>
           <Button title="My Account" onPress={() => navigation.navigate("My Account")} />
           <Button title="Tropicana Parking" onPress={() => navigation.navigate("Tropicana Parking")} />
           <Button title="Cottage Grove Parking" onPress={() => navigation.navigate("Cottage Grove Parking")} />
