@@ -4,10 +4,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import LoginScreen from "./LoginScreen";
+import LoginScreen from "./screens/LoginScreen";
+import ResetPasswordScreen from "./screens/ResetPasswordScreen";
+import SignUpScreen from "./screens/signUpScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
 import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
+import ReservationStatusScreen from "./screens/ReservationStatusScreen";
+import AddVehicleScreen from './screens/AddVehicleScreen';
+import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
 
 const Stack = createStackNavigator();
 
@@ -39,6 +44,7 @@ function HomeScreen({ navigation }) {
           <Button title="Tropicana Parking" onPress={() => navigation.navigate("Tropicana Parking")} />
           <Button title="Cottage Grove Parking" onPress={() => navigation.navigate("Cottage Grove Parking")} />
           <Button title="Gateway Parking" onPress={() => navigation.navigate("Gateway Parking")} />
+          <Button title="Reservation Status" onPress={() => navigation.navigate("Reservation Status")} />
           <Button title="Report" onPress={() => navigation.navigate("Report")} />
         </>
       ) : (
@@ -58,7 +64,7 @@ function CottageGroveParkingScreen() {
 }
 
 function GatewayParkingScreen() {
-  return <ParkingMap parkingLot="Gateway Parking" />;
+  return <ParkingMap parkingLot="Gateway Parking" />
 }
 
 
@@ -75,12 +81,17 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} /> 
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} /> 
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="My Account" component={MyAccountScreen} />
         <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} />
         <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} />
         <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} />
+        <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} />
         <Stack.Screen name="Report" component={ReportScreen} />
+        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} />
+        <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
