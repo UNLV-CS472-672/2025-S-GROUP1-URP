@@ -14,6 +14,7 @@ import ReservationStatusScreen from "./screens/ReservationStatusScreen";
 import AddVehicleScreen from './screens/AddVehicleScreen';
 import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
 import { Alert } from "react-native";
+import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
 
 const Stack = createStackNavigator();
 
@@ -108,6 +109,7 @@ export default function App() {
         <Stack.Screen name="Report" component={ReportScreen} />
         <Stack.Screen name="AddVehicle" component={AddVehicleScreen} />
         <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} />
+        <Stack.Screen name="ReservationConfirmation" component={ReservationConfirmationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
