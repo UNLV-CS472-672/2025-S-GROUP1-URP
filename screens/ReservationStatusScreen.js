@@ -10,8 +10,8 @@ const ReservationStatusScreen = ({ navigation }) => {
       </View>
 
       {/* Back Button */}
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>Back</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} testID="backButton">
+      <Text style={styles.backButton}>Back</Text>
       </TouchableOpacity>
 
       {/* Parking Details */}
