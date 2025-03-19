@@ -1,7 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 const ReservationStatusScreen = ({ navigation }) => {
+
+  // NEW CODE: Timer State
+  const [timeLeft, setTimeLeft] = useState(3600); // Example: 1 hour in seconds
+
+  // NEW: Timer Countdown Logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  //NEW: Convert time to MM:SS format
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, "0")} : ${String(secs).padStart(2, "0")}`;
+  };
+
   return (
     <View style={styles.container}>
       {/* Title/Header Section */}
@@ -23,8 +43,14 @@ const ReservationStatusScreen = ({ navigation }) => {
       <View style={styles.infoBox}>
       </View>
 
-      {/* Timer Title (Without Timer Logic) */}
+      {/* Timer Title  */}
       <Text style={styles.timerLabel}>Reservation Timer:</Text>
+
+      {/* NEW: Timer Display */}
+      <View style={styles.timerBox}>
+        <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+        <Text style={styles.timerSubtext}>mins secs</Text>
+      </View>
 
       {/* Cancel Reservation Button */}
       <TouchableOpacity onPress={() => alert("Reservation Canceled")}>
@@ -80,10 +106,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   timerLabel: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 20,
+  },
+  timerBox: {
+    backgroundColor: "red",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginVertical: 10,
   },
   cancelButton: {
     color: "red",
@@ -91,6 +124,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     textDecorationLine: "underline",
+  },
+  timerText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "white",
+  },
+  timerSubtext: {
+    fontSize: 20,  
+    fontWeight: "bold",  
+    color: "white", 
   },
 });
 
