@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, Alert, StyleSheet } from "react-native";
+import { View, Text, Button, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { db } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { auth } from "../firebaseConfig";
@@ -67,13 +67,33 @@ export default function MyAccountScreen({ navigation }) {
                     <Text style={{ fontSize: 16, fontWeight: 'bold' }}>No vehicles found. Redirecting to add vehicle screen...</Text>
                 </View>
             )}
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home")}>
+                <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 20,
+        justifyContent: 'space-between', // Ensure the back button is at the bottom
+    },
+    backButton: {
+        width: "50%", // Half the width of the screen
+        backgroundColor: "#B0463C",
+        paddingVertical: 15,
+        alignItems: "center",
+        borderRadius: 5,
+        position: 'absolute',
+        bottom: 20, // Position it at the bottom
+        left: 20, // Position it at the left
+    },
+    backButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
     infoContainer: {
         marginBottom: 20,
