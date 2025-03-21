@@ -1,3 +1,18 @@
+/**
+ * ReservationStatusScreen Component
+ * 
+ * This screen displays the current reservation status for a parking spot.
+ * It includes details such as the parking garage, spot number, and a timer (placeholder).
+ * Users can also cancel their reservation from this screen.
+ * 
+ * Features:
+ * - Header with the title "Reservation Status".
+ * - Back button to navigate to the previous screen.
+ * - Placeholder sections for parking garage and spot number details.
+ * - Placeholder for a reservation timer (no logic implemented).
+ * - Cancel reservation button with an alert confirmation.
+ * 
+ */
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -34,7 +49,7 @@ const ReservationStatusScreen = ({ navigation }) => {
   );
 };
 
-// Styles for the screen
+// Styles for the ReservationStatusScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

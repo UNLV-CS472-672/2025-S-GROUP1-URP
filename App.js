@@ -1,3 +1,37 @@
+/**
+ * App Component
+ * 
+ * This is the main entry point for the UNLV Reserved Parking application.
+ * It sets up the navigation structure and integrates Firebase for user authentication.
+ * The app includes screens for login, sign-up, password reset, parking management, reporting, and account settings.
+ * 
+ * Features:
+ * - User authentication (login, sign-up, logout, password reset).
+ * - Navigation between screens using React Navigation.
+ * - Parking management with maps for Tropicana, Cottage Grove, and Gateway parking lots.
+ * - Reservation status tracking.
+ * - Reporting functionality for parking violations.
+ * - Account management for adding/removing vehicles.
+ * 
+ * Dependencies:
+ * - React Navigation for screen transitions.
+ * - Firebase Authentication for user management.
+ * - Firebase Firestore for storing user and vehicle data.
+ * 
+ * Screens:
+ * - LoginScreen: Handles user login.
+ * - SignUpScreen: Handles user registration.
+ * - ResetPasswordScreen: Allows users to reset their password.
+ * - HomeScreen: Displays the main dashboard with navigation options.
+ * - MyAccountScreen: Manages user account and vehicle information.
+ * - TropicanaScreen, CottageGroveParkingScreen, GatewayParkingScreen: Displays parking maps for respective lots.
+ * - ReservationStatusScreen: Shows the status of the user's reservation.
+ * - ReportScreen: Allows users to report parking violations.
+ * - AddVehicleScreen: Adds a vehicle to the user's account.
+ * - RemoveVehicleScreen: Removes a vehicle from the user's account.
+ */
+
+
 // React imports for managing state and effects
 import React, { useState, useEffect } from "react";
 
@@ -26,7 +60,13 @@ import RemoveVehicleScreen from "./screens/RemoveVehicleScreen"; // Remove vehic
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator();
 
-// HomeScreen component, displays user dashboard and login/logout
+/**
+ * HomeScreen Component
+ * 
+ * Displays the user dashboard if authenticated, otherwise shows the login screen.
+ * 
+ * @param {Object} navigation - React Navigation prop for navigating between screens.
+ */
 function HomeScreen({ navigation }) {
   const [user, setUser] = useState(null); // State to track user authentication status
 
@@ -138,41 +178,45 @@ export default function App() {
   );
 }
 
-// Styles for the UI components
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white", // White background for the main container
     alignItems: "center",
-    paddingTop: 40,
+    justifyContent: "flex-start", // Align items to the top
+    margin: 0, // Remove margin to allow full-width header
   },
   header: {
-    fontSize: 22,
+    fontSize: 25, // Larger font size
     fontWeight: "bold",
-    color: "white", // White text color for the header
+    color: "white", 
     textAlign: "center",
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "#B0463C", // Red background for the header
-    borderRadius: 10, // Optional: rounded corners for the header box
-    textShadowColor: "black", // Black text shadow for an outline effect
-    textShadowOffset: { width: 2, height: 2 }, // Shadow direction
-    textShadowRadius: 3, // Spread radius for the shadow
+    padding: 20, // Padding inside the header
+    backgroundColor: "#CC0000", 
+    width: "100%", // Span the entire width of the screen
+    textShadowColor: "black", 
+    textShadowOffset: { width: 2, height: 2 }, 
+    textShadowRadius: 3, 
+    height: 100, // Fixed height for the header
+    justifyContent: "center", // Center text vertically
+    alignItems: "center", // Center text horizontally
   },
   welcomeText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "white", 
+    color: "black", 
     marginBottom: 10,
   },
   buttonContainer: {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+    padding: 20, // Add padding to the button container
   },
   button: {
-    backgroundColor: "#B0463C",
+    backgroundColor: "#CC0000",
     paddingVertical: 15,
+    borderColor: "black",
+    borderWidth: 3,
     width: 250,
     alignItems: "center",
     borderRadius: 10,
@@ -184,6 +228,6 @@ const styles = StyleSheet.create({
     color: "white", 
   },
   logoutButton: {
-    backgroundColor: "#B0463C", 
+    backgroundColor: "#CC0000", 
   },
 });

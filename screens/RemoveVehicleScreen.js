@@ -1,3 +1,17 @@
+/**
+ * RemoveVehicleScreen Component
+ * 
+ * This screen allows users to remove a vehicle from their account.
+ * Users can select a vehicle from a list, confirm the removal, and update the Firestore database.
+ * 
+ * Features:
+ * - Displays a list of vehicles associated with the user.
+ * - Allows the user to select a vehicle for removal.
+ * - Confirmation dialog to confirm the removal.
+ * - Updates Firestore with the updated list of vehicles after removal.
+ * 
+ */
+
 import React, { useState } from "react";
 import { View, Text, Button, Alert, StyleSheet } from "react-native";
 import { db } from "../firebaseConfig";
@@ -10,6 +24,13 @@ export default function RemoveVehicleScreen({ route, navigation }) {
     const [selectedVehicle, setSelectedVehicle] = useState(null); // State to store selected vehicle
     const user = auth.currentUser;
 
+    /**
+     * handleRemove Function
+     * 
+     * Removes the selected vehicle from the user's vehicle list in Firestore.
+     * Displays a success message if the removal is successful, or an error message if it fails.
+     * Navigates back to the "My Account" screen after successful removal.
+     */
     // Handle vehicle removal
     const handleRemove = async () => {
         if (selectedVehicle && user) {
@@ -54,7 +75,7 @@ export default function RemoveVehicleScreen({ route, navigation }) {
         </View>
     );
 }
-
+// Styles for the RemoveVehicleScreen component
 const styles = StyleSheet.create({
     container: {
         padding: 20,
