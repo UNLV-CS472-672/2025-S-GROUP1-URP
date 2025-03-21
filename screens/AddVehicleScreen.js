@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { db } from "../firebaseConfig";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth } from "../firebaseConfig";
@@ -41,41 +41,51 @@ export default function AddVehicleScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Enter the car information that you would like to register with UNLV Reserve Parking:</Text>
-            <Text></Text>
-            <TextInput
-                placeholder="Make"
-                value={make}
-                onChangeText={setMake}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Model"
-                value={model}
-                onChangeText={setModel}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Year"
-                value={year}
-                onChangeText={setYear}
-                style={styles.input}
-                keyboardType="numeric"
-            />
-            <TextInput
-                placeholder="License Plate"
-                value={licensePlate}
-                onChangeText={setLicensePlate}
-                style={styles.input}
-            />
-            <Button title="Save" onPress={handleSave} color="red" />
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Enter the car information that you would like to register with UNLV Reserve Parking:</Text>
+                <Text></Text>
+                <TextInput
+                    placeholder="Make"
+                    value={make}
+                    onChangeText={setMake}
+                    style={styles.input}
+                />
+                <TextInput
+                    placeholder="Model"
+                    value={model}
+                    onChangeText={setModel}
+                    style={styles.input}
+                />
+                <TextInput
+                    placeholder="Year"
+                    value={year}
+                    onChangeText={setYear}
+                    style={styles.input}
+                    keyboardType="numeric"
+                />
+                <TextInput
+                    placeholder="License Plate"
+                    value={licensePlate}
+                    onChangeText={setLicensePlate}
+                    style={styles.input}
+                />
+                <Button title="Save" onPress={handleSave} color="red" />
+            </ScrollView>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("My Account")}>
+                <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 20,
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'flex-start', // Align content to the top
     },
     input: {
         height: 40,
@@ -83,5 +93,20 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 20,
         paddingHorizontal: 10,
+    },
+    backButton: {
+        width: "50%", // Half the width of the screen
+        backgroundColor: "#B0463C",
+        paddingVertical: 15,
+        alignItems: "center",
+        borderRadius: 5,
+        position: 'absolute',
+        bottom: 20, // Position it at the bottom
+        left: 20, // Position it at the left
+    },
+    backButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
