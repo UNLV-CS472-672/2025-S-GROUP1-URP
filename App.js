@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     margin: 0, // Remove margin to allow full-width header
   },
   header: {
-    fontSize: 25, // Larger font size
+    fontSize: 26, // Larger font size
     fontWeight: "bold",
     color: "white", 
     textAlign: "center",

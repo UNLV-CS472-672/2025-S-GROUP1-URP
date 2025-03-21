@@ -41,7 +41,7 @@ const SignUpScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.header}>Sign Up</Text>
+      <Text style={styles.header}>UNLV Reserved Parking{"\n"}Create an Account</Text>
 
       {/* Email Input Field */}
       <Text style={styles.label}>Email</Text>
@@ -77,7 +77,7 @@ const SignUpScreen = ({ navigation }) => {
   );
 };
 
-// Styles for the SignUpScreen component
+// Styles for SignUpScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -87,29 +87,61 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    fontSize: 24,
-    fontWeight: "bold",
+    width: "100%",
+    backgroundColor: "#CC0000",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
     marginBottom: 20,
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+    textShadowColor: "black",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  headerText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+    textShadowColor: "black",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   label: {
     alignSelf: "flex-start",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
   },
   input: {
     width: "100%",
     backgroundColor: "#d3d3d3",
-    padding: 10,
+    padding: 12,
     borderRadius: 5,
     marginBottom: 15,
   },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+    width: "100%",
+  },
+  checkboxText: {
+    fontSize: 14,
+    marginLeft: 5,
+    flexShrink: 1, // Ensure text wraps correctly
+  },
   button: {
     width: "100%",
-    backgroundColor: "#B0463C",
-    paddingVertical: 15,
+    backgroundColor: "#CC0000",
+    paddingVertical: 12,
     alignItems: "center",
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#000", // Border to match the image
     marginBottom: 10,
   },
   buttonText: {
@@ -117,12 +149,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  backText: {
-    color: "red",
-    fontSize: 14,
+  signInContainer: {
+    flexDirection: "row",
     marginTop: 10,
+  },
+  signInText: {
+    fontSize: 14,
+  },
+  signInLink: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "red",
   },
 });
 
 export default SignUpScreen;
-
