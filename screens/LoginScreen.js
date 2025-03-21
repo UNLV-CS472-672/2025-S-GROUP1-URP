@@ -2,7 +2,15 @@ import { useState } from "react";
 import { View, TextInput, Text, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
-
+/**
+ * LoginScreen Component
+ * 
+ * This component provides a user interface for logging into the application.
+ * It includes input fields for email and password, a login button, and navigation options
+ * for signing up or resetting a forgotten password.
+ * 
+ * @param {Object} navigation - React Navigation prop used to navigate between screens.
+ */
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -76,7 +84,7 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    backgroundColor: "#B0463C",
+    backgroundColor: "#CC0000",
     paddingVertical: 20,
     alignItems: "center",
     marginBottom: 30,
@@ -85,6 +93,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
+    textShadowColor: "black", 
+    textShadowOffset: { width: 2, height: 2 }, 
+    textShadowRadius: 3, 
   },
   label: {
     alignSelf: "flex-start",
@@ -112,7 +123,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   showPassword: {
-    color: "#B0463C",
+    color: "#CC0000",
     fontWeight: "bold",
   },
   signupText: {
@@ -121,7 +132,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    backgroundColor: "#B0463C",
+    backgroundColor: "#CC0000",
     paddingVertical: 15,
     alignItems: "center",
     borderRadius: 5,

@@ -1,3 +1,20 @@
+/**
+ * ReportScreen Component
+ * 
+ * This screen allows users to report a parking violation by providing details about the vehicle.
+ * The submitted report is stored in Firestore, and the logged-in user's ID and a timestamp are automatically included.
+ * 
+ * Features:
+ * - Header with the title "Report Violation".
+ * - Input fields for license plate number, vehicle color, make/model, and optional comments.
+ * - Validation to ensure required fields are filled.
+ * - Submission to Firestore with user ID and timestamp.
+ * - Success or error alerts based on the submission result.
+ * 
+ * Dependencies:
+ * - Firebase Firestore for storing reports.
+ * - Firebase Authentication for identifying the logged-in user.
+ */
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Button, Alert, TouchableOpacity } from "react-native";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // Import serverTimestamp
@@ -9,6 +26,14 @@ export default function ReportScreen({ navigation }) {
   const [makeModel, setMakeModel] = useState("");
   const [comments, setComments] = useState("");
 
+  /**
+   * handleSubmit Function
+   * 
+   * Validates the input fields and submits the report to Firestore.
+   * Includes the logged-in user's ID and a timestamp automatically.
+   * Displays success or error alerts based on the submission result.
+   */
+  
   const handleSubmit = async () => {
     if (!licensePlate || !color || !makeModel) {
       Alert.alert("Error", "Please fill in all required fields.");

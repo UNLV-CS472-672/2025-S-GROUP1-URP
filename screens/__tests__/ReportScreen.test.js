@@ -59,3 +59,4 @@ describe("<ReportScreen />", () => {
     expect(mockNavigation.navigate).toHaveBeenCalledWith("Home");
   });
 });
+
