@@ -1,65 +1,62 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import RemoveVehicleScreen from "../RemoveVehicleScreen";
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
+import ReportScreen from "../ReportScreen";
 
-// Mock Firebase auth and Firestore
-jest.mock("firebase/firestore", () => {
-    return {
-        doc: jest.fn(),
-        setDoc: jest.fn(() => Promise.resolve()),
-    };
-});
-
-jest.mock("../../firebaseConfig", () => ({
-    auth: { currentUser: { email: "test@example.com", uid: "12345" } },
-    db: {},
+// Mock Firebase dependencies
+jest.mock("firebase/firestore", () => ({
+  collection: jest.fn(),
+  addDoc: jest.fn(() => Promise.resolve()),
+  serverTimestamp: jest.fn(() => "mockedTimestamp"),
 }));
 
-describe("<RemoveVehicleScreen />", () => {
-    const mockNavigation = { navigate: jest.fn() };
-    const mockRoute = {
-        params: {
-            vehicles: [
-                { make: "Toyota", model: "Camry", year: "2022", licensePlate: "XYZ123" },
-                { make: "Honda", model: "Civic", year: "2021", licensePlate: "ABC789" },
-            ],
-        },
-    };
+jest.mock("../../firebaseConfig", () => ({
+  auth: { currentUser: { uid: "12345" } },
+  db: {},
+}));
 
-    test("Displays list of vehicles", async () => {
-        const { findByText } = render(
-            <RemoveVehicleScreen route={mockRoute} navigation={mockNavigation} />
-        );
+// Mock Alert.alert
+import { Alert } from "react-native";
+jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
-        await findByText("Make: Toyota");
-        await findByText("Make: Honda");
+describe("<ReportScreen />", () => {
+  const mockNavigation = { navigate: jest.fn() };
+
+  it("displays validation alert when required fields are missing", async () => {
+    const { getByText } = render(<ReportScreen navigation={mockNavigation} />);
+    const submitButton = getByText("Submit Report");
+
+    fireEvent.press(submitButton);
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith("Error", "Please fill in all required fields.");
+    });
+  });
+
+  it("submits the report when all required fields are filled", async () => {
+    const { getByPlaceholderText, getByText } = render(<ReportScreen navigation={mockNavigation} />);
+    
+    fireEvent.changeText(getByPlaceholderText("Enter license plate"), "ABC123");
+    fireEvent.changeText(getByPlaceholderText("Enter vehicle color"), "Blue");
+    fireEvent.changeText(getByPlaceholderText("Enter vehicle make and model"), "Honda Civic");
+    fireEvent.changeText(getByPlaceholderText("Additional comments (optional)"), "Parked illegally.");
+
+    const submitButton = getByText("Submit Report");
+    await act(async () => {
+      fireEvent.press(submitButton);
     });
 
-    test("Selects a vehicle and confirms removal", async () => {
-        const { getAllByText, getByText } = render(
-            <RemoveVehicleScreen route={mockRoute} navigation={mockNavigation} />
-        );
-
-        const selectButtons = getAllByText("Select");
-        fireEvent.press(selectButtons[0]);
-
-        const confirmButton = getByText("Confirm");
-        fireEvent.press(confirmButton);
-
-        await waitFor(() => expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account"));
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith("Success", "Report submitted successfully!");
     });
+  });
 
-    test("Cancels vehicle removal", async () => {
-        const { getAllByText, getByText } = render(
-            <RemoveVehicleScreen route={mockRoute} navigation={mockNavigation} />
-        );
+  it("navigates to Home when Back button is pressed", () => {
+    const { getByText } = render(<ReportScreen navigation={mockNavigation} />);
+    const backButton = getByText("Back");
 
-        const selectButtons = getAllByText("Select");
-        fireEvent.press(selectButtons[0]);
+    fireEvent.press(backButton);
 
-        const cancelButton = getByText("Cancel");
-        fireEvent.press(cancelButton);
-
-        expect(getAllByText("Select").length).toBeGreaterThan(0); // Ensure selection remains possible
-    });
+    expect(mockNavigation.navigate).toHaveBeenCalledWith("Home");
+  });
 });
+
