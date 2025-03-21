@@ -16,11 +16,11 @@
  * - Firebase Authentication for identifying the logged-in user.
  */
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, Alert, TouchableOpacity } from "react-native";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // Import serverTimestamp
 import { db, auth } from "../firebaseConfig"; // Import Firestore and Auth
 
-export default function ReportScreen() {
+export default function ReportScreen({ navigation }) {
   const [licensePlate, setLicensePlate] = useState("");
   const [color, setColor] = useState("");
   const [makeModel, setMakeModel] = useState("");
@@ -67,7 +67,6 @@ export default function ReportScreen() {
     }
   };
 
-
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -77,43 +76,44 @@ export default function ReportScreen() {
 
       {/* Main Content */}
       <View style={styles.content}>
-         {/* Vehicle Number Section */}
-         <Text style={styles.label}>License Plate Number:</Text>
+        {/* Vehicle Number Section */}
+        <Text style={styles.label}>License Plate Number:</Text>
 
         {/* License Plate # input Section */}
-         <TextInput 
+        <TextInput 
           style={styles.input}
           placeholder="Enter license plate"
           value={licensePlate}
           onChangeText={setLicensePlate}
         />
 
-         {/* Vehicle Color Section */}
-         <Text style={styles.label}>Color:</Text>
+        {/* Vehicle Color Section */}
+        <Text style={styles.label}>Color:</Text>
 
-        {/* Vechicle Color input Section */}
-         <TextInput 
+        {/* Vehicle Color input Section */}
+        <TextInput 
           style={styles.input}
           placeholder="Enter vehicle color"
           value={color}
           onChangeText={setColor}
         />
 
-         {/* Make/Model Section */}
-         <Text style={styles.label}>Make/Model:</Text>
+        {/* Make/Model Section */}
+        <Text style={styles.label}>Make/Model:</Text>
 
-        {/* Make/Model Section input*/}
-         <TextInput 
+        {/* Make/Model Section input */}
+        <TextInput 
           style={styles.input}
           placeholder="Enter vehicle make and model"
           value={makeModel}
           onChangeText={setMakeModel}
         />
-         {/* Comments Section*/}
-         <Text style={styles.label}>Comments:</Text>
 
-        {/* Comments input*/}
-         <TextInput 
+        {/* Comments Section */}
+        <Text style={styles.label}>Comments:</Text>
+
+        {/* Comments input */}
+        <TextInput 
           style={[styles.input, styles.commentInput]}
           placeholder="Additional comments (optional)"
           value={comments}
@@ -123,11 +123,14 @@ export default function ReportScreen() {
 
         <Button title="Submit Report" onPress={handleSubmit} color="red" />
       </View>
+
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
     </View>
   );
 }
-
-// the following is the title for report page
 
 const styles = StyleSheet.create({
   container: {
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 3, height: 1 }, // Offset to create the outline
     textShadowRadius: 10, // Controls the thickness of the outline
   },
-   content: {
+  content: {
     flex: 1,
     padding: 20,
   },
@@ -172,5 +175,20 @@ const styles = StyleSheet.create({
   commentInput: {
     height: 80,
     textAlignVertical: "top",
+  },
+  backButton: {
+    width: "50%", // Half the width of the screen
+    backgroundColor: "#B0463C",
+    paddingVertical: 15,
+    alignItems: "center",
+    borderRadius: 5,
+    position: 'absolute',
+    bottom: 20, // Position it at the bottom
+    left: 20, // Position it at the left
+  },
+  backButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

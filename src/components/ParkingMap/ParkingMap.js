@@ -1,13 +1,16 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import Svg, { Rect, Text as SvgText } from "react-native-svg";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
 
 const ParkingMap = ({ parkingLot }) => {
+  const navigation = useNavigation(); // Get navigation context
+
   // Sample parking data (Replace with dynamic data later)
   const parkingSpaces = [
-    { id: 1, status: "open" }, // Green
-    { id: 2, status: "occupied" }, // Red
-    { id: 3, status: "reserved" }, // Yellow
+    { id: 1, status: "open" },
+    { id: 2, status: "occupied" },
+    { id: 3, status: "reserved" },
     { id: 4, status: "occupied" },
     { id: 5, status: "occupied" },
     { id: 6, status: "open" },
@@ -27,21 +30,19 @@ const ParkingMap = ({ parkingLot }) => {
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>
-        {parkingLot}
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>{parkingLot}</Text>
 
       {/* Parking Key */}
-      <View style={{ flexDirection: "row", marginBottom: 10 }}>
-        <Text style={{ textShadowColor: 'black', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 3, color: "green", marginRight: 10 }}>🟩 Open</Text>
-        <Text style={{ textShadowColor: 'black', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 3, color: "yellow", marginRight: 10 }}>🟨 Reserved</Text>
-        <Text style={{ textShadowColor: 'black', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 3, color: "red" }}>🟥 Occupied</Text>
+      <View style={styles.keyContainer}>
+        <Text style={[styles.keyText, { color: "green" }]}>🟩 Open</Text>
+        <Text style={[styles.keyText, { color: "yellow" }]}>🟨 Reserved</Text>
+        <Text style={[styles.keyText, { color: "red" }]}>🟥 Occupied</Text>
       </View>
 
       {/* SVG Parking Lot Map */}
       <ScrollView vertical>
-        <ScrollView>
+        <ScrollView horizontal>
           <Svg height="1000" viewBox="0 0 300 1000">
             {/* Background */}
             <Rect x="0" y="0" width="300" height="1000" fill="lightgray" />
@@ -63,7 +64,7 @@ const ParkingMap = ({ parkingLot }) => {
             {/* Parking Labels */}
             {parkingSpaces.map((space, i) => (
               <SvgText
-                key={space.id}
+                key={`label-${space.id}`}
                 x="150"
                 y={i * 60 + 90}
                 fontSize="20"
@@ -78,16 +79,70 @@ const ParkingMap = ({ parkingLot }) => {
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={{ flexDirection: "row", marginTop: 20 }}>
-        {/* <TouchableOpacity style={{ backgroundColor: "blue", padding: 10, margin: 5, borderRadius: 5 }}>
-          <Text style={{ color: "white" }}>Back</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity style={{ backgroundColor: "red", padding: 10, margin: 5, borderRadius: 5 }}>
-          <Text style={{ color: "white" }}>Reserve</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home")}>
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.reserveButton}>
+          <Text style={styles.reserveButtonText}>Reserve</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "space-between",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  keyContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+    justifyContent: "center",
+  },
+  keyText: {
+    textShadowColor: "black",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 3,
+    marginRight: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  backButton: {
+    width: "45%",
+    backgroundColor: "#B0463C",
+    paddingVertical: 15,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  backButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  reserveButton: {
+    width: "45%",
+    backgroundColor: "red",
+    paddingVertical: 15,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  reserveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
 
 export default ParkingMap;
