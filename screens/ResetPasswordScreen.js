@@ -1,3 +1,15 @@
+/**
+ * ResetPasswordScreen Component
+ * 
+ * This screen allows users to reset their password by entering their email address.
+ * It uses Firebase Authentication to send a password reset email to the provided email address.
+ * 
+ * Features:
+ * - Input field for the user's email.
+ * - Button to trigger the password reset process.
+ * - Navigation option to go back to the login screen.
+ * 
+ */
 import { useState } from "react";
 import { View, TextInput, Text, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import { sendPasswordResetEmail } from "firebase/auth";
@@ -18,8 +30,12 @@ const ResetPasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Reset Password</Text>
+      {/* Header with red box */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>UNLV Reserved Parking{"\n"}Reset Password</Text>
+      </View>
 
+      {/* Email Input Field */}
       <Text style={styles.label}>Enter your email</Text>
       <TextInput
         value={email}
@@ -30,18 +46,15 @@ const ResetPasswordScreen = ({ navigation }) => {
         style={styles.input}
       />
 
+      {/* Button to Send Reset Email */}
       <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
         <Text style={styles.buttonText}>Send Reset Email</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>Back to Login</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-// Styles
+// Styles for ResetPasswordScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -51,9 +64,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    fontSize: 24,
+    width: "100%",
+    backgroundColor: "#CC0000",
+    paddingVertical: 20,
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  headerText: {
+    color: "#fff",
+    fontSize: 25,
     fontWeight: "bold",
-    marginBottom: 20,
+    textShadowColor: "black",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+    alignContent: "center",
+    justifyContent: "center",
+    textAlign: "center", 
   },
   label: {
     alignSelf: "flex-start",
@@ -70,7 +96,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    backgroundColor: "#B0463C",
+    backgroundColor: "#CC0000",
     paddingVertical: 15,
     alignItems: "center",
     borderRadius: 5,
@@ -80,11 +106,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  backText: {
-    color: "red",
-    fontSize: 14,
-    marginTop: 10,
   },
 });
 
