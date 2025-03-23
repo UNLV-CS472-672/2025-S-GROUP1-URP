@@ -14,8 +14,8 @@
  * 
  */
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 
 export default function ReservationStatusScreen({ navigation }) {
@@ -38,12 +38,12 @@ export default function ReservationStatusScreen({ navigation }) {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          const resData = querySnapshot.docs[0].data();
-          setReservation(resData);
+          const resDoc = querySnapshot.docs[0];
+          const resData = resDoc.data();
+          setReservation({ id: resDoc.id, ...resData });
 
-          // Calculate the countdown timer
-          const startTime = resData.startTime.toDate(); // Convert Firestore timestamp to Date
-          const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
+          const startTime = resData.startTime.toDate();
+          const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
           updateTimer(endTime);
         } else {
           setReservation(null);
@@ -57,7 +57,6 @@ export default function ReservationStatusScreen({ navigation }) {
     fetchReservation();
   }, []);
 
-  // Timer updater
   useEffect(() => {
     if (!reservation) return;
     const interval = setInterval(() => {
@@ -73,13 +72,33 @@ export default function ReservationStatusScreen({ navigation }) {
     const now = new Date();
     const diff = endTime - now;
     if (diff <= 0) {
-      setTimeLeft(null);
-      setReservation(null);
+      setTimeLeft({ minutes: 0, seconds: 0, expired: true });
     } else {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setTimeLeft({ minutes, seconds });
+      setTimeLeft({ minutes, seconds, expired: false });
     }
+  };
+
+  const handleCancel = async () => {
+    Alert.alert(
+      "Cancel Reservation",
+      "Are you sure you want to cancel your reservation?",
+      [
+        { text: "No", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, "Reservations", reservation.id));
+              setReservation(null);
+            } catch (error) {
+              console.error("Error canceling reservation:", error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -103,16 +122,14 @@ export default function ReservationStatusScreen({ navigation }) {
           <View style={styles.inputBox}><Text>{reservation.spotId}</Text></View>
 
           <Text style={styles.timerLabel}>Reservation Timer:</Text>
-          {timeLeft ? (
-            <View style={styles.timerBox}>
-              <Text style={styles.timerText}>{timeLeft.minutes} : {timeLeft.seconds}</Text>
-              <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
-            </View>
-          ) : (
-            <Text style={styles.expiredText}>Reservation expired</Text>
-          )}
+          <View style={[styles.timerBox, timeLeft?.expired && styles.expiredTimerBox]}>
+            <Text style={[styles.timerText, timeLeft?.expired && styles.expiredTimerText]}>
+              {timeLeft.minutes} : {timeLeft.seconds}
+            </Text>
+            <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
+          </View>
 
-          <TouchableOpacity style={styles.cancelButton} onPress={() => setReservation(null)}>
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
             <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
           </TouchableOpacity>
         </>
@@ -181,19 +198,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
+  expiredTimerBox: {
+    backgroundColor: "red",
+  },
   timerText: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
   },
+  expiredTimerText: {
+    color: "yellow",
+  },
   dateText: {
     color: "white",
     marginTop: 5,
-  },
-  expiredText: {
-    fontSize: 16,
-    color: "red",
-    marginTop: 10,
   },
   cancelButton: {
     marginTop: 20,
