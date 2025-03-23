@@ -1,206 +1,295 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  Dimensions,
+} from "react-native";
 import Svg, { Rect, Text as SvgText, Image as SvgImage } from "react-native-svg";
 import carIcon from "../../../assets/car_icon.png";
-import { useNavigation } from "@react-navigation/native"; // Import navigation
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  setDoc,
+  Timestamp,
+  collection,
+  onSnapshot,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { useNavigation } from "@react-navigation/native";
 
-const ParkingMap = ({ parkingLot }) => {
-    const navigation = useNavigation(); // Initialize navigation
+// Firebase setup
+const db = getFirestore();
+const auth = getAuth();
+const screenWidth = Dimensions.get("window").width;
 
-    // Sample parking data (Replace with dynamic data later)
-    const parkingSpaces = [
-        { id: 1, status: "open" },
-        { id: 2, status: "occupied" },
-        { id: 3, status: "reserved" },
-        { id: 4, status: "occupied" },
-        { id: 5, status: "occupied" },
-        { id: 6, status: "open" },
-        { id: 7, status: "open" },
-        { id: 8, status: "open" },
-        { id: 9, status: "occupied" },
-        { id: 10, status: "open" },
-        { id: 11, status: "reserved" },
-        { id: 12, status: "open" },
-    ];
+const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
+  const navigation = useNavigation();
+  const [selectedSpot, setSelectedSpot] = useState(null);
+  const [parkingSpaces, setParkingSpaces] = useState([]);
 
-    // Color map for different parking statuses
-    const statusColors = {
-        open: "green",
-        occupied: "red",
-        reserved: "yellow",
-    };
+  const statusColors = {
+    available: "green",
+    held: "yellow",
+    occupied: "red",
+  };
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>{parkingLot}</Text>
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "parkingSpotsTrop"),
+      async (snapshot) => {
+        const now = Timestamp.now();
+        const spots = [];
 
-            {/* Parking Key */}
-            <View style={styles.legendContainer}>
-                <View style={styles.legendItem}>
-                    <View style={[styles.legendBox, { backgroundColor: "green" }]} />
-                    <Text style={styles.legendText}>Open</Text>
-                </View>
-                <View style={styles.legendItem}>
-                    <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
-                    <Text style={styles.legendText}>Reserved</Text>
-                </View>
-                <View style={styles.legendItem}>
-                    <View style={[styles.legendBox, { backgroundColor: "red" }]} />
-                    <Text style={styles.legendText}>Occupied</Text>
-                </View>
-            </View>
+        for (const docSnap of snapshot.docs) {
+          const spot = { id: docSnap.id, ...docSnap.data() };
 
-            {/* SVG Parking Lot Map */}
-            <ScrollView vertical>
-                <ScrollView horizontal>
-                    <Svg height="600" width="300" viewBox="0 0 300 600">
-                        {/* Background */}
-                        <Rect x="0" y="0" width="300" height="600" fill="lightgray" />
+          // Auto-release if hold expired
+          if (
+            spot.status === "held" &&
+            spot.holdExpiresAt &&
+            spot.holdExpiresAt.toMillis() < now.toMillis()
+          ) {
+            await updateDoc(doc(db, "parkingSpotsTrop", spot.id), {
+              status: "available",
+              heldBy: "",
+              holdExpiresAt: null,
+            });
 
-                        {/* Parking Spaces - Two Columns */}
-                        {parkingSpaces.map((space, i) => {
-                            const col = i % 2; // Left (0) or Right (1) column
-                            const row = Math.floor(i / 2); // Position in row
-                            const xPos = col === 0 ? 30 : 160; // Adjust X position for columns
-                            const yPos = row * 60 + 40; // Adjust Y position
+            // Update in local UI too
+            spot.status = "available";
+            spot.heldBy = "";
+            spot.holdExpiresAt = null;
+          }
 
-                            return (
-                                <React.Fragment key={space.id}>
-                                    {/* Parking Spot */}
-                                    <Rect
-                                        x={xPos}
-                                        y={yPos}
-                                        width="100"
-                                        height="50"
-                                        fill={statusColors[space.status]}
-                                        stroke="black"
-                                        strokeWidth="2"
-                                        rx="5"
-                                        ry="5"
-                                    />
-                                    {/* Parking Spot Label */}
-                                    <SvgText
-                                        x={xPos + 50}
-                                        y={yPos + 30}
-                                        fontSize="18"
-                                        fill="black"
-                                        textAnchor="middle"
-                                        fontWeight="bold"
-                                    >
-                                        {space.id}
-                                    </SvgText>
-                                    {/* Add a car image to occupied spots */}
-                                    {space.status === "occupied" && (
-                                        <SvgImage
-                                            x={xPos + 10}
-                                            y={yPos + 5}
-                                            width="80"
-                                            height="40"
-                                            href={carIcon} // Use imported image
-                                        />
-                                    )}
-                                </React.Fragment>
-                            );
-                        })}
-                    </Svg>
-                </ScrollView>
-            </ScrollView>
+          spots.push(spot);
+        }
 
-            {/* Availability Section */}
-            <View style={styles.availabilityContainer}>
-                <Text style={styles.availabilityText}>Availability:</Text>
-                <Text style={styles.availabilityDetail}>13 Reserved</Text>
-                <Text style={styles.availabilityDetail}>2 Open</Text>
-                <Text style={styles.availabilityDetail}>28,721 Occupied</Text>
-            </View>
-
-            {/* Steps for Reserving a Spot */}
-            <View style={styles.stepsContainer}>
-                <Text style={styles.stepsTitle}>Steps:</Text>
-                <Text style={styles.stepsText}>1. Click on an available green spot</Text>
-                <Text style={styles.stepsText}>
-                    2. Hit the reserve button after selecting
-                </Text>
-                <Text style={styles.stepsText}>3. Arrive within an hour</Text>
-            </View>
-
-            {/* Reserve Button with Navigation to Confirmation Screen */}
-            <TouchableOpacity
-                style={styles.reserveButton}
-                onPress={() => navigation.navigate("ReservationConfirmation")}
-            >
-                <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
-            </TouchableOpacity>
-        </View>
+        // Sort by parking spot location
+        setParkingSpaces(spots.sort((a, b) => a.location - b.location));
+      }
     );
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleReserve = async () => {
+    if (selectedSpot === null) {
+      Alert.alert("No spot selected", "Please select an available spot.");
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Not signed in", "Please log in to reserve a spot.");
+        return;
+      }
+
+      const spotDocRef = doc(db, "parkingSpotsTrop", selectedSpot);
+      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
+      const now = Timestamp.now();
+      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000)); // 2 minutes
+
+      await updateDoc(spotDocRef, {
+        status: "held",
+        heldBy: user.uid,
+        holdExpiresAt: holdExpires,
+      });
+
+      await setDoc(doc(db, "Reservations", reservationId), {
+        userID: user.uid,
+        spotId: selectedSpot,
+        status: "held",
+        startTime: now,
+        endTime: holdExpires,
+        createdAt: now,
+      });
+
+      Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
+      setSelectedSpot(null);
+    } catch (err) {
+      console.error("Reservation error:", err);
+      Alert.alert("Error", "Failed to reserve spot.");
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{parkingLot}</Text>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Legend */}
+        <View style={styles.legendContainer}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "green" }]} />
+            <Text style={styles.legendText}>Open</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
+            <Text style={styles.legendText}>Reserved</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "red" }]} />
+            <Text style={styles.legendText}>Occupied</Text>
+          </View>
+        </View>
+
+        {/* SVG Map */}
+        <View style={styles.mapWrapper}>
+          <Svg height="400" width="300" viewBox="0 0 300 400">
+            <Rect x="0" y="0" width="300" height="400" fill="lightgray" />
+            {parkingSpaces.map((space, index) => {
+              const col = index % 2;
+              const row = Math.floor(index / 2);
+              const xPos = col === 0 ? 30 : 160;
+              const yPos = row * 60 + 40;
+              const isSelected = selectedSpot === space.id;
+
+              return (
+                <React.Fragment key={space.id}>
+                  <Rect
+                    x={xPos}
+                    y={yPos}
+                    width="100"
+                    height="50"
+                    fill={isSelected ? "blue" : statusColors[space.status]}
+                    stroke="black"
+                    strokeWidth="2"
+                    rx="5"
+                    ry="5"
+                  />
+                  <SvgText
+                    x={xPos + 50}
+                    y={yPos + 30}
+                    fontSize="18"
+                    fill="black"
+                    textAnchor="middle"
+                    fontWeight="bold"
+                  >
+                    {space.location}
+                  </SvgText>
+                  {space.status === "occupied" && (
+                    <SvgImage
+                      x={xPos + 10}
+                      y={yPos + 5}
+                      width="80"
+                      height="40"
+                      href={carIcon}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </Svg>
+
+          {/* Touchable overlays for available spots */}
+          {parkingSpaces.map((space, index) => {
+            const col = index % 2;
+            const row = Math.floor(index / 2);
+            const xPos = col === 0 ? 30 : 160;
+            const yPos = row * 60 + 40;
+
+            return space.status === "available" ? (
+              <TouchableOpacity
+                key={`touch-${space.id}`}
+                style={{
+                  position: "absolute",
+                  left: xPos,
+                  top: yPos,
+                  width: 100,
+                  height: 50,
+                }}
+                onPress={() => setSelectedSpot(space.id)}
+              />
+            ) : null;
+          })}
+        </View>
+
+        {/* Steps */}
+        <View style={styles.stepsContainer}>
+          <Text style={styles.stepsTitle}>Steps:</Text>
+          <Text style={styles.stepsText}>1. Click on an available green spot</Text>
+          <Text style={styles.stepsText}>
+            2. Hit the reserve button after selecting
+          </Text>
+          <Text style={styles.stepsText}>3. Arrive within 2 minutes</Text>
+        </View>
+
+        {/* Reserve Button */}
+        <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
+          <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
+  );
 };
 
-// Styles
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        backgroundColor: "white",
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    legendContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        marginBottom: 10,
-    },
-    legendItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginHorizontal: 10,
-    },
-    legendBox: {
-        width: 20,
-        height: 20,
-        marginRight: 5,
-    },
-    legendText: {
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    availabilityContainer: {
-        marginTop: 15,
-        alignItems: "center",
-        padding: 10,
-        backgroundColor: "#ddd",
-        borderRadius: 8,
-    },
-    availabilityText: {
-        fontSize: 18,
-        fontWeight: "bold",
-    },
-    availabilityDetail: {
-        fontSize: 16,
-        color: "black",
-    },
-    stepsContainer: {
-        marginTop: 15,
-        alignItems: "center",
-        padding: 10,
-    },
-    stepsTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-    },
-    stepsText: {
-        fontSize: 16,
-    },
-    reserveButton: {
-        backgroundColor: "red",
-        padding: 12,
-        marginTop: 10,
-        borderRadius: 5,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    paddingTop: 40,
+  },
+  scrollContent: {
+    alignItems: "center",
+    paddingBottom: 60,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+  legendBox: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
+  },
+  legendText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  mapWrapper: {
+    width: 300,
+    height: 400,
+    position: "relative",
+    marginBottom: 20,
+  },
+  stepsContainer: {
+    alignItems: "center",
+    padding: 10,
+  },
+  stepsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  stepsText: {
+    fontSize: 16,
+  },
+  reserveButton: {
+    backgroundColor: "red",
+    padding: 12,
+    marginTop: 10,
+    borderRadius: 5,
+    alignSelf: "center",
+    width: 140,
+    alignItems: "center",
+  },
 });
 
 export default ParkingMap;
