@@ -52,7 +52,6 @@ import ParkingMap from "./src/components/ParkingMap/ParkingMap";
 import ReservationStatusScreen from "./screens/ReservationStatusScreen";
 import AddVehicleScreen from './screens/AddVehicleScreen';
 import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
-import { Alert } from "react-native";
 import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
 
 
