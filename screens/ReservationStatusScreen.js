@@ -43,7 +43,7 @@ export default function ReservationStatusScreen({ navigation }) {
           setReservation({ id: resDoc.id, ...resData });
 
           const startTime = resData.startTime.toDate();
-          const endTime = new Date(startTime.getTime() + 2 * 60 * 1000); // 2 minutes
+          const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour
           updateTimer(endTime);
         } else {
           setReservation(null);
@@ -61,7 +61,7 @@ export default function ReservationStatusScreen({ navigation }) {
     if (!reservation) return;
     const interval = setInterval(() => {
       const startTime = reservation.startTime.toDate();
-      const endTime = new Date(startTime.getTime() + 2 * 60 * 1000); // 2 minutes
+      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour
       updateTimer(endTime);
     }, 1000);
 
@@ -80,20 +80,43 @@ export default function ReservationStatusScreen({ navigation }) {
     } else {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setTimeLeft({ minutes, seconds, expired: false });
+
+      // Format minutes and seconds with zero-padding
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+
+      setTimeLeft({ minutes: formattedMinutes, seconds: formattedSeconds, expired: false });
     }
   };
 
-  const handleCancel = async () => {
-    try {
-      if (reservation) {
-        await deleteDoc(doc(db, "Reservations", reservation.id));
-        setReservation(null); // Update UI after deletion
-        console.log("Reservation canceled and deleted");
-      }
-    } catch (error) {
-      console.error("Error canceling reservation:", error);
-    }
+  // Handle reservation cancellation with confirmation popup
+  const handleCancel = () => {
+    Alert.alert(
+      "Cancel Reservation",
+      "Are you sure you want to cancel your current reservation?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              if (reservation) {
+                await deleteDoc(doc(db, "Reservations", reservation.id));
+                setReservation(null); // Update UI after deletion
+                console.log("Reservation canceled and deleted");
+              }
+            } catch (error) {
+              console.error("Error canceling reservation:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -227,4 +250,3 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
 });
-
