@@ -122,6 +122,7 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{parkingLot}</Text>
 
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Legend */}
         <View style={styles.legendContainer}>
