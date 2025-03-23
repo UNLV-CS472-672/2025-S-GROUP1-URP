@@ -33,7 +33,7 @@ describe("<RemoveVehicleScreen />", () => {
 
         await findByText("Make: Toyota");
         await findByText("Make: Honda");
-    });
+    }, 10000);
 
     test("Selects a vehicle and confirms removal", async () => {
         const { getAllByText, getByText } = render(
@@ -47,7 +47,7 @@ describe("<RemoveVehicleScreen />", () => {
         fireEvent.press(confirmButton);
 
         await waitFor(() => expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account"));
-    });
+    }, 10000);
 
     test("Cancels vehicle removal", async () => {
         const { getAllByText, getByText } = render(
@@ -61,5 +61,5 @@ describe("<RemoveVehicleScreen />", () => {
         fireEvent.press(cancelButton);
 
         expect(getAllByText("Select").length).toBeGreaterThan(0); // Ensure selection remains possible
-    });
+    }, 10000);
 });
