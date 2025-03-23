@@ -41,21 +41,19 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from "rea
 // Navigation-related imports for handling navigation between screens
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { auth } from "./firebaseConfig";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import LoginScreen from "./screens/LoginScreen";
+import ResetPasswordScreen from "./screens/ResetPasswordScreen";
+import SignUpScreen from "./screens/signUpScreen";
+import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
+import MyAccountScreen from "./screens/MyAccountScreen";
+import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
+import ReservationStatusScreen from "./screens/ReservationStatusScreen";
+import AddVehicleScreen from './screens/AddVehicleScreen';
+import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
+import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
 
-// Firebase imports for authentication functions
-import { auth } from "./firebaseConfig"; // Authentication object
-import { onAuthStateChanged, signOut } from "firebase/auth"; // Functions for managing user auth state
-
-// Importing screen components for navigation
-import LoginScreen from "./screens/LoginScreen"; // Login screen
-import ResetPasswordScreen from "./screens/ResetPasswordScreen"; // Reset password screen
-import SignUpScreen from "./screens/signUpScreen"; // Sign-up screen
-import ReportScreen from "./screens/ReportScreen"; // Report screen
-import MyAccountScreen from "./screens/MyAccountScreen"; // Account management screen
-import ParkingMap from "./src/components/ParkingMap/ParkingMap"; // Parking map display component
-import ReservationStatusScreen from "./screens/ReservationStatusScreen"; // Reservation status screen
-import AddVehicleScreen from "./screens/AddVehicleScreen"; // Add vehicle screen
-import RemoveVehicleScreen from "./screens/RemoveVehicleScreen"; // Remove vehicle screen
 
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator();
