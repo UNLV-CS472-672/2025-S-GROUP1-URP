@@ -163,16 +163,16 @@ export default function App() {
         {/* Defining screen routes */}
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="My Account" component={MyAccountScreen} />
-        <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} />
-        <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} />
-        <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} />
-        <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} />
-        <Stack.Screen name="Report" component={ReportScreen} />
-        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} />
-        <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerLeft: null }} />
+        <Stack.Screen name="My Account" component={MyAccountScreen} options={{ headerLeft: null }} />
+        <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} options={{ headerLeft: null }} />
+        <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} options={{ headerLeft: null }} />
+        <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen name="Report" component={ReportScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} options={{ headerLeft: null }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
