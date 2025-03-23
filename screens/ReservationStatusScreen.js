@@ -43,7 +43,7 @@ export default function ReservationStatusScreen({ navigation }) {
           setReservation({ id: resDoc.id, ...resData });
 
           const startTime = resData.startTime.toDate();
-          const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+          const endTime = new Date(startTime.getTime() + 2 * 60 * 1000); // 2 minutes
           updateTimer(endTime);
         } else {
           setReservation(null);
@@ -61,18 +61,22 @@ export default function ReservationStatusScreen({ navigation }) {
     if (!reservation) return;
     const interval = setInterval(() => {
       const startTime = reservation.startTime.toDate();
-      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+      const endTime = new Date(startTime.getTime() + 2 * 60 * 1000); // 2 minutes
       updateTimer(endTime);
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Clear interval on cleanup
   }, [reservation]);
 
   const updateTimer = (endTime) => {
     const now = new Date();
     const diff = endTime - now;
     if (diff <= 0) {
+      // Timer expired, delete the reservation
       setTimeLeft({ minutes: 0, seconds: 0, expired: true });
+
+      // Delete reservation from Firebase
+      handleCancel();
     } else {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -81,24 +85,15 @@ export default function ReservationStatusScreen({ navigation }) {
   };
 
   const handleCancel = async () => {
-    Alert.alert(
-      "Cancel Reservation",
-      "Are you sure you want to cancel your reservation?",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Yes",
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(db, "Reservations", reservation.id));
-              setReservation(null);
-            } catch (error) {
-              console.error("Error canceling reservation:", error);
-            }
-          },
-        },
-      ]
-    );
+    try {
+      if (reservation) {
+        await deleteDoc(doc(db, "Reservations", reservation.id));
+        setReservation(null); // Update UI after deletion
+        console.log("Reservation canceled and deleted");
+      }
+    } catch (error) {
+      console.error("Error canceling reservation:", error);
+    }
   };
 
   return (
@@ -232,3 +227,4 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
 });
+
