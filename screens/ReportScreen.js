@@ -18,7 +18,6 @@ import { db } from "../firebaseConfig";
 import { getAuth } from "firebase/auth";
 const auth = getAuth();
 
-
 export default function ReportScreen({ navigation }) {
   const [licensePlate, setLicensePlate] = useState("");
   const [color, setColor] = useState("");
@@ -62,6 +61,13 @@ export default function ReportScreen({ navigation }) {
 
     try {
       if (image) {
+        // 🔒 File size check
+        const fileInfo = await FileSystem.getInfoAsync(image);
+        if (fileInfo.size > 5 * 1024 * 1024) {
+          Alert.alert("File Too Large", "Image must be smaller than 5MB.");
+          return;
+        }
+
         const storage = getStorage();
         const filename = `violationReports/test_${Date.now()}.jpg`;
         const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?uploadType=media`;
@@ -195,7 +201,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120, // allows space for Back button
+    paddingBottom: 120,
   },
   content: {},
   label: {
