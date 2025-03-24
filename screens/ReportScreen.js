@@ -1,50 +1,84 @@
-/**
- * ReportScreen Component
- * 
- * This screen allows users to report a parking violation by providing details about the vehicle.
- * The submitted report is stored in Firestore, and the logged-in user's ID and a timestamp are automatically included.
- * 
- * Features:
- * - Header with the title "Report Violation".
- * - Input fields for license plate number, vehicle color, make/model, and optional comments.
- * - Validation to ensure required fields are filled.
- * - Submission to Firestore with user ID and timestamp.
- * - Success or error alerts based on the submission result.
- * 
- * Dependencies:
- * - Firebase Firestore for storing reports.
- * - Firebase Authentication for identifying the logged-in user.
- */
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Button, Alert, TouchableOpacity } from "react-native";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // Import serverTimestamp
-import { db, auth } from "../firebaseConfig"; // Import Firestore and Auth
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { db } from "../firebaseConfig";
+import { getAuth } from "firebase/auth";
+const auth = getAuth();
+
 
 export default function ReportScreen({ navigation }) {
   const [licensePlate, setLicensePlate] = useState("");
   const [color, setColor] = useState("");
   const [makeModel, setMakeModel] = useState("");
   const [comments, setComments] = useState("");
+  const [image, setImage] = useState(null);
 
-  /**
-   * handleSubmit Function
-   * 
-   * Validates the input fields and submits the report to Firestore.
-   * Includes the logged-in user's ID and a timestamp automatically.
-   * Displays success or error alerts based on the submission result.
-   */
-  
+  const pickImageFromLibrary = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+    if (!result.canceled && result.assets?.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const takePhotoWithCamera = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Camera access is needed.");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+    if (!result.canceled && result.assets?.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!licensePlate || !color || !makeModel) {
-      Alert.alert("Error", "Please fill in all required fields.");
+      Alert.alert("Missing Info", "Please fill out all required fields.");
       return;
     }
 
+    let imageUrl = null;
+
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        Alert.alert("Error", "You must be logged in to submit a report.");
-        return;
+      if (image) {
+        const storage = getStorage();
+        const filename = `violationReports/test_${Date.now()}.jpg`;
+        const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?uploadType=media`;
+
+        console.log("Uploading image from:", image);
+        const uploadResult = await FileSystem.uploadAsync(uploadUrl, image, {
+          httpMethod: "POST",
+          headers: { "Content-Type": "image/jpeg" },
+          uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+        });
+
+        if (uploadResult.status !== 200) {
+          throw new Error("Upload failed with status " + uploadResult.status);
+        }
+
+        imageUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?alt=media`;
+        console.log("✅ Upload success:", imageUrl);
       }
 
       await addDoc(collection(db, "reports"), {
@@ -52,77 +86,85 @@ export default function ReportScreen({ navigation }) {
         color,
         makeModel,
         comments,
-        userId: user.uid, // Automatically assign the logged-in user’s ID
-        timestamp: serverTimestamp(), // Automatically generate a timestamp
+        imageUrl,
+        timestamp: serverTimestamp(),
+        userId: auth.currentUser?.uid || "unknown"
       });
 
-      Alert.alert("Success", "Report submitted successfully!");
+      Alert.alert("Success", "Report submitted.");
       setLicensePlate("");
       setColor("");
       setMakeModel("");
       setComments("");
-    } catch (error) {
-      console.error("Error submitting report:", error);
-      Alert.alert("Error", "Failed to submit report.");
+      setImage(null);
+    } catch (err) {
+      console.error("Upload failed:", err.message);
+      Alert.alert("Upload Error", "Image upload or report save failed.");
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header Section */}
+      {/* Red Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Report Violation</Text>
       </View>
 
-      {/* Main Content */}
-      <View style={styles.content}>
-        {/* Vehicle Number Section */}
-        <Text style={styles.label}>License Plate Number:</Text>
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.content}>
+          <Text style={styles.label}>License Plate Number:</Text>
+          <TextInput
+            style={styles.input}
+            value={licensePlate}
+            onChangeText={setLicensePlate}
+            placeholder="ABC123"
+          />
 
-        {/* License Plate # input Section */}
-        <TextInput 
-          style={styles.input}
-          placeholder="Enter license plate"
-          value={licensePlate}
-          onChangeText={setLicensePlate}
-        />
+          <Text style={styles.label}>Color:</Text>
+          <TextInput
+            style={styles.input}
+            value={color}
+            onChangeText={setColor}
+            placeholder="Red, Blue, etc"
+          />
 
-        {/* Vehicle Color Section */}
-        <Text style={styles.label}>Color:</Text>
+          <Text style={styles.label}>Make/Model:</Text>
+          <TextInput
+            style={styles.input}
+            value={makeModel}
+            onChangeText={setMakeModel}
+            placeholder="e.g. Toyota Camry"
+          />
 
-        {/* Vehicle Color input Section */}
-        <TextInput 
-          style={styles.input}
-          placeholder="Enter vehicle color"
-          value={color}
-          onChangeText={setColor}
-        />
+          <Text style={styles.label}>Comments:</Text>
+          <TextInput
+            style={[styles.input, styles.commentInput]}
+            value={comments}
+            onChangeText={setComments}
+            placeholder="Additional comments"
+            multiline
+          />
 
-        {/* Make/Model Section */}
-        <Text style={styles.label}>Make/Model:</Text>
+          {/* Image Buttons */}
+          <View style={styles.imageButtons}>
+            <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
+              <Text style={styles.imageButtonText}>Take Photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.imageButton} onPress={pickImageFromLibrary}>
+              <Text style={styles.imageButtonText}>Choose Photo</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Make/Model Section input */}
-        <TextInput 
-          style={styles.input}
-          placeholder="Enter vehicle make and model"
-          value={makeModel}
-          onChangeText={setMakeModel}
-        />
+          {/* Image Preview */}
+          {image && (
+            <Image source={{ uri: image }} style={styles.imagePreview} resizeMode="cover" />
+          )}
 
-        {/* Comments Section */}
-        <Text style={styles.label}>Comments:</Text>
-
-        {/* Comments input */}
-        <TextInput 
-          style={[styles.input, styles.commentInput]}
-          placeholder="Additional comments (optional)"
-          value={comments}
-          onChangeText={setComments}
-          multiline
-        />
-
-        <Button title="Submit Report" onPress={handleSubmit} color="red" />
-      </View>
+          {/* Submit */}
+          <Button title="Submit Report" onPress={handleSubmit} color="red" />
+        </View>
+      </ScrollView>
 
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home")}>
@@ -133,32 +175,29 @@ export default function ReportScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
   header: {
     width: "100%",
-    height: 150, // Adjust height as needed
+    height: 150,
     backgroundColor: "red",
     justifyContent: "center",
     alignItems: "center",
-    borderBottomLeftRadius: 30, // Optional for styling
-    borderBottomRightRadius: 30, // Optional for styling
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   headerText: {
     fontSize: 30,
     fontWeight: "bold",
     color: "white",
-    // Text Outline Effect
     textShadowColor: "black",
-    textShadowOffset: { width: 3, height: 1 }, // Offset to create the outline
-    textShadowRadius: 10, // Controls the thickness of the outline
+    textShadowOffset: { width: 3, height: 1 },
+    textShadowRadius: 10,
   },
-  content: {
-    flex: 1,
+  scrollContent: {
     padding: 20,
+    paddingBottom: 120, // allows space for Back button
   },
+  content: {},
   label: {
     fontSize: 16,
     fontWeight: "bold",
@@ -176,15 +215,40 @@ const styles = StyleSheet.create({
     height: 80,
     textAlignVertical: "top",
   },
+  imageButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  imageButton: {
+    backgroundColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  imageButtonText: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  imagePreview: {
+    width: "100%",
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
   backButton: {
-    width: "50%", // Half the width of the screen
+    width: "50%",
     backgroundColor: "#B0463C",
     paddingVertical: 15,
     alignItems: "center",
     borderRadius: 5,
-    position: 'absolute',
-    bottom: 20, // Position it at the bottom
-    left: 20, // Position it at the left
+    position: "absolute",
+    bottom: 20,
+    left: 20,
   },
   backButtonText: {
     color: "#fff",
