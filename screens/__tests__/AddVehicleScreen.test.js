@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import AddVehicleScreen from "../AddVehicleScreen";
 import { setDoc, getDoc, doc } from "firebase/firestore";
 
@@ -43,13 +43,17 @@ describe("AddVehicleScreen", () => {
     );
 
     // Simulating user input
-    fireEvent.changeText(getByPlaceholderText("Make"), "Toyota");
-    fireEvent.changeText(getByPlaceholderText("Model"), "Camry");
-    fireEvent.changeText(getByPlaceholderText("Year"), "2022");
-    fireEvent.changeText(getByPlaceholderText("License Plate"), "ABC123");
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText("Make"), "Toyota");
+      fireEvent.changeText(getByPlaceholderText("Model"), "Camry");
+      fireEvent.changeText(getByPlaceholderText("Year"), "2022");
+      fireEvent.changeText(getByPlaceholderText("License Plate"), "ABC123");
+    });
 
     // Pressing Save button
-    fireEvent.press(getByText("Save"));
+    await act(async () => {
+      fireEvent.press(getByText("Save"));
+    });
 
     // Ensure Firestore function is called correctly
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));

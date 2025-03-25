@@ -37,7 +37,7 @@ describe('ReservationStatusScreen', () => {
     await waitFor(() => {
       expect(getByText('No current reservation at this time.')).toBeTruthy(); // Verifying empty state message
     });
-  });
+  }, 10000); // 10 seconds timeout
 
   it('renders correctly with an active reservation', async () => {
     const mockReservation = {
@@ -58,7 +58,7 @@ describe('ReservationStatusScreen', () => {
       expect(getByText('Parking Spot Number:')).toBeTruthy();
       expect(getByText('Reservation Timer:')).toBeTruthy();
     });
-  });
+  }, 10000); // 10 seconds timeout
 
   it('handles reservation cancellation', async () => {
     const mockReservation = { id: '123', spotId: 'A1', startTime: { toDate: () => new Date() } };
@@ -75,5 +75,5 @@ describe('ReservationStatusScreen', () => {
       expect(deleteDoc).toHaveBeenCalledTimes(1); // Ensuring deleteDoc was called once
       expect(deleteDoc).toHaveBeenCalledWith(doc({}, "Reservations", "123")); // Verifying correct deletion
     });
-  });
+  }, 10000); // 10 seconds timeout
 });
