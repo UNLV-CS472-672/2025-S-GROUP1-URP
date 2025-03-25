@@ -31,6 +31,7 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
   const navigation = useNavigation();
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [parkingSpaces, setParkingSpaces] = useState([]);
+  const [filter, setFilter] = useState("student");
 
   const statusColors = {
     available: "green",
@@ -118,12 +119,30 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     }
   };
 
+  const filteredSpaces = parkingSpaces.filter(space => space.type === filter);
+  
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
+        <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
+      </TouchableOpacity>
+
       <Text style={styles.title}>{parkingLot}</Text>
 
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.filterContainer}>
+          {['student', 'staff', 'accessible'].map((type) => (
+            <TouchableOpacity
+              key={type}
+              style={styles.filterOption}
+              onPress={() => setFilter(type)}
+            >
+              <Text style={styles.checkbox}>{filter === type ? '☑' : '☐'}</Text>
+              <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {/* Legend */}
         <View style={styles.legendContainer}>
           <View style={styles.legendItem}>
@@ -144,9 +163,9 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
         <View style={styles.mapWrapper}>
           <Svg height="400" width="300" viewBox="0 0 300 400">
             <Rect x="0" y="0" width="300" height="400" fill="lightgray" />
-            {parkingSpaces.map((space, index) => {
-              const col = index % 2;
-              const row = Math.floor(index / 2);
+            {parkingSpaces.filter(space => space.type === filter).map((space, index) => {
+              const col = space.location % 2 === 0 ? 1 : 0; // even = right, odd = left
+              const row = Math.floor((space.location - 1) / 2);
               const xPos = col === 0 ? 30 : 160;
               const yPos = row * 60 + 40;
               const isSelected = selectedSpot === space.id;
@@ -189,9 +208,9 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           </Svg>
 
           {/* Touchable overlays for available spots */}
-          {parkingSpaces.map((space, index) => {
-            const col = index % 2;
-            const row = Math.floor(index / 2);
+          {parkingSpaces.filter(space => space.type === filter).map((space, index) => {
+            const col = space.location % 2 === 0 ? 1 : 0;
+            const row = Math.floor((space.location - 1) / 2);
             const xPos = col === 0 ? 30 : 160;
             const yPos = row * 60 + 40;
 
@@ -218,7 +237,7 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           <Text style={styles.stepsText}>
             2. Hit the reserve button after selecting
           </Text>
-          <Text style={styles.stepsText}>3. Arrive within 2 minutes</Text>
+          <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
 
         {/* Reserve Button */}
@@ -291,6 +310,26 @@ const styles = StyleSheet.create({
     width: 140,
     alignItems: "center",
   },
+  filterContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",  // <-- add this
+    flexWrap: "wrap",      // <-- add this
+    marginVertical: 10,
+  },
+  filterOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+  checkbox: {
+    fontSize: 20,
+    marginRight: 5,
+  },
+  filterLabel: {
+    fontSize: 16,
+  },
+  
 });
 
 export default ParkingMap;
