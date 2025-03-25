@@ -2,19 +2,41 @@ import React from "react";
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import ReportScreen from "../ReportScreen";
 
-// Mock Firebase dependencies
+// ✅ Mock Firebase Auth
+jest.mock("firebase/auth", () => ({
+  getAuth: jest.fn(() => ({
+    currentUser: { uid: "12345" },
+  })),
+}));
+
+// ✅ Mock Firebase Firestore
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
   addDoc: jest.fn(() => Promise.resolve()),
   serverTimestamp: jest.fn(() => "mockedTimestamp"),
 }));
 
+// ✅ Mock Firebase Storage
+jest.mock("firebase/storage", () => ({
+  getStorage: jest.fn(() => ({
+    app: {
+      options: {
+        storageBucket: "mock-bucket"
+      }
+    }
+  })),
+  ref: jest.fn(),
+  uploadBytes: jest.fn(() => Promise.resolve()),
+  getDownloadURL: jest.fn(() => Promise.resolve("https://fake.url/image.png")),
+}));
+
+// ✅ Mock firebaseConfig.js
 jest.mock("../../firebaseConfig", () => ({
   auth: { currentUser: { uid: "12345" } },
   db: {},
 }));
 
-// Mock Alert.alert
+// ✅ Mock Alert.alert
 import { Alert } from "react-native";
 jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
@@ -28,17 +50,17 @@ describe("<ReportScreen />", () => {
     fireEvent.press(submitButton);
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith("Error", "Please fill in all required fields.");
+      expect(Alert.alert).toHaveBeenCalledWith("Missing Info", "Please fill out all required fields.");
     });
   });
 
   it("submits the report when all required fields are filled", async () => {
     const { getByPlaceholderText, getByText } = render(<ReportScreen navigation={mockNavigation} />);
     
-    fireEvent.changeText(getByPlaceholderText("Enter license plate"), "ABC123");
-    fireEvent.changeText(getByPlaceholderText("Enter vehicle color"), "Blue");
-    fireEvent.changeText(getByPlaceholderText("Enter vehicle make and model"), "Honda Civic");
-    fireEvent.changeText(getByPlaceholderText("Additional comments (optional)"), "Parked illegally.");
+    fireEvent.changeText(getByPlaceholderText("ABC123"), "ABC123");
+    fireEvent.changeText(getByPlaceholderText("Red, Blue, etc"), "Blue");
+    fireEvent.changeText(getByPlaceholderText("e.g. Toyota Camry"), "Honda Civic");
+    fireEvent.changeText(getByPlaceholderText("Additional comments"), "Parked illegally.");
 
     const submitButton = getByText("Submit Report");
     await act(async () => {
@@ -46,7 +68,7 @@ describe("<ReportScreen />", () => {
     });
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith("Success", "Report submitted successfully!");
+      expect(Alert.alert).toHaveBeenCalledWith("Success", "Report submitted.");
     });
   });
 
@@ -59,4 +81,3 @@ describe("<ReportScreen />", () => {
     expect(mockNavigation.navigate).toHaveBeenCalledWith("Home");
   });
 });
-
