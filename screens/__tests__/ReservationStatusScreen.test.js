@@ -4,20 +4,23 @@ import { Alert } from 'react-native';
 import ReservationStatusScreen from '../ReservationStatusScreen';
 import { deleteDoc, doc, getDocs } from 'firebase/firestore';
 
+// Mocking Firebase authentication and database to prevent actual API calls
 jest.mock('../../firebaseConfig', () => ({
   db: {},
-  auth: { currentUser: { uid: 'testUser' } },
+  auth: { currentUser: { uid: 'testUser' } }, // Simulating a logged-in user
 }));
 
+// Mocking Firebase Firestore functions
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   query: jest.fn(),
   where: jest.fn(),
-  getDocs: jest.fn(),
+  getDocs: jest.fn(), // Mocked function to return test data
   deleteDoc: jest.fn(),
   doc: jest.fn(),
 }));
 
+// Mocking Alert behavior to simulate user confirmation
 jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
   const confirmButton = buttons.find(button => button.text === 'Yes');
   if (confirmButton && confirmButton.onPress) {
@@ -27,12 +30,12 @@ jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
 
 describe('ReservationStatusScreen', () => {
   it('renders correctly with no reservation', async () => {
-    getDocs.mockResolvedValue({ empty: true, docs: [] });
+    getDocs.mockResolvedValue({ empty: true, docs: [] }); // Simulating no reservations
     
     const { getByText } = render(<ReservationStatusScreen navigation={{ goBack: jest.fn() }} />);
     
     await waitFor(() => {
-      expect(getByText('No current reservation at this time.')).toBeTruthy();
+      expect(getByText('No current reservation at this time.')).toBeTruthy(); // Verifying empty state message
     });
   });
 
@@ -40,14 +43,14 @@ describe('ReservationStatusScreen', () => {
     const mockReservation = {
       id: '123',
       spotId: 'A1',
-      startTime: { toDate: () => new Date(Date.now() - 30 * 60 * 1000) }, // Started 30 mins ago
+      startTime: { toDate: () => new Date(Date.now() - 30 * 60 * 1000) }, // Reservation started 30 minutes ago
     };
     
     getDocs.mockResolvedValue({
       empty: false,
       docs: [{ id: '123', data: () => mockReservation }],
     });
-    
+
     const { getByText } = render(<ReservationStatusScreen navigation={{ goBack: jest.fn() }} />);
     
     await waitFor(() => {
@@ -60,17 +63,17 @@ describe('ReservationStatusScreen', () => {
   it('handles reservation cancellation', async () => {
     const mockReservation = { id: '123', spotId: 'A1', startTime: { toDate: () => new Date() } };
     getDocs.mockResolvedValue({ empty: false, docs: [{ id: '123', data: () => mockReservation }] });
-    deleteDoc.mockResolvedValue();
+    deleteDoc.mockResolvedValue(); // Simulating successful document deletion
 
     const { getByText } = render(<ReservationStatusScreen navigation={{ goBack: jest.fn() }} />);
 
     await waitFor(() => expect(getByText('Cancel Reservation')).toBeTruthy());
 
-    fireEvent.press(getByText('Cancel Reservation'));
+    fireEvent.press(getByText('Cancel Reservation')); // Simulating user cancel action
 
     await waitFor(() => {
-      expect(deleteDoc).toHaveBeenCalledTimes(1);
-      expect(deleteDoc).toHaveBeenCalledWith(doc({}, "Reservations", "123"));
+      expect(deleteDoc).toHaveBeenCalledTimes(1); // Ensuring deleteDoc was called once
+      expect(deleteDoc).toHaveBeenCalledWith(doc({}, "Reservations", "123")); // Verifying correct deletion
     });
   });
 });
