@@ -18,10 +18,13 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 
+const TIMER_DURATION_MINUTES = 30; // Change this to 1 or 2 for testing
+
 export default function ReservationStatusScreen({ navigation }) {
   const [reservation, setReservation] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [timerExpired, setTimerExpired] = useState(false);
 
   useEffect(() => {
     const fetchReservation = async () => {
@@ -42,8 +45,9 @@ export default function ReservationStatusScreen({ navigation }) {
           const resData = resDoc.data();
           setReservation({ id: resDoc.id, ...resData });
 
+          // Calculate expiration time based on Firebase timestamp
           const startTime = resData.startTime.toDate();
-          const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour
+          const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
           updateTimer(endTime);
         } else {
           setReservation(null);
@@ -61,36 +65,37 @@ export default function ReservationStatusScreen({ navigation }) {
     if (!reservation) return;
     const interval = setInterval(() => {
       const startTime = reservation.startTime.toDate();
-      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour
+      const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
       updateTimer(endTime);
     }, 1000);
 
-    return () => clearInterval(interval); // Clear interval on cleanup
+    return () => clearInterval(interval);
   }, [reservation]);
 
   const updateTimer = (endTime) => {
     const now = new Date();
     const diff = endTime - now;
     if (diff <= 0) {
-      // Timer expired, delete the reservation
-      setTimeLeft({ minutes: 0, seconds: 0, expired: true });
-
-      // Delete reservation from Firebase
-      handleCancel();
+      setTimeLeft({ minutes: "00", seconds: "00", expired: true });
+      setTimerExpired(true); // Prevents issues when canceling after expiration
     } else {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-      // Format minutes and seconds with zero-padding
-      const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
-      const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-
-      setTimeLeft({ minutes: formattedMinutes, seconds: formattedSeconds, expired: false });
+      setTimeLeft({
+        minutes: minutes < 10 ? `0${minutes}` : `${minutes}`,
+        seconds: seconds < 10 ? `0${seconds}` : `${seconds}`,
+        expired: false,
+      });
     }
   };
 
-  // Handle reservation cancellation with confirmation popup
   const handleCancel = () => {
+    if (timerExpired || !reservation) {
+      console.log("Reservation already expired or does not exist.");
+      return;
+    }
+
     Alert.alert(
       "Cancel Reservation",
       "Are you sure you want to cancel your current reservation?",
@@ -104,11 +109,9 @@ export default function ReservationStatusScreen({ navigation }) {
           text: "Yes",
           onPress: async () => {
             try {
-              if (reservation) {
-                await deleteDoc(doc(db, "Reservations", reservation.id));
-                setReservation(null); // Update UI after deletion
-                console.log("Reservation canceled and deleted");
-              }
+              await deleteDoc(doc(db, "Reservations", reservation.id));
+              setReservation(null);
+              console.log("Reservation canceled and deleted");
             } catch (error) {
               console.error("Error canceling reservation:", error);
             }
