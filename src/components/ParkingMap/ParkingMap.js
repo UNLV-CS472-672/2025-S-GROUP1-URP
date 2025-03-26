@@ -18,6 +18,9 @@ import {
   Timestamp,
   collection,
   onSnapshot,
+  query,
+  where,
+  getDocs
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
@@ -83,37 +86,52 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     }
 
     try {
-      const user = auth.currentUser;
-      if (!user) {
+        const user = auth.currentUser;
+        if (!user) {
         Alert.alert("Not signed in", "Please log in to reserve a spot.");
         return;
-      }
+        }
 
-      const spotDocRef = doc(db, "parkingSpotsTrop", selectedSpot);
-      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
-      const now = Timestamp.now();
-      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000)); // 2 minutes
+        const reservationQuery = query(
+            collection(db, "Reservations"),
+            where("userID", "==", user.uid),
+            where("status", "==", "held")
+        );
+        const reservationSnapshot = await getDocs(reservationQuery);
+    
+        if (!reservationSnapshot.empty) {
+            Alert.alert(
+            "Active Reservation Found",
+            "You already have an active reservation. You must cancel it before reserving a new spot."
+            );
+            return;
+        }
 
-      await updateDoc(spotDocRef, {
-        status: "held",
-        heldBy: user.uid,
-        holdExpiresAt: holdExpires,
-      });
+        const spotDocRef = doc(db, "parkingSpotsTrop", selectedSpot);
+        const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
+        const now = Timestamp.now();
+        const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000)); // 2 minutes
 
-      await setDoc(doc(db, "Reservations", reservationId), {
+        await updateDoc(spotDocRef, {
+            status: "held",
+            heldBy: user.uid,
+            holdExpiresAt: holdExpires,
+        });
+
+        await setDoc(doc(db, "Reservations", reservationId), {
         userID: user.uid,
         spotId: selectedSpot,
         status: "held",
         startTime: now,
         endTime: holdExpires,
         createdAt: now,
-      });
+        });
 
-      Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
-      setSelectedSpot(null);
+        Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
+        setSelectedSpot(null);
     } catch (err) {
-      console.error("Reservation error:", err);
-      Alert.alert("Error", "Failed to reserve spot.");
+        console.error("Reservation error:", err);
+        Alert.alert("Error", "Failed to reserve spot.");
     }
   };
 
