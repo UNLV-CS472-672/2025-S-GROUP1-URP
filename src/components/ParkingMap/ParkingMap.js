@@ -63,8 +63,6 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
             // Update in local UI too
             spot.status = "available";
-            spot.heldBy = "";
-            spot.holdExpiresAt = null;
           }
 
           spots.push(spot);
@@ -145,18 +143,22 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
         {/* Legend */}
         <View style={styles.legendContainer}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendBox, { backgroundColor: "green" }]} />
-            <Text style={styles.legendText}>Open</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
-            <Text style={styles.legendText}>Reserved</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendBox, { backgroundColor: "red" }]} />
-            <Text style={styles.legendText}>Occupied</Text>
-          </View>
+            <View style={styles.legendItem}>
+                <View style={[styles.legendBox, { backgroundColor: "green" }]} />
+                <Text style={styles.legendText}>Open</Text>
+            </View>
+            <View style={styles.legendItem}>
+                <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
+                <Text style={styles.legendText}>Reserved</Text>
+            </View>
+            <View style={styles.legendItem}>
+                <View style={[styles.legendBox, { backgroundColor: "red" }]} />
+                <Text style={styles.legendText}>Occupied</Text>
+            </View>
+            <View style={styles.legendItem}>
+                <View style={[styles.legendBox, { backgroundColor: "blue" }]} />
+                <Text style={styles.legendText}>Selected</Text>
+            </View>
         </View>
 
         {/* SVG Map */}
@@ -193,10 +195,10 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
                   >
                     {space.location}
                   </SvgText>
-                  {space.status === "occupied" && (
+                  {(space.status === "occupied" || space.status === "held") && (
                     <SvgImage
-                      x={xPos + 10}
-                      y={yPos + 5}
+                      x={xPos + (100 - 80) / 2}
+                      y={yPos + (50 - 40) / 2}
                       width="80"
                       height="40"
                       href={carIcon}
@@ -313,8 +315,8 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",  // <-- add this
-    flexWrap: "wrap",      // <-- add this
+    alignItems: "center", 
+    flexWrap: "wrap",
     marginVertical: 10,
   },
   filterOption: {
