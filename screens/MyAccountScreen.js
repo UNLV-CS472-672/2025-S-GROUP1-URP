@@ -97,9 +97,11 @@ export default function MyAccountScreen({ navigation }) {
                     <Text style={{ fontSize: 16, fontWeight: 'bold' }}>No vehicles found. Redirecting to add vehicle screen...</Text>
                 </View>
             )}
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home")}>
-                <Text style={styles.backButtonText}>Back</Text>
-            </TouchableOpacity>
+            {vehicles.length > 0 && (
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home")}>
+                    <Text style={styles.backButtonText}>Back</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 };
