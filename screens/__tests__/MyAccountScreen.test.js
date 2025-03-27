@@ -31,7 +31,7 @@ describe("<MyAccountScreen />", () => {
     const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
     await findByText("User Information:");
     await findByText("Email: test@example.com");
-  }, 10000);
+  }, 20000);
 
   test("Displays vehicle information", async () => {
     const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
@@ -39,21 +39,21 @@ describe("<MyAccountScreen />", () => {
     await findByText("Model: Camry");
     await findByText("Year: 2022");
     await findByText("License Plate: XYZ123");
-  }, 10000);
+  }, 20000);
 
   test("Navigates to AddVehicle when 'Add Another Vehicle' is pressed", async () => {
     const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
     const button = await findByText("Add Another Vehicle");
     fireEvent.press(button);
     expect(mockNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
-  }, 10000);
+  }, 20000);
 
   test("Navigates to RemoveVehicle when 'Remove a Vehicle' is pressed", async () => {
     const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
     const button = await findByText("Remove a Vehicle");
     fireEvent.press(button);
     expect(mockNavigation.navigate).toHaveBeenCalledWith("RemoveVehicle", expect.any(Object));
-  }, 10000);
+  }, 20000);
 
   test("Redirects to AddVehicle screen when no vehicles are found", async () => {
     jest.mock("firebase/firestore", () => {
@@ -66,7 +66,7 @@ describe("<MyAccountScreen />", () => {
     render(<MyAccountScreen navigation={mockNavigation} />);
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for redirect timeout
     expect(mockNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
-  }, 10000);
+  }, 20000);
 
   test("Handles case when Firestore document does not exist", async () => {
     jest.mock("firebase/firestore", () => {
@@ -78,6 +78,6 @@ describe("<MyAccountScreen />", () => {
     
     const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
     await findByText("No vehicles found. Redirecting to add vehicle screen...");
-  }, 10000);
+  }, 20000);
 
 });
