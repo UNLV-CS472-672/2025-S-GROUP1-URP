@@ -36,7 +36,7 @@
 import React, { useState, useEffect } from "react";
 
 // Importing components from React Native
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from "react-native";
 
 // Navigation-related imports for handling navigation between screens
 import { NavigationContainer } from "@react-navigation/native";
@@ -53,7 +53,6 @@ import ReservationStatusScreen from "./screens/ReservationStatusScreen";
 import AddVehicleScreen from './screens/AddVehicleScreen';
 import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
 import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
-
 
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator();
@@ -84,34 +83,36 @@ function HomeScreen({ navigation }) {
 
       {/* Conditionally render either user dashboard or login screen */}
       {user ? (
-        // If user is authenticated, show dashboard with navigation options
-        <ScrollView contentContainerStyle={styles.buttonContainer}>
-          <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
+        <>
+          {/*If user is authenticated, show dashboard with navigation options */}
+          <ScrollView contentContainerStyle={styles.buttonContainer}> 
+            <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
 
           {/* Navigation buttons for various screens */}
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("My Account")}>
-            <Text style={styles.buttonText}>My Account</Text>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Cottage Grove Parking")}>
+            <Image
+              source={require("./assets/CottageGrove-ParkingGarage.jpg")}
+              style={styles.parkingImage}
+            />
+            <Text style={styles.parkingLabel}>Cottage Grove Parking</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Tropicana Parking")}>
-            <Text style={styles.buttonText}>Tropicana Parking</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Cottage Grove Parking")}>
-            <Text style={styles.buttonText}>Cottage Grove Parking</Text>
+            <Image
+              source={require("./assets/Tropicana-ParkingGarage.jpg")}
+              style={styles.parkingImage}
+            />
+            <Text style={styles.parkingLabel}>Tropicana Parking</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Gateway Parking")}>
-            <Text style={styles.buttonText}>Gateway Parking</Text>
+          <Image
+            source={require("./assets/Gateway-ParkingGarage.jpg")}
+            style={styles.parkingImage}
+          />
+            <Text style={styles.parkingLabel}>Gateway Parking</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Reservation Status")}>
-            <Text style={styles.buttonText}>Reservation Status</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Report")}>
-            <Text style={styles.buttonText}>Report</Text>
-          </TouchableOpacity>
 
           {/* Logout button with confirmation alert */}
           <TouchableOpacity
@@ -132,6 +133,22 @@ function HomeScreen({ navigation }) {
             <Text style={styles.buttonText}>Logout</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        <View style={styles.bottomNav}>
+        <TouchableOpacity onPress={() => navigation.navigate("Report")}>
+          <Text style={styles.navIcon}>❗</Text>
+          <Text style={styles.navLabel}>Report</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Reservation Status")}>
+          <Text style={styles.navIcon}>🚗</Text>
+          <Text style={styles.navLabel}>Reservations</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("My Account")}>
+          <Text style={styles.navIcon}>👤</Text>
+          <Text style={styles.navLabel}>Account</Text>
+        </TouchableOpacity>
+        </View>
+        </>
       ) : (
         // If user is not authenticated, show login screen
         <LoginScreen />
@@ -228,4 +245,44 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: "#CC0000", 
   },
+  parkingContainer: {
+    alignItems: "center",
+    paddingBottom: 100,
+  },
+  parkingImage: {
+    width: 240,
+    height: 150,
+    resizeMode: "cover",
+    borderRadius: 5,
+    marginTop: 15,
+  },
+  parkingLabel: {
+    backgroundColor: "#CC0000",
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 16,
+    width: 200,
+    textAlign: "center",
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: 80,
+    backgroundColor: "#CC0000",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+  },
+  navIcon: {
+    fontSize: 22,
+    color: "black",
+    textAlign: "center",
+  },
+  
+  navLabel: {
+    fontSize: 12,
+    color: "black",
+    textAlign: "center",
+  }
 });
