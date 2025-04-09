@@ -42,9 +42,17 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     occupied: "red",
   };
 
+  const collectionMap = {
+    "Tropicana Parking": "parkingSpotsTrop",
+    "Cottage Grove Parking": "parkingSpotsCottage",
+    "Gateway Parking": "parkingSpotsGateway",
+  };
+
+  const collectionName = collectionMap[parkingLot] || "parkingSpotsTrop";
+
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "parkingSpotsTrop"),
+      collection(db, collectionName),
       async (snapshot) => {
         const now = Timestamp.now();
         const spots = [];
@@ -52,32 +60,29 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
         for (const docSnap of snapshot.docs) {
           const spot = { id: docSnap.id, ...docSnap.data() };
 
-          // Auto-release if hold expired
           if (
             spot.status === "held" &&
             spot.holdExpiresAt &&
             spot.holdExpiresAt.toMillis() < now.toMillis()
           ) {
-            await updateDoc(doc(db, "parkingSpotsTrop", spot.id), {
+            await updateDoc(doc(db, collectionName, spot.id), {
               status: "available",
               heldBy: "",
               holdExpiresAt: null,
             });
 
-            // Update in local UI too
             spot.status = "available";
           }
 
           spots.push(spot);
         }
 
-        // Sort by parking spot location
         setParkingSpaces(spots.sort((a, b) => a.location - b.location));
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [collectionName]);
 
   const handleReserve = async () => {
     if (selectedSpot === null) {
@@ -86,57 +91,57 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     }
 
     try {
-        const user = auth.currentUser;
-        if (!user) {
+      const user = auth.currentUser;
+      if (!user) {
         Alert.alert("Not signed in", "Please log in to reserve a spot.");
         return;
-        }
+      }
 
-        const reservationQuery = query(
-            collection(db, "Reservations"),
-            where("userID", "==", user.uid),
-            where("status", "==", "held")
+      const reservationQuery = query(
+        collection(db, "Reservations"),
+        where("userID", "==", user.uid),
+        where("status", "==", "held")
+      );
+      const reservationSnapshot = await getDocs(reservationQuery);
+
+      if (!reservationSnapshot.empty) {
+        Alert.alert(
+          "Active Reservation Found",
+          "You already have an active reservation. You must cancel it before reserving a new spot."
         );
-        const reservationSnapshot = await getDocs(reservationQuery);
-    
-        if (!reservationSnapshot.empty) {
-            Alert.alert(
-            "Active Reservation Found",
-            "You already have an active reservation. You must cancel it before reserving a new spot."
-            );
-            return;
-        }
+        return;
+      }
 
-        const spotDocRef = doc(db, "parkingSpotsTrop", selectedSpot);
-        const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
-        const now = Timestamp.now();
-        const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000)); // 2 minutes
+      const spotDocRef = doc(db, collectionName, selectedSpot);
+      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
+      const now = Timestamp.now();
+      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000));
 
-        await updateDoc(spotDocRef, {
-            status: "held",
-            heldBy: user.uid,
-            holdExpiresAt: holdExpires,
-        });
+      await updateDoc(spotDocRef, {
+        status: "held",
+        heldBy: user.uid,
+        holdExpiresAt: holdExpires,
+      });
 
-        await setDoc(doc(db, "Reservations", reservationId), {
+      await setDoc(doc(db, "Reservations", reservationId), {
         userID: user.uid,
         spotId: selectedSpot,
         status: "held",
         startTime: now,
         endTime: holdExpires,
         createdAt: now,
-        });
+      });
 
-        Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
-        setSelectedSpot(null);
+      Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
+      setSelectedSpot(null);
     } catch (err) {
-        console.error("Reservation error:", err);
-        Alert.alert("Error", "Failed to reserve spot.");
+      console.error("Reservation error:", err);
+      Alert.alert("Error", "Failed to reserve spot.");
     }
   };
 
   const filteredSpaces = parkingSpaces.filter(space => space.type === filter);
-  
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
@@ -159,32 +164,25 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           ))}
         </View>
 
-        {/* Legend */}
         <View style={styles.legendContainer}>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "green" }]} />
-                <Text style={styles.legendText}>Open</Text>
+          {[
+            { color: "green", label: "Open" },
+            { color: "yellow", label: "Reserved" },
+            { color: "red", label: "Occupied" },
+            { color: "blue", label: "Selected" }
+          ].map(({ color, label }) => (
+            <View style={styles.legendItem} key={label}>
+              <View style={[styles.legendBox, { backgroundColor: color }]} />
+              <Text style={styles.legendText}>{label}</Text>
             </View>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
-                <Text style={styles.legendText}>Reserved</Text>
-            </View>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "red" }]} />
-                <Text style={styles.legendText}>Occupied</Text>
-            </View>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "blue" }]} />
-                <Text style={styles.legendText}>Selected</Text>
-            </View>
+          ))}
         </View>
 
-        {/* SVG Map */}
         <View style={styles.mapWrapper}>
           <Svg height="400" width="300" viewBox="0 0 300 400">
             <Rect x="0" y="0" width="300" height="400" fill="lightgray" />
-            {parkingSpaces.filter(space => space.type === filter).map((space, index) => {
-              const col = space.location % 2 === 0 ? 1 : 0; // even = right, odd = left
+            {filteredSpaces.map((space) => {
+              const col = space.location % 2 === 0 ? 1 : 0;
               const row = Math.floor((space.location - 1) / 2);
               const xPos = col === 0 ? 30 : 160;
               const yPos = row * 60 + 40;
@@ -215,8 +213,8 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
                   </SvgText>
                   {(space.status === "occupied" || space.status === "held") && (
                     <SvgImage
-                      x={xPos + (100 - 80) / 2}
-                      y={yPos + (50 - 40) / 2}
+                      x={xPos + 10}
+                      y={yPos + 5}
                       width="80"
                       height="40"
                       href={carIcon}
@@ -227,8 +225,7 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
             })}
           </Svg>
 
-          {/* Touchable overlays for available spots */}
-          {parkingSpaces.filter(space => space.type === filter).map((space, index) => {
+          {filteredSpaces.map((space) => {
             const col = space.location % 2 === 0 ? 1 : 0;
             const row = Math.floor((space.location - 1) / 2);
             const xPos = col === 0 ? 30 : 160;
@@ -250,17 +247,13 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           })}
         </View>
 
-        {/* Steps */}
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
           <Text style={styles.stepsText}>1. Click on an available green spot</Text>
-          <Text style={styles.stepsText}>
-            2. Hit the reserve button after selecting
-          </Text>
+          <Text style={styles.stepsText}>2. Hit the reserve button after selecting</Text>
           <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
 
-        {/* Reserve Button */}
         <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
           <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
         </TouchableOpacity>
@@ -270,57 +263,17 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    paddingTop: 40,
-  },
-  scrollContent: {
-    alignItems: "center",
-    paddingBottom: 60,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  legendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  legendBox: {
-    width: 20,
-    height: 20,
-    marginRight: 5,
-  },
-  legendText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  mapWrapper: {
-    width: 300,
-    height: 400,
-    position: "relative",
-    marginBottom: 20,
-  },
-  stepsContainer: {
-    alignItems: "center",
-    padding: 10,
-  },
-  stepsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  stepsText: {
-    fontSize: 16,
-  },
+  container: { flex: 1, backgroundColor: "white", paddingTop: 40 },
+  scrollContent: { alignItems: "center", paddingBottom: 60 },
+  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
+  legendContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 10 },
+  legendItem: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
+  legendBox: { width: 20, height: 20, marginRight: 5 },
+  legendText: { fontSize: 16, fontWeight: "bold" },
+  mapWrapper: { width: 300, height: 400, position: "relative", marginBottom: 20 },
+  stepsContainer: { alignItems: "center", padding: 10 },
+  stepsTitle: { fontSize: 18, fontWeight: "bold" },
+  stepsText: { fontSize: 16 },
   reserveButton: {
     backgroundColor: "red",
     padding: 12,
@@ -333,7 +286,7 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center", 
+    alignItems: "center",
     flexWrap: "wrap",
     marginVertical: 10,
   },
@@ -342,14 +295,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 10,
   },
-  checkbox: {
-    fontSize: 20,
-    marginRight: 5,
-  },
-  filterLabel: {
-    fontSize: 16,
-  },
-  
+  checkbox: { fontSize: 20, marginRight: 5 },
+  filterLabel: { fontSize: 16 },
 });
 
 export default ParkingMap;
