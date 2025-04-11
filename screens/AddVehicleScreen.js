@@ -102,10 +102,10 @@ export default function AddVehicleScreen({ navigation }) {
         <Button title="Save" onPress={handleSave} color="red" />
       </ScrollView>
       <TouchableOpacity
-        style={[styles.backButton, { backgroundColor: "#555", bottom: 80 }]}
-        onPress={() => navigation.navigate("Home")}
+        style={[styles.backButton]}
+        onPress={() => navigation.navigate("My Account")}
       >
-        <Text style={styles.backButtonText}>Back to Home</Text>
+        <Text style={styles.backButtonText}>Back to My Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 5,
     position: "absolute",
+    marginTop: 20,
     bottom: 20, // Position it at the bottom
     left: 20, // Position it at the left
   },
