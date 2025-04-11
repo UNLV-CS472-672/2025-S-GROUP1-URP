@@ -8,7 +8,11 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import Svg, { Rect, Text as SvgText, Image as SvgImage } from "react-native-svg";
+import Svg, {
+  Rect,
+  Text as SvgText,
+  Image as SvgImage,
+} from "react-native-svg";
 import carIcon from "../../../assets/car_icon.png";
 import {
   getFirestore,
@@ -20,7 +24,7 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
@@ -86,60 +90,141 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     }
 
     try {
-        const user = auth.currentUser;
-        if (!user) {
+      const user = auth.currentUser;
+      if (!user) {
         Alert.alert("Not signed in", "Please log in to reserve a spot.");
         return;
-        }
+      }
 
-        const reservationQuery = query(
-            collection(db, "Reservations"),
-            where("userID", "==", user.uid),
-            where("status", "==", "held")
+      const reservationQuery = query(
+        collection(db, "Reservations"),
+        where("userID", "==", user.uid),
+        where("status", "==", "held")
+      );
+      const reservationSnapshot = await getDocs(reservationQuery);
+
+      if (!reservationSnapshot.empty) {
+        Alert.alert(
+          "Active Reservation Found",
+          "You already have an active reservation. You must cancel it before reserving a new spot."
         );
-        const reservationSnapshot = await getDocs(reservationQuery);
-    
-        if (!reservationSnapshot.empty) {
-            Alert.alert(
-            "Active Reservation Found",
-            "You already have an active reservation. You must cancel it before reserving a new spot."
-            );
-            return;
-        }
+        return;
+      }
 
-        const spotDocRef = doc(db, "parkingSpotsTrop", selectedSpot);
-        const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
-        const now = Timestamp.now();
-        const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000)); // 2 minutes
+      const spotDocRef = doc(db, "parkingSpotsTrop", selectedSpot);
+      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
+      const now = Timestamp.now();
+      const holdExpires = Timestamp.fromDate(
+        new Date(Date.now() + 2 * 60 * 1000)
+      ); // 2 minutes
 
-        await updateDoc(spotDocRef, {
-            status: "held",
-            heldBy: user.uid,
-            holdExpiresAt: holdExpires,
-        });
+      await updateDoc(spotDocRef, {
+        status: "held",
+        heldBy: user.uid,
+        holdExpiresAt: holdExpires,
+      });
 
-        await setDoc(doc(db, "Reservations", reservationId), {
+      await setDoc(doc(db, "Reservations", reservationId), {
         userID: user.uid,
         spotId: selectedSpot,
         status: "held",
         startTime: now,
         endTime: holdExpires,
         createdAt: now,
-        });
+      });
 
-        Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
-        setSelectedSpot(null);
+      Alert.alert("Success", `Spot ${selectedSpot} reserved for 2 minutes.`);
+      setSelectedSpot(null);
     } catch (err) {
-        console.error("Reservation error:", err);
-        Alert.alert("Error", "Failed to reserve spot.");
+      console.error("Reservation error:", err);
+      Alert.alert("Error", "Failed to reserve spot.");
     }
   };
 
-  const filteredSpaces = parkingSpaces.filter(space => space.type === filter);
-  
+  const handleReserveRandomSpot = async () => {
+    try {
+      // Step 1: Filter available spots
+      const availableSpots = parkingSpaces.filter(
+        (space) => space.status === "available" && space.type === filter
+      );
+
+      if (availableSpots.length === 0) {
+        Alert.alert(
+          "No Available Spots",
+          "There are no available spots to reserve."
+        );
+        return;
+      }
+
+      // Step 2: Select a random spot
+      const randomSpot =
+        availableSpots[Math.floor(Math.random() * availableSpots.length)];
+
+      // Step 3: Reserve the spot
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Not Signed In", "Please log in to reserve a spot.");
+        return;
+      }
+
+      const reservationQuery = query(
+        collection(db, "Reservations"),
+        where("userID", "==", user.uid),
+        where("status", "==", "held")
+      );
+      const reservationSnapshot = await getDocs(reservationQuery);
+
+      if (!reservationSnapshot.empty) {
+        Alert.alert(
+          "Active Reservation Found",
+          "You already have an active reservation. You must cancel it before reserving a new spot."
+        );
+        return;
+      }
+
+      const spotDocRef = doc(db, "parkingSpotsTrop", randomSpot.id);
+      const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
+      const now = Timestamp.now();
+      const holdExpires = Timestamp.fromDate(
+        new Date(Date.now() + 2 * 60 * 1000)
+      ); // 2 minutes hold
+
+      await updateDoc(spotDocRef, {
+        status: "held",
+        heldBy: user.uid,
+        holdExpiresAt: holdExpires,
+      });
+
+      await setDoc(doc(db, "Reservations", reservationId), {
+        userID: user.uid,
+        spotId: randomSpot.id,
+        status: "held",
+        startTime: now,
+        endTime: holdExpires,
+        createdAt: now,
+      });
+
+      Alert.alert(
+        "Success",
+        `Spot ${randomSpot.location} reserved for 2 minutes.`
+      );
+    } catch (error) {
+      console.error("Error reserving random spot:", error);
+      Alert.alert(
+        "Error",
+        "Failed to reserve a random spot. Please try again."
+      );
+    }
+  };
+
+  const filteredSpaces = parkingSpaces.filter((space) => space.type === filter);
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={{ marginLeft: 10 }}
+      >
         <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
       </TouchableOpacity>
 
@@ -147,122 +232,143 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.filterContainer}>
-          {['student', 'staff', 'accessible'].map((type) => (
+          {["student", "staff", "accessible"].map((type) => (
             <TouchableOpacity
               key={type}
               style={styles.filterOption}
               onPress={() => setFilter(type)}
             >
-              <Text style={styles.checkbox}>{filter === type ? '☑' : '☐'}</Text>
-              <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+              <Text style={styles.checkbox}>{filter === type ? "☑" : "☐"}</Text>
+              <Text style={styles.filterLabel}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Legend */}
         <View style={styles.legendContainer}>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "green" }]} />
-                <Text style={styles.legendText}>Open</Text>
-            </View>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
-                <Text style={styles.legendText}>Reserved</Text>
-            </View>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "red" }]} />
-                <Text style={styles.legendText}>Occupied</Text>
-            </View>
-            <View style={styles.legendItem}>
-                <View style={[styles.legendBox, { backgroundColor: "blue" }]} />
-                <Text style={styles.legendText}>Selected</Text>
-            </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "green" }]} />
+            <Text style={styles.legendText}>Open</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "yellow" }]} />
+            <Text style={styles.legendText}>Reserved</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "red" }]} />
+            <Text style={styles.legendText}>Occupied</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "blue" }]} />
+            <Text style={styles.legendText}>Selected</Text>
+          </View>
         </View>
 
         {/* SVG Map */}
         <View style={styles.mapWrapper}>
           <Svg height="400" width="300" viewBox="0 0 300 400">
             <Rect x="0" y="0" width="300" height="400" fill="lightgray" />
-            {parkingSpaces.filter(space => space.type === filter).map((space, index) => {
-              const col = space.location % 2 === 0 ? 1 : 0; // even = right, odd = left
-              const row = Math.floor((space.location - 1) / 2);
-              const xPos = col === 0 ? 30 : 160;
-              const yPos = row * 60 + 40;
-              const isSelected = selectedSpot === space.id;
+            {parkingSpaces
+              .filter((space) => space.type === filter)
+              .map((space, index) => {
+                const col = space.location % 2 === 0 ? 1 : 0; // even = right, odd = left
+                const row = Math.floor((space.location - 1) / 2);
+                const xPos = col === 0 ? 30 : 160;
+                const yPos = row * 60 + 40;
+                const isSelected = selectedSpot === space.id;
 
-              return (
-                <React.Fragment key={space.id}>
-                  <Rect
-                    x={xPos}
-                    y={yPos}
-                    width="100"
-                    height="50"
-                    fill={isSelected ? "blue" : statusColors[space.status]}
-                    stroke="black"
-                    strokeWidth="2"
-                    rx="5"
-                    ry="5"
-                  />
-                  <SvgText
-                    x={xPos + 50}
-                    y={yPos + 30}
-                    fontSize="18"
-                    fill="black"
-                    textAnchor="middle"
-                    fontWeight="bold"
-                  >
-                    {space.location}
-                  </SvgText>
-                  {(space.status === "occupied" || space.status === "held") && (
-                    <SvgImage
-                      x={xPos + (100 - 80) / 2}
-                      y={yPos + (50 - 40) / 2}
-                      width="80"
-                      height="40"
-                      href={carIcon}
+                return (
+                  <React.Fragment key={space.id}>
+                    <Rect
+                      x={xPos}
+                      y={yPos}
+                      width="100"
+                      height="50"
+                      fill={isSelected ? "blue" : statusColors[space.status]}
+                      stroke="black"
+                      strokeWidth="2"
+                      rx="5"
+                      ry="5"
                     />
-                  )}
-                </React.Fragment>
-              );
-            })}
+                    <SvgText
+                      x={xPos + 50}
+                      y={yPos + 30}
+                      fontSize="18"
+                      fill="black"
+                      textAnchor="middle"
+                      fontWeight="bold"
+                    >
+                      {space.location}
+                    </SvgText>
+                    {(space.status === "occupied" ||
+                      space.status === "held") && (
+                      <SvgImage
+                        x={xPos + (100 - 80) / 2}
+                        y={yPos + (50 - 40) / 2}
+                        width="80"
+                        height="40"
+                        href={carIcon}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
           </Svg>
 
           {/* Touchable overlays for available spots */}
-          {parkingSpaces.filter(space => space.type === filter).map((space, index) => {
-            const col = space.location % 2 === 0 ? 1 : 0;
-            const row = Math.floor((space.location - 1) / 2);
-            const xPos = col === 0 ? 30 : 160;
-            const yPos = row * 60 + 40;
+          {parkingSpaces
+            .filter((space) => space.type === filter)
+            .map((space, index) => {
+              const col = space.location % 2 === 0 ? 1 : 0;
+              const row = Math.floor((space.location - 1) / 2);
+              const xPos = col === 0 ? 30 : 160;
+              const yPos = row * 60 + 40;
 
-            return space.status === "available" ? (
-              <TouchableOpacity
-                key={`touch-${space.id}`}
-                style={{
-                  position: "absolute",
-                  left: xPos,
-                  top: yPos,
-                  width: 100,
-                  height: 50,
-                }}
-                onPress={() => setSelectedSpot(space.id)}
-              />
-            ) : null;
-          })}
+              return space.status === "available" ? (
+                <TouchableOpacity
+                  key={`touch-${space.id}`}
+                  style={{
+                    position: "absolute",
+                    left: xPos,
+                    top: yPos,
+                    width: 100,
+                    height: 50,
+                  }}
+                  onPress={() => setSelectedSpot(space.id)}
+                />
+              ) : null;
+            })}
         </View>
 
         {/* Steps */}
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
-          <Text style={styles.stepsText}>1. Click on an available green spot</Text>
+          <Text style={styles.stepsText}>
+            1. Click on an available green spot
+          </Text>
           <Text style={styles.stepsText}>
             2. Hit the reserve button after selecting
           </Text>
           <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
 
-        {/* Reserve Button */}
+        {/* Reserve Buttons */}
         <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
           <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.reserveButton,
+            { backgroundColor: "#2196F3", marginTop: 10 },
+          ]}
+          onPress={handleReserveRandomSpot}
+        >
+          <Text style={{ textAlign:"center", color: "white", fontSize: 16 }}>
+            Reserve Random Spot
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -333,7 +439,7 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center", 
+    alignItems: "center",
     flexWrap: "wrap",
     marginVertical: 10,
   },
@@ -349,7 +455,6 @@ const styles = StyleSheet.create({
   filterLabel: {
     fontSize: 16,
   },
-  
 });
 
 export default ParkingMap;
