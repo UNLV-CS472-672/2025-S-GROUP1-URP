@@ -89,30 +89,36 @@ function HomeScreen({ navigation }) {
             <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
 
           {/* Navigation buttons for various screens */}
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Cottage Grove Parking")}>
-            <Image
-              source={require("./assets/CottageGrove-ParkingGarage.jpg")}
-              style={styles.parkingImage}
-            />
-            <Text style={styles.parkingLabel}>Cottage Grove Parking</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Cottage Grove Parking")}>
+            <View style={styles.parkingCard}>
+              <Image
+                source={require("./assets/CottageGrove-ParkingGarage.jpg")}
+                style={styles.parkingImage}
+              />
+              <Text style={styles.parkingText}>Cottage Grove Parking</Text>
+            </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Tropicana Parking")}>
-            <Image
-              source={require("./assets/Tropicana-ParkingGarage.jpg")}
-              style={styles.parkingImage}
-            />
-            <Text style={styles.parkingLabel}>Tropicana Parking</Text>
+
+          <TouchableOpacity onPress={() => navigation.navigate("Tropicana Parking")}>
+            <View style={styles.parkingCard}>
+              <Image
+                source={require("./assets/Tropicana-ParkingGarage.jpg")}
+                style={styles.parkingImage}
+              />
+              <Text style={styles.parkingText}>Tropicana Parking</Text>
+            </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Gateway Parking")}>
-          <Image
-            source={require("./assets/Gateway-ParkingGarage.jpg")}
-            style={styles.parkingImage}
-          />
-            <Text style={styles.parkingLabel}>Gateway Parking</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Gateway Parking")}>
+            <View style={styles.parkingCard}>
+              <Image
+                source={require("./assets/Gateway-ParkingGarage.jpg")}
+                style={styles.parkingImage}
+              />
+              <Text style={styles.parkingText}>Gateway Parking</Text>
+            </View>
           </TouchableOpacity>
-
 
           {/* Logout button with confirmation alert */}
           <TouchableOpacity
@@ -249,18 +255,46 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 100,
   },
+  parkingCard: {
+    width: 215,
+    backgroundColor: "#CC0000",
+    borderRadius: 10,
+    marginBottom: 10,
+    overflow: "hidden",
+    alignItems: "center",
+    elevation: 3,
+  },
   parkingImage: {
-    width: 240,
-    height: 150,
+    width: 200,
+    height: 120,
     resizeMode: "cover",
     borderRadius: 5,
     marginTop: 15,
+  },
+  parkingText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
+    paddingVertical: 10,
+    textAlign: "center",
+    textShadowColor: "black",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },
+  logoutButton: {
+    backgroundColor: "#CC0000",
+    borderWidth: 0,
+    width: 180,
+    alignItems: "center",
+    borderRadius: 4,
+    paddingVertical: 8,
+    marginTop: 1,
   },
   parkingLabel: {
     backgroundColor: "#CC0000",
     color: "black",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 25,
     width: 200,
     textAlign: "center",
   },
@@ -275,7 +309,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   navIcon: {
-    fontSize: 22,
+    fontSize: 30,
     color: "black",
     textAlign: "center",
   },
