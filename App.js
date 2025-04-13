@@ -60,6 +60,8 @@ import AddVehicleScreen from "./screens/AddVehicleScreen";
 import RemoveVehicleScreen from "./screens/RemoveVehicleScreen";
 import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
 import EditVehicleScreen from "./screens/EditVehicleScreen"; // Import the Edit Vehicle Screen
+import initializeParkingCollections from "./src/components/ParkingMap/initParkingData";
+
 
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator();
@@ -136,6 +138,19 @@ function HomeScreen({ navigation }) {
           >
             <Text style={styles.buttonText}>Report</Text>
           </TouchableOpacity>
+
+
+          {/*-------UNCOMMENT THIS CODE TO POPULATE THE GARAGES--------
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: "#444" }]}
+            onPress={async () => {
+            const result = await initializeParkingCollections();
+            Alert.alert(result ? "Success" : "Error", result ? "All garages initialized." : "Check console.");
+            }}
+            >
+            <Text style={styles.buttonText}>Initialize Parking Garages</Text>
+          </TouchableOpacity>
+          */}
 
           {/* Logout button with confirmation alert */}
           <TouchableOpacity
