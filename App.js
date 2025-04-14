@@ -1,10 +1,10 @@
 /**
  * App Component
- * 
+ *
  * This is the main entry point for the UNLV Reserved Parking application.
  * It sets up the navigation structure and integrates Firebase for user authentication.
  * The app includes screens for login, sign-up, password reset, parking management, reporting, and account settings.
- * 
+ *
  * Features:
  * - User authentication (login, sign-up, logout, password reset).
  * - Navigation between screens using React Navigation.
@@ -12,12 +12,12 @@
  * - Reservation status tracking.
  * - Reporting functionality for parking violations.
  * - Account management for adding/removing vehicles.
- * 
+ *
  * Dependencies:
  * - React Navigation for screen transitions.
  * - Firebase Authentication for user management.
  * - Firebase Firestore for storing user and vehicle data.
- * 
+ *
  * Screens:
  * - LoginScreen: Handles user login.
  * - SignUpScreen: Handles user registration.
@@ -31,12 +31,18 @@
  * - RemoveVehicleScreen: Removes a vehicle from the user's account.
  */
 
-
 // React imports for managing state and effects
 import React, { useState, useEffect } from "react";
 
 // Importing components from React Native
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from "react-native";
 
 // Navigation-related imports for handling navigation between screens
 import { NavigationContainer } from "@react-navigation/native";
@@ -48,11 +54,12 @@ import ResetPasswordScreen from "./screens/ResetPasswordScreen";
 import SignUpScreen from "./screens/signUpScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
-import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
+import ParkingMap from "./src/components/ParkingMap/ParkingMap";
 import ReservationStatusScreen from "./screens/ReservationStatusScreen";
-import AddVehicleScreen from './screens/AddVehicleScreen';
-import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
+import AddVehicleScreen from "./screens/AddVehicleScreen";
+import RemoveVehicleScreen from "./screens/RemoveVehicleScreen";
 import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
+import EditVehicleScreen from "./screens/EditVehicleScreen"; // Import the Edit Vehicle Screen
 import initializeParkingCollections from "./src/components/ParkingMap/initParkingData";
 
 
@@ -61,9 +68,9 @@ const Stack = createStackNavigator();
 
 /**
  * HomeScreen Component
- * 
+ *
  * Displays the user dashboard if authenticated, otherwise shows the login screen.
- * 
+ *
  * @param {Object} navigation - React Navigation prop for navigating between screens.
  */
 function HomeScreen({ navigation }) {
@@ -90,27 +97,45 @@ function HomeScreen({ navigation }) {
           <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
 
           {/* Navigation buttons for various screens */}
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("My Account")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("My Account")}
+          >
             <Text style={styles.buttonText}>My Account</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Tropicana Parking")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Tropicana Parking")}
+          >
             <Text style={styles.buttonText}>Tropicana Parking</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Cottage Grove Parking")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Cottage Grove Parking")}
+          >
             <Text style={styles.buttonText}>Cottage Grove Parking</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Gateway Parking")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Gateway Parking")}
+          >
             <Text style={styles.buttonText}>Gateway Parking</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Reservation Status")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Reservation Status")}
+          >
             <Text style={styles.buttonText}>Reservation Status</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Report")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Report")}
+          >
             <Text style={styles.buttonText}>Report</Text>
           </TouchableOpacity>
 
@@ -131,16 +156,20 @@ function HomeScreen({ navigation }) {
           <TouchableOpacity
             style={[styles.button, styles.logoutButton]}
             onPress={() => {
-              Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Yes, Logout",
-                  onPress: () => {
-                    signOut(auth); // Logs out the user
-                    navigation.navigate("Login"); // Navigate to login screen
+              Alert.alert(
+                "Confirm Logout",
+                "Are you sure you want to log out?",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Yes, Logout",
+                    onPress: () => {
+                      signOut(auth); // Logs out the user
+                      navigation.navigate("Login"); // Navigate to login screen
+                    },
                   },
-                },
-              ]);
+                ]
+              );
             }}
           >
             <Text style={styles.buttonText}>Logout</Text>
@@ -173,18 +202,67 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         {/* Defining screen routes */}
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="My Account" component={MyAccountScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="Report" component={ReportScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="My Account"
+          component={MyAccountScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Tropicana Parking"
+          component={TropicanaScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Cottage Grove Parking"
+          component={CottageGroveParkingScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Gateway Parking"
+          component={GatewayParkingScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Reservation Status"
+          component={ReservationStatusScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Report"
+          component={ReportScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="AddVehicle"
+          component={AddVehicleScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="RemoveVehicle"
+          component={RemoveVehicleScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="EditVehicle"
+          component={EditVehicleScreen}
+          options={{ headerLeft: null }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -200,14 +278,14 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 26, // Larger font size
     fontWeight: "bold",
-    color: "white", 
+    color: "white",
     textAlign: "center",
     padding: 20, // Padding inside the header
-    backgroundColor: "#CC0000", 
+    backgroundColor: "#CC0000",
     width: "100%", // Span the entire width of the screen
-    textShadowColor: "black", 
-    textShadowOffset: { width: 2, height: 2 }, 
-    textShadowRadius: 3, 
+    textShadowColor: "black",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
     height: 100, // Fixed height for the header
     justifyContent: "center", // Center text vertically
     alignItems: "center", // Center text horizontally
@@ -215,7 +293,7 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "black", 
+    color: "black",
     marginBottom: 10,
   },
   buttonContainer: {
@@ -237,9 +315,9 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "white", 
+    color: "white",
   },
   logoutButton: {
-    backgroundColor: "#CC0000", 
+    backgroundColor: "#CC0000",
   },
 });
