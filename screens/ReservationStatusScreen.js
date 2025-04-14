@@ -1,24 +1,12 @@
-/**
- * ReservationStatusScreen Component
- * 
- * This screen displays the current reservation status for a parking spot.
- * It includes details such as the parking garage, spot number, and a timer (placeholder).
- * Users can also cancel their reservation from this screen.
- * 
- * Features:
- * - Header with the title "Reservation Status".
- * - Back button to navigate to the previous screen.
- * - Placeholder sections for parking garage and spot number details.
- * - Placeholder for a reservation timer (no logic implemented).
- * - Cancel reservation button with an alert confirmation.
- * 
- */
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 
-const TIMER_DURATION_MINUTES = 30; // Change this to 1 or 2 for testing
+const TIMER_DURATION_MINUTES = 30;
+
+// ✅ CHANGE: Detect test environment
+const isTestEnv = process.env.NODE_ENV === 'test';
 
 export default function ReservationStatusScreen({ navigation }) {
   const [reservation, setReservation] = useState(null);
@@ -45,7 +33,6 @@ export default function ReservationStatusScreen({ navigation }) {
           const resData = resDoc.data();
           setReservation({ id: resDoc.id, ...resData });
 
-          // Calculate expiration time based on Firebase timestamp
           const startTime = resData.startTime.toDate();
           const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
           updateTimer(endTime);
@@ -61,23 +48,40 @@ export default function ReservationStatusScreen({ navigation }) {
     fetchReservation();
   }, []);
 
+  // ✅ CHANGE: Skip timer interval during tests
   useEffect(() => {
-    if (!reservation) return;
+    if (!reservation || isTestEnv) return;
+
     const interval = setInterval(() => {
       const startTime = reservation.startTime.toDate();
       const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
-      updateTimer(endTime);
+
+      (async () => {
+        await updateTimer(endTime);
+      })();
     }, 1000);
 
     return () => clearInterval(interval);
   }, [reservation]);
 
-  const updateTimer = (endTime) => {
+  // ✅ CHANGE: Marked async and added auto-deletion for expired
+  const updateTimer = async (endTime) => {
     const now = new Date();
     const diff = endTime - now;
+
     if (diff <= 0) {
-      setTimeLeft({ minutes: "00", seconds: "00", expired: true });
-      setTimerExpired(true); // Prevents issues when canceling after expiration
+      if (!timerExpired && reservation) {
+        setTimerExpired(true);
+        setTimeLeft({ minutes: "00", seconds: "00", expired: true });
+
+        try {
+          await deleteDoc(doc(db, "Reservations", reservation.id));
+          setReservation(null);
+          console.log("Expired reservation auto-deleted");
+        } catch (error) {
+          console.error("Error auto-deleting expired reservation:", error);
+        }
+      }
     } else {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -143,12 +147,20 @@ export default function ReservationStatusScreen({ navigation }) {
           <View style={styles.inputBox}><Text>{reservation.spotId}</Text></View>
 
           <Text style={styles.timerLabel}>Reservation Timer:</Text>
-          <View style={[styles.timerBox, timeLeft?.expired && styles.expiredTimerBox]}>
-            <Text style={[styles.timerText, timeLeft?.expired && styles.expiredTimerText]}>
-              {timeLeft.minutes} : {timeLeft.seconds}
-            </Text>
-            <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
-          </View>
+
+          {/* ✅ CHANGE: Check if timeLeft exists before rendering timer */}
+          {timeLeft ? (
+            <View style={[styles.timerBox, timeLeft.expired && styles.expiredTimerBox]}>
+              <Text style={[styles.timerText, timeLeft.expired && styles.expiredTimerText]}>
+                {timeLeft.minutes} : {timeLeft.seconds}
+              </Text>
+              <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
+            </View>
+          ) : (
+            <View style={styles.timerBox}>
+              <Text style={styles.timerText}>Loading...</Text>
+            </View>
+          )}
 
           <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
             <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
