@@ -46,9 +46,17 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     occupied: "red",
   };
 
+  const collectionMap = {
+    "Tropicana Parking": "parkingSpotsTrop",
+    "Cottage Grove Parking": "parkingSpotsCottage",
+    "Gateway Parking": "parkingSpotsGateway",
+  };
+
+  const collectionName = collectionMap[parkingLot] || "parkingSpotsTrop";
+
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "parkingSpotsTrop"),
+      collection(db, collectionName),
       async (snapshot) => {
         const now = Timestamp.now();
         const spots = [];
@@ -56,32 +64,29 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
         for (const docSnap of snapshot.docs) {
           const spot = { id: docSnap.id, ...docSnap.data() };
 
-          // Auto-release if hold expired
           if (
             spot.status === "held" &&
             spot.holdExpiresAt &&
             spot.holdExpiresAt.toMillis() < now.toMillis()
           ) {
-            await updateDoc(doc(db, "parkingSpotsTrop", spot.id), {
+            await updateDoc(doc(db, collectionName, spot.id), {
               status: "available",
               heldBy: "",
               holdExpiresAt: null,
             });
 
-            // Update in local UI too
             spot.status = "available";
           }
 
           spots.push(spot);
         }
 
-        // Sort by parking spot location
         setParkingSpaces(spots.sort((a, b) => a.location - b.location));
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [collectionName]);
 
   const handleReserve = async () => {
     if (selectedSpot === null) {
@@ -246,7 +251,6 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           ))}
         </View>
 
-        {/* Legend */}
         <View style={styles.legendContainer}>
           <View style={styles.legendItem}>
             <View style={[styles.legendBox, { backgroundColor: "green" }]} />
@@ -266,7 +270,6 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           </View>
         </View>
 
-        {/* SVG Map */}
         <View style={styles.mapWrapper}>
           <Svg height="400" width="300" viewBox="0 0 300 400">
             <Rect x="0" y="0" width="300" height="400" fill="lightgray" />
@@ -342,7 +345,6 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
             })}
         </View>
 
-        {/* Steps */}
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
           <Text style={styles.stepsText}>
@@ -376,57 +378,17 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    paddingTop: 40,
-  },
-  scrollContent: {
-    alignItems: "center",
-    paddingBottom: 60,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  legendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  legendBox: {
-    width: 20,
-    height: 20,
-    marginRight: 5,
-  },
-  legendText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  mapWrapper: {
-    width: 300,
-    height: 400,
-    position: "relative",
-    marginBottom: 20,
-  },
-  stepsContainer: {
-    alignItems: "center",
-    padding: 10,
-  },
-  stepsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  stepsText: {
-    fontSize: 16,
-  },
+  container: { flex: 1, backgroundColor: "white", paddingTop: 40 },
+  scrollContent: { alignItems: "center", paddingBottom: 60 },
+  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
+  legendContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 10 },
+  legendItem: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
+  legendBox: { width: 20, height: 20, marginRight: 5 },
+  legendText: { fontSize: 16, fontWeight: "bold" },
+  mapWrapper: { width: 300, height: 400, position: "relative", marginBottom: 20 },
+  stepsContainer: { alignItems: "center", padding: 10 },
+  stepsTitle: { fontSize: 18, fontWeight: "bold" },
+  stepsText: { fontSize: 16 },
   reserveButton: {
     backgroundColor: "red",
     padding: 12,
