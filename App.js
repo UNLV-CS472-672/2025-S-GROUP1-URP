@@ -138,6 +138,11 @@ function HomeScreen({ navigation }) {
           >
             <Text style={styles.buttonText}>Logout</Text>
           </TouchableOpacity>
+
+          <View style={styles.parkingCard}>
+            <Text style={styles.parkingText}></Text>
+          </View>
+
         </ScrollView>
 
         <View style={styles.bottomNav}>
