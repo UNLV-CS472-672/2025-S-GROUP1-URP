@@ -1,10 +1,10 @@
 /**
  * App Component
- * 
+ *
  * This is the main entry point for the UNLV Reserved Parking application.
  * It sets up the navigation structure and integrates Firebase for user authentication.
  * The app includes screens for login, sign-up, password reset, parking management, reporting, and account settings.
- * 
+ *
  * Features:
  * - User authentication (login, sign-up, logout, password reset).
  * - Navigation between screens using React Navigation.
@@ -12,12 +12,12 @@
  * - Reservation status tracking.
  * - Reporting functionality for parking violations.
  * - Account management for adding/removing vehicles.
- * 
+ *
  * Dependencies:
  * - React Navigation for screen transitions.
  * - Firebase Authentication for user management.
  * - Firebase Firestore for storing user and vehicle data.
- * 
+ *
  * Screens:
  * - LoginScreen: Handles user login.
  * - SignUpScreen: Handles user registration.
@@ -30,7 +30,6 @@
  * - AddVehicleScreen: Adds a vehicle to the user's account.
  * - RemoveVehicleScreen: Removes a vehicle from the user's account.
  */
-
 
 // React imports for managing state and effects
 import React, { useState, useEffect } from "react";
@@ -48,20 +47,23 @@ import ResetPasswordScreen from "./screens/ResetPasswordScreen";
 import SignUpScreen from "./screens/signUpScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
-import ParkingMap from "./src/components/ParkingMap/ParkingMap"; 
+import ParkingMap from "./src/components/ParkingMap/ParkingMap";
 import ReservationStatusScreen from "./screens/ReservationStatusScreen";
-import AddVehicleScreen from './screens/AddVehicleScreen';
-import RemoveVehicleScreen from './screens/RemoveVehicleScreen';
+import AddVehicleScreen from "./screens/AddVehicleScreen";
+import RemoveVehicleScreen from "./screens/RemoveVehicleScreen";
 import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
+import EditVehicleScreen from "./screens/EditVehicleScreen"; // Import the Edit Vehicle Screen
+import initializeParkingCollections from "./src/components/ParkingMap/initParkingData";
+
 
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator();
 
 /**
  * HomeScreen Component
- * 
+ *
  * Displays the user dashboard if authenticated, otherwise shows the login screen.
- * 
+ *
  * @param {Object} navigation - React Navigation prop for navigating between screens.
  */
 function HomeScreen({ navigation }) {
@@ -181,18 +183,67 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         {/* Defining screen routes */}
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="My Account" component={MyAccountScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="Tropicana Parking" component={TropicanaScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="Cottage Grove Parking" component={CottageGroveParkingScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="Gateway Parking" component={GatewayParkingScreen} options={{ headerLeft: null }} />
-        <Stack.Screen name="Reservation Status" component={ReservationStatusScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="Report" component={ReportScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ headerLeft: null }}/>
-        <Stack.Screen name="RemoveVehicle" component={RemoveVehicleScreen} options={{ headerLeft: null }}/>
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="My Account"
+          component={MyAccountScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Tropicana Parking"
+          component={TropicanaScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Cottage Grove Parking"
+          component={CottageGroveParkingScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Gateway Parking"
+          component={GatewayParkingScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Reservation Status"
+          component={ReservationStatusScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Report"
+          component={ReportScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="AddVehicle"
+          component={AddVehicleScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="RemoveVehicle"
+          component={RemoveVehicleScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="EditVehicle"
+          component={EditVehicleScreen}
+          options={{ headerLeft: null }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -208,14 +259,14 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 26, // Larger font size
     fontWeight: "bold",
-    color: "white", 
+    color: "white",
     textAlign: "center",
     padding: 20, // Padding inside the header
-    backgroundColor: "#CC0000", 
+    backgroundColor: "#CC0000",
     width: "100%", // Span the entire width of the screen
-    textShadowColor: "black", 
-    textShadowOffset: { width: 2, height: 2 }, 
-    textShadowRadius: 3, 
+    textShadowColor: "black",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
     height: 100, // Fixed height for the header
     justifyContent: "center", // Center text vertically
     alignItems: "center", // Center text horizontally
@@ -223,7 +274,7 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "black", 
+    color: "black",
     marginBottom: 10,
   },
   buttonContainer: {
@@ -245,10 +296,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "white", 
+    color: "white",
   },
   logoutButton: {
-    backgroundColor: "#CC0000", 
+    backgroundColor: "#CC0000",
   },
   parkingContainer: {
     alignItems: "center",
