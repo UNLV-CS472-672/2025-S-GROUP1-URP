@@ -120,32 +120,26 @@ function HomeScreen({ navigation }) {
             </View>
           </TouchableOpacity>
 
-          {/* Logout button with confirmation alert */}
+        </ScrollView>
+
+        <View style={styles.bottomNav}>
           <TouchableOpacity
-            style={[styles.button, styles.logoutButton]}
             onPress={() => {
               Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Yes, Logout",
                   onPress: () => {
-                    signOut(auth); // Logs out the user
-                    navigation.navigate("Login"); // Navigate to login screen
+                    signOut(auth);
+                    navigation.navigate("Login");
                   },
                 },
               ]);
             }}
           >
-            <Text style={styles.buttonText}>Logout</Text>
-          </TouchableOpacity>
-
-          <View style={styles.parkingCard}>
-            <Text style={styles.parkingText}></Text>
-          </View>
-
-        </ScrollView>
-
-        <View style={styles.bottomNav}>
+          <Text style={styles.navIcon}>✖</Text>
+          <Text style={styles.navLabel}>Logout</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Report")}>
           <Text style={styles.navIcon}>❗</Text>
           <Text style={styles.navLabel}>Report</Text>
