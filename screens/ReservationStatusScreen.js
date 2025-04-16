@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, where, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 
 const TIMER_DURATION_MINUTES = 30;
@@ -13,6 +13,7 @@ export default function ReservationStatusScreen({ navigation }) {
   const [timeLeft, setTimeLeft] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timerExpired, setTimerExpired] = useState(false);
+  const [garageName, setGarageName] = useState("Loading...");
 
   useEffect(() => {
     const fetchReservation = async () => {
@@ -36,6 +37,27 @@ export default function ReservationStatusScreen({ navigation }) {
           const startTime = resData.startTime.toDate();
           const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
           updateTimer(endTime);
+
+          // ✅ CHANGE: Determine garage name based on spotId
+          const spotId = resData.spotId;
+          const collections = [
+            { name: "parkingSpotsTrop", displayName: "Tropicana Garage" },
+            { name: "parkingSpotsGateway", displayName: "Gateway Garage" },
+            { name: "parkingSpotsCottage", displayName: "Cottage Grove Garage" },
+          ];
+
+          for (const col of collections) {
+            try {
+              const spotRef = doc(db, col.name, spotId);
+              const spotSnap = await getDoc(spotRef);
+              if (spotSnap.exists()) {
+                setGarageName(col.displayName);
+                break;
+              }
+            } catch (error) {
+              console.error(`Error checking collection ${col.name}:`, error);
+            }
+          }
         } else {
           setReservation(null);
         }
@@ -141,7 +163,7 @@ export default function ReservationStatusScreen({ navigation }) {
       ) : reservation ? (
         <>
           <Text style={styles.label}>Parking Garage:</Text>
-          <View style={styles.inputBox}><Text>{reservation.spotId}</Text></View>
+          <View style={styles.inputBox}><Text>{garageName}</Text></View>
 
           <Text style={styles.label}>Parking Spot Number:</Text>
           <View style={styles.inputBox}><Text>{reservation.spotId}</Text></View>
