@@ -10,30 +10,44 @@ import cv2
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    # Capture image from webcam
-    cam = cv2.VideoCapture(0)
-    if not cam.isOpened():
-        logging.error("Unable to access the webcam.")
+    choice = input("Press 'n' to take a new image or 'e' to use an existing image: ").strip().lower()
+
+    if choice == 'n':
+        # Capture image from webcam
+        cam = cv2.VideoCapture(0)
+        if not cam.isOpened():
+            logging.error("Unable to access the webcam.")
+            return
+
+        ret, frame = cam.read()
+        if ret:
+            cv2.imwrite("images/parking_lot_1.png", frame)
+            logging.info("Image captured and saved as parking_lot_1.png")
+        else:
+            logging.error("Failed to capture image from webcam.")
+        cam.release()
+        image_file = "images/parking_lot_1.png"
+    elif choice == 'e':
+        image_file = "images/parking_lot_1.png"
+    else:
+        logging.error("Invalid choice. Exiting.")
         return
 
-    ret, frame = cam.read()
-    if ret:
-        cv2.imwrite("images/parking_lot_1.png", frame)
-        logging.info("Image captured and saved as parking_lot_1.png")
-    else:
-        logging.error("Failed to capture image from webcam.")
-    cam.release()
-
-    image_file = "images/parking_lot_1.png"
     data_file = "data/coordinates_1.yml"
     start_frame = 400
     video_file = 0  # Use 0 for the default webcam
 
-    if image_file is not None:
-        with open(data_file, "w+") as points:
-            generator = CoordinatesGenerator(image_file, points, COLOR_RED)
-            generator.generate()
+    print("Press 'n' to create new coordinates or any other key to use existing coordinates.")
+    choice = input("Press n/e: ").strip().lower()
 
+    if choice == 'n':
+        if image_file is not None:
+            with open(data_file, "w+") as points:
+                generator = CoordinatesGenerator(image_file, points, COLOR_RED)
+                generator.generate()      
+    else:
+        pass
+    
     with open(data_file, "r") as data:
         points = yaml.full_load(data)
         detector = MotionDetector(video_file, points, int(start_frame))
