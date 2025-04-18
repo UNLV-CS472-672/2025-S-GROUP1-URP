@@ -23,6 +23,8 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 // Replace this with your layout image
 import cottageMap from "../assets/cottage_map.png";
@@ -31,13 +33,50 @@ const db = getFirestore();
 const auth = getAuth();
 const screenWidth = Dimensions.get("window").width;
 const baseWidth = 300; // width of design reference image
-const scale = screenWidth / baseWidth;
+const Screenscale = screenWidth / baseWidth;
 
 const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
   const navigation = useNavigation();
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [parkingSpaces, setParkingSpaces] = useState([]);
   const [filter, setFilter] = useState("student");
+
+  const scale = useSharedValue(1);
+  const savedScale = useSharedValue(1);
+
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
+
+  const pinchGesture = Gesture.Pinch()
+  .onUpdate((e) => {
+    scale.value = savedScale.value * e.scale;
+  })
+  .onEnd(() => {
+    savedScale.value = scale.value;
+  });
+
+  const panGesture = Gesture.Pan()
+  .onUpdate((e) => {
+    translateX.value = savedTranslateX.value + e.translationX;
+    translateY.value = savedTranslateY.value + e.translationY;
+  })
+  .onEnd(() => {
+    savedTranslateX.value = translateX.value;
+    savedTranslateY.value = translateY.value;
+  });
+  const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture);
+const animatedStyle = useAnimatedStyle(() => {
+  return {
+    transform: [
+      { scale: scale.value },
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+    ],
+  };
+  });
+  
 
   const statusColors = {
     available: "green",
@@ -158,6 +197,8 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
   return (
     <View style={styles.container}>
+          <GestureDetector gesture={composedGesture}>
+          <Animated.View style={animatedStyle}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
         <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
       </TouchableOpacity>
@@ -212,8 +253,8 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
                   style={[
                     styles.spotButton,
                     {
-                      top: coords.top * scale,
-                      left: coords.left * scale,
+                      top: coords.top * Screenscale,
+                      left: coords.left * Screenscale,
                       backgroundColor: color,
                     },
                   ]}
@@ -236,6 +277,8 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
           <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
         </TouchableOpacity>
       </ScrollView>
+      </Animated.View>
+      </GestureDetector>
     </View>
   );
 };
@@ -258,8 +301,8 @@ const styles = StyleSheet.create({
   },
   spotButton: {
     position: "absolute",
-    width: 20 * scale,
-    height: 10 * scale,
+    width: 20 * Screenscale,
+    height: 10 * Screenscale,
     //borderRadius: 20 * scale,
     justifyContent: "center",
     alignItems: "center",
@@ -269,7 +312,7 @@ const styles = StyleSheet.create({
   spotText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 5 * scale,
+    fontSize: 5 * Screenscale,
   },
   legendContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 10 },
   legendItem: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
