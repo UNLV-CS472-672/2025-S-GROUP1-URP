@@ -54,16 +54,16 @@ import ResetPasswordScreen from './screens/ResetPasswordScreen'
 import SignUpScreen from './screens/signUpScreen'
 import ReportScreen from './screens/ReportScreen' // Import the Report Page
 import MyAccountScreen from './screens/MyAccountScreen'
-import ParkingMap from './src/components/ParkingMap/ParkingMap'
+// import ParkingMap from './src/components/ParkingMap/ParkingMap'
 import TropicanaParkingScreen from './screens/TropicanaParkingScreen'
 import CottageGroveParkingScreen from './screens/CottageGroveParkingScreen'
 import GatewayParkingScreen from './screens/GatewayParkingScreen'
 import ReservationStatusScreen from './screens/ReservationStatusScreen'
 import AddVehicleScreen from './screens/AddVehicleScreen'
 import RemoveVehicleScreen from './screens/RemoveVehicleScreen'
-import ReservationConfirmationScreen from './screens/ReservationConfirmationScreen'
+// import ReservationConfirmationScreen from './screens/ReservationConfirmationScreen'
 import EditVehicleScreen from './screens/EditVehicleScreen' // Import the Edit Vehicle Screen
-import initializeParkingCollections from './src/components/ParkingMap/initParkingData'
+// import initializeParkingCollections from './src/components/ParkingMap/initParkingData'
 
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator()
@@ -93,55 +93,56 @@ function HomeScreen ({ navigation }) {
       <Text style={styles.header}>UNLV Reserved Parking Dashboard</Text>
 
       {/* Conditionally render either user dashboard or login screen */}
-      {user ? (
-        // If user is authenticated, show dashboard with navigation options
-        <ScrollView contentContainerStyle={styles.buttonContainer}>
-          <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
+      {user
+        ? (
+      // If user is authenticated, show dashboard with navigation options
+          <ScrollView contentContainerStyle={styles.buttonContainer}>
+            <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
 
-          {/* Navigation buttons for various screens */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('My Account')}
-          >
-            <Text style={styles.buttonText}>My Account</Text>
-          </TouchableOpacity>
+            {/* Navigation buttons for various screens */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('My Account')}
+            >
+              <Text style={styles.buttonText}>My Account</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Tropicana Parking')}
-          >
-            <Text style={styles.buttonText}>Tropicana Parking</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Tropicana Parking')}
+            >
+              <Text style={styles.buttonText}>Tropicana Parking</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Cottage Grove Parking')}
-          >
-            <Text style={styles.buttonText}>Cottage Grove Parking</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Cottage Grove Parking')}
+            >
+              <Text style={styles.buttonText}>Cottage Grove Parking</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Gateway Parking')}
-          >
-            <Text style={styles.buttonText}>Gateway Parking</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Gateway Parking')}
+            >
+              <Text style={styles.buttonText}>Gateway Parking</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Reservation Status')}
-          >
-            <Text style={styles.buttonText}>Reservation Status</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Reservation Status')}
+            >
+              <Text style={styles.buttonText}>Reservation Status</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Report')}
-          >
-            <Text style={styles.buttonText}>Report</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Report')}
+            >
+              <Text style={styles.buttonText}>Report</Text>
+            </TouchableOpacity>
 
-          {/* -------UNCOMMENT THIS CODE TO POPULATE THE GARAGES--------
+            {/* -------UNCOMMENT THIS CODE TO POPULATE THE GARAGES--------
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#444" }]}
             onPress={async () => {
@@ -153,33 +154,34 @@ function HomeScreen ({ navigation }) {
           </TouchableOpacity>
           */}
 
-          {/* Logout button with confirmation alert */}
-          <TouchableOpacity
-            style={[styles.button, styles.logoutButton]}
-            onPress={() => {
-              Alert.alert(
-                'Confirm Logout',
-                'Are you sure you want to log out?',
-                [
-                  { text: 'Cancel', style: 'cancel' },
-                  {
-                    text: 'Yes, Logout',
-                    onPress: () => {
-                      signOut(auth) // Logs out the user
-                      navigation.navigate('Login') // Navigate to login screen
+            {/* Logout button with confirmation alert */}
+            <TouchableOpacity
+              style={[styles.button, styles.logoutButton]}
+              onPress={() => {
+                Alert.alert(
+                  'Confirm Logout',
+                  'Are you sure you want to log out?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Yes, Logout',
+                      onPress: () => {
+                        signOut(auth) // Logs out the user
+                        navigation.navigate('Login') // Navigate to login screen
+                      }
                     }
-                  }
-                ]
-              )
-            }}
-          >
-            <Text style={styles.buttonText}>Logout</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      ) : (
-        // If user is not authenticated, show login screen
-        <LoginScreen />
-      )}
+                  ]
+                )
+              }}
+            >
+              <Text style={styles.buttonText}>Logout</Text>
+            </TouchableOpacity>
+          </ScrollView>
+          )
+        : (
+      // If user is not authenticated, show login screen
+          <LoginScreen />
+          )}
     </View>
   )
 }

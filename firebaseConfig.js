@@ -6,7 +6,7 @@ import { getFirestore } from 'firebase/firestore' // Import Firestore
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDJCwZZjxg-wXxvnEv6Q4gwCwsrcJ4-7Hw',
+  apiKey: process.env.REACT_APP_FIREBASECONFIG_API_KEY,
   authDomain: 'urp-project-9b5ce.firebaseapp.com',
   projectId: 'urp-project-9b5ce',
   storageBucket: 'urp-project-9b5ce.firebasestorage.app',
