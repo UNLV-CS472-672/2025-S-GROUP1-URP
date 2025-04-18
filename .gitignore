@@ -37,3 +37,7 @@ yarn-error.*
 
 # test coverage reports
 coverage
+
+camera/data
+camera/images
+camera/videos
