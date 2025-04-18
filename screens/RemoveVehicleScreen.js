@@ -60,7 +60,9 @@ export default function RemoveVehicleScreen({ route, navigation }) {
 
         // Remove the vehicle from Firestore
         const updatedVehicles = vehicles.filter(
-          (vehicle) => vehicle !== selectedVehicle
+          (vehicle) => 
+            vehicle.licensePlate !== selectedVehicle.licensePlate ||
+            vehicle.make !== selectedVehicle.make
         );
         await setDoc(doc(db, "vehicles", user.uid), {
           vehicles: updatedVehicles,

@@ -19,8 +19,10 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { getStorage } from "firebase/storage";
 
+
+
 // AddVehicleScreen component
-export default function AddVehicleScreen({ navigation }) {
+export default function AddVehicleScreen({ navigation, route }) {
   const [make, setMake] = useState(""); // Vehicle make
   const [model, setModel] = useState(""); // Vehicle model
   const [year, setYear] = useState(""); // Vehicle year
@@ -29,6 +31,7 @@ export default function AddVehicleScreen({ navigation }) {
   const [image, setImage] = useState(null); // State for vehicle image
   const [isModalVisible, setModalVisible] = useState(false); // Modal visibility
   const [isSaving, setIsSaving] = useState(false); // Prevent duplicate saves
+  const fromRedirect = route?.params?.fromRedirect || false;
 
   // Listen to keyboard show/hide events
   useEffect(() => {
@@ -261,9 +264,17 @@ export default function AddVehicleScreen({ navigation }) {
       {!isKeyboardVisible && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate("My Account")}
+          onPress={() => {
+            if (fromRedirect) {
+              navigation.navigate("Home");
+            } else {
+              navigation.navigate("My Account");
+            }
+          }}
         >
-          <Text style={styles.backButtonText}>Back to My Account</Text>
+          <Text style={styles.backButtonText}>
+            Back to {fromRedirect ? "Home" : "My Account"}
+          </Text>
         </TouchableOpacity>
       )}
     </View>
