@@ -32,7 +32,7 @@
  */
 
 // React imports for managing state and effects
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 
 // Importing components from React Native
 import {
@@ -41,33 +41,32 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
-} from "react-native";
+  Alert
+} from 'react-native'
 
 // Navigation-related imports for handling navigation between screens
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { auth } from "./firebaseConfig";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import LoginScreen from "./screens/LoginScreen";
-import ResetPasswordScreen from "./screens/ResetPasswordScreen";
-import SignUpScreen from "./screens/signUpScreen";
-import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
-import MyAccountScreen from "./screens/MyAccountScreen";
-import ParkingMap from "./src/components/ParkingMap/ParkingMap";
-import TropicanaParkingScreen from "./screens/TropicanaParkingScreen";
-import CottageGroveParkingScreen from "./screens/CottageGroveParkingScreen";
-import GatewayParkingScreen from "./screens/GatewayParkingScreen";
-import ReservationStatusScreen from "./screens/ReservationStatusScreen";
-import AddVehicleScreen from "./screens/AddVehicleScreen";
-import RemoveVehicleScreen from "./screens/RemoveVehicleScreen";
-import ReservationConfirmationScreen from "./screens/ReservationConfirmationScreen";
-import EditVehicleScreen from "./screens/EditVehicleScreen"; // Import the Edit Vehicle Screen
-import initializeParkingCollections from "./src/components/ParkingMap/initParkingData";
-
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import { auth } from './firebaseConfig'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+import LoginScreen from './screens/LoginScreen'
+import ResetPasswordScreen from './screens/ResetPasswordScreen'
+import SignUpScreen from './screens/signUpScreen'
+import ReportScreen from './screens/ReportScreen' // Import the Report Page
+import MyAccountScreen from './screens/MyAccountScreen'
+import ParkingMap from './src/components/ParkingMap/ParkingMap'
+import TropicanaParkingScreen from './screens/TropicanaParkingScreen'
+import CottageGroveParkingScreen from './screens/CottageGroveParkingScreen'
+import GatewayParkingScreen from './screens/GatewayParkingScreen'
+import ReservationStatusScreen from './screens/ReservationStatusScreen'
+import AddVehicleScreen from './screens/AddVehicleScreen'
+import RemoveVehicleScreen from './screens/RemoveVehicleScreen'
+import ReservationConfirmationScreen from './screens/ReservationConfirmationScreen'
+import EditVehicleScreen from './screens/EditVehicleScreen' // Import the Edit Vehicle Screen
+import initializeParkingCollections from './src/components/ParkingMap/initParkingData'
 
 // Stack navigator creation for screen transitions
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 /**
  * HomeScreen Component
@@ -76,17 +75,17 @@ const Stack = createStackNavigator();
  *
  * @param {Object} navigation - React Navigation prop for navigating between screens.
  */
-function HomeScreen({ navigation }) {
-  const [user, setUser] = useState(null); // State to track user authentication status
+function HomeScreen ({ navigation }) {
+  const [user, setUser] = useState(null) // State to track user authentication status
 
   // Effect hook to subscribe to authentication state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user); // Update user state when auth state changes
-    });
+      setUser(user) // Update user state when auth state changes
+    })
 
-    return unsubscribe; // Clean up subscription when component unmounts
-  }, []);
+    return unsubscribe // Clean up subscription when component unmounts
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -102,48 +101,47 @@ function HomeScreen({ navigation }) {
           {/* Navigation buttons for various screens */}
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("My Account")}
+            onPress={() => navigation.navigate('My Account')}
           >
             <Text style={styles.buttonText}>My Account</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Tropicana Parking")}
+            onPress={() => navigation.navigate('Tropicana Parking')}
           >
             <Text style={styles.buttonText}>Tropicana Parking</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Cottage Grove Parking")}
+            onPress={() => navigation.navigate('Cottage Grove Parking')}
           >
             <Text style={styles.buttonText}>Cottage Grove Parking</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Gateway Parking")}
+            onPress={() => navigation.navigate('Gateway Parking')}
           >
             <Text style={styles.buttonText}>Gateway Parking</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Reservation Status")}
+            onPress={() => navigation.navigate('Reservation Status')}
           >
             <Text style={styles.buttonText}>Reservation Status</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Report")}
+            onPress={() => navigation.navigate('Report')}
           >
             <Text style={styles.buttonText}>Report</Text>
           </TouchableOpacity>
 
-
-          {/*-------UNCOMMENT THIS CODE TO POPULATE THE GARAGES--------
+          {/* -------UNCOMMENT THIS CODE TO POPULATE THE GARAGES--------
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#444" }]}
             onPress={async () => {
@@ -160,19 +158,19 @@ function HomeScreen({ navigation }) {
             style={[styles.button, styles.logoutButton]}
             onPress={() => {
               Alert.alert(
-                "Confirm Logout",
-                "Are you sure you want to log out?",
+                'Confirm Logout',
+                'Are you sure you want to log out?',
                 [
-                  { text: "Cancel", style: "cancel" },
+                  { text: 'Cancel', style: 'cancel' },
                   {
-                    text: "Yes, Logout",
+                    text: 'Yes, Logout',
                     onPress: () => {
-                      signOut(auth); // Logs out the user
-                      navigation.navigate("Login"); // Navigate to login screen
-                    },
-                  },
+                      signOut(auth) // Logs out the user
+                      navigation.navigate('Login') // Navigate to login screen
+                    }
+                  }
                 ]
-              );
+              )
             }}
           >
             <Text style={styles.buttonText}>Logout</Text>
@@ -183,144 +181,144 @@ function HomeScreen({ navigation }) {
         <LoginScreen />
       )}
     </View>
-  );
+  )
 }
 
 // Screens for different parking lots
-function TropicanaScreen() {
-  return <TropicanaParkingScreen parkingLot="Tropicana Parking" />;
+function TropicanaScreen () {
+  return <TropicanaParkingScreen parkingLot='Tropicana Parking' />
 }
 
-function CottageGroveScreen() {
-  return <CottageGroveParkingScreen parkingLot="Cottage Grove Parking" />;
+function CottageGroveScreen () {
+  return <CottageGroveParkingScreen parkingLot='Cottage Grove Parking' />
 }
 
-function GatewayScreen() {
-  return <GatewayParkingScreen parkingLot="Gateway Parking" />;
+function GatewayScreen () {
+  return <GatewayParkingScreen parkingLot='Gateway Parking' />
 }
 
 // App component that includes the navigator and stack of screens
-export default function App() {
+export default function App () {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName='Login'>
         {/* Defining screen routes */}
         <Stack.Screen
-          name="Login"
+          name='Login'
           component={LoginScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name='SignUp' component={SignUpScreen} />
         <Stack.Screen
-          name="ResetPassword"
+          name='ResetPassword'
           component={ResetPasswordScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="Home"
+          name='Home'
           component={HomeScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="My Account"
+          name='My Account'
           component={MyAccountScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="Tropicana Parking"
+          name='Tropicana Parking'
           component={TropicanaScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="Cottage Grove Parking"
+          name='Cottage Grove Parking'
           component={CottageGroveScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="Gateway Parking"
+          name='Gateway Parking'
           component={GatewayScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="Reservation Status"
+          name='Reservation Status'
           component={ReservationStatusScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="Report"
+          name='Report'
           component={ReportScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="AddVehicle"
+          name='AddVehicle'
           component={AddVehicleScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="RemoveVehicle"
+          name='RemoveVehicle'
           component={RemoveVehicleScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
-          name="EditVehicle"
+          name='EditVehicle'
           component={EditVehicleScreen}
           options={{ headerLeft: null }}
         />
       </Stack.Navigator>
     </NavigationContainer>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start", // Align items to the top
-    margin: 0, // Remove margin to allow full-width header
+    alignItems: 'center',
+    justifyContent: 'flex-start', // Align items to the top
+    margin: 0 // Remove margin to allow full-width header
   },
   header: {
     fontSize: 26, // Larger font size
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
     padding: 20, // Padding inside the header
-    backgroundColor: "#CC0000",
-    width: "100%", // Span the entire width of the screen
-    textShadowColor: "black",
+    backgroundColor: '#CC0000',
+    width: '100%', // Span the entire width of the screen
+    textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
     height: 100, // Fixed height for the header
-    justifyContent: "center", // Center text vertically
-    alignItems: "center", // Center text horizontally
+    justifyContent: 'center', // Center text vertically
+    alignItems: 'center' // Center text horizontally
   },
   welcomeText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "black",
-    marginBottom: 10,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 10
   },
   buttonContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    padding: 20, // Add padding to the button container
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    padding: 20 // Add padding to the button container
   },
   button: {
-    backgroundColor: "#CC0000",
+    backgroundColor: '#CC0000',
     paddingVertical: 15,
-    borderColor: "black",
+    borderColor: 'black',
     borderWidth: 3,
     width: 250,
-    alignItems: "center",
+    alignItems: 'center',
     borderRadius: 10,
-    marginVertical: 8,
+    marginVertical: 8
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: 'bold',
+    color: 'white'
   },
   logoutButton: {
-    backgroundColor: "#CC0000",
-  },
-});
+    backgroundColor: '#CC0000'
+  }
+})
