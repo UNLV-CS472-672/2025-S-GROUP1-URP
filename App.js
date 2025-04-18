@@ -24,7 +24,7 @@
  * - ResetPasswordScreen: Allows users to reset their password.
  * - HomeScreen: Displays the main dashboard with navigation options.
  * - MyAccountScreen: Manages user account and vehicle information.
- * - TropicanaScreen, CottageGroveParkingScreen, GatewayParkingScreen: Displays parking maps for respective lots.
+ * - TropicanaParkingScreen, CottageGroveParkingScreen, GatewayParkingScreen: Displays parking maps for respective lots.
  * - ReservationStatusScreen: Shows the status of the user's reservation.
  * - ReportScreen: Allows users to report parking violations.
  * - AddVehicleScreen: Adds a vehicle to the user's account.
@@ -55,6 +55,9 @@ import SignUpScreen from "./screens/signUpScreen";
 import ReportScreen from "./screens/ReportScreen"; // Import the Report Page
 import MyAccountScreen from "./screens/MyAccountScreen";
 import ParkingMap from "./src/components/ParkingMap/ParkingMap";
+import TropicanaParkingScreen from "./screens/TropicanaParkingScreen";
+import CottageGroveParkingScreen from "./screens/CottageGroveParkingScreen";
+import GatewayParkingScreen from "./screens/GatewayParkingScreen";
 import ReservationStatusScreen from "./screens/ReservationStatusScreen";
 import AddVehicleScreen from "./screens/AddVehicleScreen";
 import RemoveVehicleScreen from "./screens/RemoveVehicleScreen";
@@ -185,15 +188,15 @@ function HomeScreen({ navigation }) {
 
 // Screens for different parking lots
 function TropicanaScreen() {
-  return <ParkingMap parkingLot="Tropicana Parking" />;
+  return <TropicanaParkingScreen parkingLot="Tropicana Parking" />;
 }
 
-function CottageGroveParkingScreen() {
-  return <ParkingMap parkingLot="Cottage Grove Parking" />;
+function CottageGroveScreen() {
+  return <CottageGroveParkingScreen parkingLot="Cottage Grove Parking" />;
 }
 
-function GatewayParkingScreen() {
-  return <ParkingMap parkingLot="Gateway Parking" />;
+function GatewayScreen() {
+  return <GatewayParkingScreen parkingLot="Gateway Parking" />;
 }
 
 // App component that includes the navigator and stack of screens
@@ -230,12 +233,12 @@ export default function App() {
         />
         <Stack.Screen
           name="Cottage Grove Parking"
-          component={CottageGroveParkingScreen}
+          component={CottageGroveScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
           name="Gateway Parking"
-          component={GatewayParkingScreen}
+          component={GatewayScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen
