@@ -24,13 +24,6 @@ def main():
         logging.error("Failed to capture image from webcam.")
     cam.release()
 
-    # Killswitch: Wait for 'q' key to terminate the program
-    logging.info("Press 'q' to terminate the program.")
-    while True:
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            logging.info("Killswitch activated. Exiting program.")
-            break
-
     image_file = "images/parking_lot_1.png"
     data_file = "data/coordinates_1.yml"
     start_frame = 400
