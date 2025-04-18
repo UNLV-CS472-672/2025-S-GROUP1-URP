@@ -41,3 +41,5 @@ coverage
 camera/data
 camera/images
 camera/videos
+camera/data/coordinates_1.yml
+camera/images/parking_lot_1.png
