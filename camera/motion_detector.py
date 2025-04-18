@@ -18,8 +18,11 @@ class MotionDetector:
         self.mask = []
 
     def detect_motion(self):
-        capture = open_cv.VideoCapture(self.video)
-        capture.set(open_cv.CAP_PROP_POS_FRAMES, self.start_frame)
+        capture = open_cv.VideoCapture(self.video)  # `self.video` can now be an integer for webcam
+        if isinstance(self.video, int):
+            self.start_frame = 0  # Ignore start_frame for live video feed
+        else:
+            capture.set(open_cv.CAP_PROP_POS_FRAMES, self.start_frame)
 
         coordinates_data = self.coordinates_data
         logging.debug("coordinates data: %s", coordinates_data)
@@ -60,7 +63,7 @@ class MotionDetector:
                 break
 
             if not result:
-                raise CaptureReadError("Error reading video capture on frame %s" % str(frame))
+                raise CaptureReadError("Error reading video capture.")
 
             blurred = open_cv.GaussianBlur(frame.copy(), (5, 5), 3)
             grayed = open_cv.cvtColor(blurred, open_cv.COLOR_BGR2GRAY)

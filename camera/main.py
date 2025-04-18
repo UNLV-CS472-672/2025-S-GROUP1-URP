@@ -4,15 +4,30 @@ import logging
 from coordinates_generator import CoordinatesGenerator
 from motion_detector import MotionDetector
 from colors import *
+import cv2
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
 
+    # Capture image from webcam
+    cam = cv2.VideoCapture(0)
+    if not cam.isOpened():
+        logging.error("Unable to access the webcam.")
+        return
+
+    ret, frame = cam.read()
+    if ret:
+        cv2.imwrite("images/parking_lot_1.png", frame)
+        logging.info("Image captured and saved as parking_lot_1.png")
+    else:
+        logging.error("Failed to capture image from webcam.")
+    cam.release()
+    
     image_file = "images/parking_lot_1.png"
     data_file = "data/coordinates_1.yml"
     start_frame = 400
-    video_file = "videos/parking_lot_1.mp4"
+    video_file = 0  # Use 0 for the default webcam
 
     if image_file is not None:
         with open(data_file, "w+") as points:
@@ -35,8 +50,9 @@ def parse_args():
 
     parser.add_argument("--video",
                         dest="video_file",
-                        required=True,
-                        help="Video file to detect motion on")
+                        required=False,
+                        default=0,  # Default to webcam
+                        help="Video file to detect motion on (use 0 for webcam)")
 
     parser.add_argument("--data",
                         dest="data_file",
@@ -47,7 +63,7 @@ def parse_args():
                         dest="start_frame",
                         required=False,
                         default=1,
-                        help="Starting frame on the video")
+                        help="Starting frame on the video (ignored for webcam)")
 
     return parser.parse_args()
 
