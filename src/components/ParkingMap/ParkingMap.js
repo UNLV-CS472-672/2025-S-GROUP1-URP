@@ -8,7 +8,11 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import Svg, { Rect, Text as SvgText, Image as SvgImage } from "react-native-svg";
+import Svg, {
+  Rect,
+  Text as SvgText,
+  Image as SvgImage,
+} from "react-native-svg";
 import carIcon from "../../../assets/car_icon.png";
 import {
   getFirestore,
@@ -20,7 +24,7 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
@@ -115,7 +119,9 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
       const spotDocRef = doc(db, collectionName, selectedSpot);
       const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
       const now = Timestamp.now();
-      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000));
+      const holdExpires = Timestamp.fromDate(
+        new Date(Date.now() + 2 * 60 * 1000)
+      );
 
       await updateDoc(spotDocRef, {
         status: "held",
@@ -140,11 +146,90 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     }
   };
 
-  const filteredSpaces = parkingSpaces.filter(space => space.type === filter);
+  const handleReserveRandomSpot = async () => {
+    try {
+      // Step 1: Filter available spots
+      const availableSpots = parkingSpaces.filter(
+        (space) => space.status === "available" && space.type === filter
+      );
+
+      if (availableSpots.length === 0) {
+        Alert.alert(
+          "No Available Spots",
+          "There are no available spots to reserve."
+        );
+        return;
+      }
+
+      // Step 2: Select a random spot
+      const randomSpot =
+        availableSpots[Math.floor(Math.random() * availableSpots.length)];
+
+      // Step 3: Reserve the spot
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Not Signed In", "Please log in to reserve a spot.");
+        return;
+      }
+
+      const reservationQuery = query(
+        collection(db, "Reservations"),
+        where("userID", "==", user.uid),
+        where("status", "==", "held")
+      );
+      const reservationSnapshot = await getDocs(reservationQuery);
+
+      if (!reservationSnapshot.empty) {
+        Alert.alert(
+          "Active Reservation Found",
+          "You already have an active reservation. You must cancel it before reserving a new spot."
+        );
+        return;
+      }
+
+      const spotDocRef = doc(db, collectionName, randomSpot.id);
+      const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
+      const now = Timestamp.now();
+      const holdExpires = Timestamp.fromDate(
+        new Date(Date.now() + 2 * 60 * 1000)
+      ); // 2 minutes hold
+
+      await updateDoc(spotDocRef, {
+        status: "held",
+        heldBy: user.uid,
+        holdExpiresAt: holdExpires,
+      });
+
+      await setDoc(doc(db, "Reservations", reservationId), {
+        userID: user.uid,
+        spotId: randomSpot.id,
+        status: "held",
+        startTime: now,
+        endTime: holdExpires,
+        createdAt: now,
+      });
+
+      Alert.alert(
+        "Success",
+        `Spot ${randomSpot.location} reserved for 2 minutes.`
+      );
+    } catch (error) {
+      console.error("Error reserving random spot:", error);
+      Alert.alert(
+        "Error",
+        "Failed to reserve a random spot. Please try again."
+      );
+    }
+  };
+
+  const filteredSpaces = parkingSpaces.filter((space) => space.type === filter);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={{ marginLeft: 10 }}
+      >
         <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
       </TouchableOpacity>
 
@@ -152,14 +237,16 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.filterContainer}>
-          {['student', 'staff', 'accessible'].map((type) => (
+          {["student", "staff", "accessible"].map((type) => (
             <TouchableOpacity
               key={type}
               style={styles.filterOption}
               onPress={() => setFilter(type)}
             >
-              <Text style={styles.checkbox}>{filter === type ? '☑' : '☐'}</Text>
-              <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+              <Text style={styles.checkbox}>{filter === type ? "☑" : "☐"}</Text>
+              <Text style={styles.filterLabel}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -169,7 +256,7 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
             { color: "green", label: "Open" },
             { color: "yellow", label: "Reserved" },
             { color: "red", label: "Occupied" },
-            { color: "blue", label: "Selected" }
+            { color: "blue", label: "Selected" },
           ].map(({ color, label }) => (
             <View style={styles.legendItem} key={label}>
               <View style={[styles.legendBox, { backgroundColor: color }]} />
@@ -249,13 +336,29 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
-          <Text style={styles.stepsText}>1. Click on an available green spot</Text>
-          <Text style={styles.stepsText}>2. Hit the reserve button after selecting</Text>
+          <Text style={styles.stepsText}>
+            1. Click on an available green spot
+          </Text>
+          <Text style={styles.stepsText}>
+            2. Hit the reserve button after selecting
+          </Text>
           <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
 
         <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
           <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.reserveButton,
+            { backgroundColor: "#2196F3", marginTop: 10 },
+          ]}
+          onPress={handleReserveRandomSpot}
+        >
+          <Text style={{ textAlign: "center", color: "white", fontSize: 16 }}>
+            Reserve Random Spot
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -265,12 +368,30 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "white", paddingTop: 40 },
   scrollContent: { alignItems: "center", paddingBottom: 60 },
-  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
-  legendContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 10 },
-  legendItem: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
   legendBox: { width: 20, height: 20, marginRight: 5 },
   legendText: { fontSize: 16, fontWeight: "bold" },
-  mapWrapper: { width: 300, height: 400, position: "relative", marginBottom: 20 },
+  mapWrapper: {
+    width: 300,
+    height: 400,
+    position: "relative",
+    marginBottom: 20,
+  },
   stepsContainer: { alignItems: "center", padding: 10 },
   stepsTitle: { fontSize: 18, fontWeight: "bold" },
   stepsText: { fontSize: 16 },
