@@ -9,7 +9,7 @@ import {
   Dimensions
 } from 'react-native'
 import Svg, { Rect, Text as SvgText, Image as SvgImage } from 'react-native-svg'
-import carIcon from '../../../assets/car_icon.png'
+import carIcon from '../assets/car_icon.png'
 import {
   getFirestore,
   doc,
