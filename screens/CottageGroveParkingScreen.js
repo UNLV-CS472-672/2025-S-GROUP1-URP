@@ -83,9 +83,12 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
       prevTranslationY.value = translationY.value;
     })
     .onUpdate((event) => {
-      const maxTranslateX = width / 2 - 50;
-      const maxTranslateY = height / 2 - 50;
-
+      const scaledWidth = screenWidth * scale.value;
+      const scaledHeight = screenWidth * scale.value;
+    
+      const maxTranslateX = Math.max((scaledWidth - screenWidth) / 2, 0);
+      const maxTranslateY = Math.max((scaledHeight - screenWidth) / 2, 0);
+    
       translationX.value = clamp(
         prevTranslationX.value + event.translationX,
         -maxTranslateX,
@@ -220,52 +223,55 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
   return (
     <View style={styles.container}>
-
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
-        <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
+    <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
+      <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
+    </TouchableOpacity>
+  
+    <Text style={styles.title}>{parkingLot}</Text>
+  
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      {/* Non-gesture UI in white background */}
+      <View style={styles.infoSection}>
+  <View style={styles.filterContainer}>
+    {["student", "staff", "accessible"].map((type) => (
+      <TouchableOpacity
+        key={type}
+        style={styles.filterOption}
+        onPress={() => setFilter(type)}
+      >
+        <Text style={styles.checkbox}>{filter === type ? "☑" : "☐"}</Text>
+        <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
       </TouchableOpacity>
-      
-      <Text style={styles.title}>{parkingLot}</Text>
+    ))}
+  </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.filterContainer}>
-          {["student", "staff", "accessible"].map((type) => (
-            <TouchableOpacity
-              key={type}
-              style={styles.filterOption}
-              onPress={() => setFilter(type)}
-            >
-              <Text style={styles.checkbox}>{filter === type ? "☑" : "☐"}</Text>
-              <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+  <View style={styles.legendContainer}>
+    {[
+      { color: "green", label: "Open" },
+      { color: "yellow", label: "Reserved" },
+      { color: "red", label: "Occupied" },
+      { color: "blue", label: "Selected" },
+    ].map(({ color, label }) => (
+      <View style={styles.legendItem} key={label}>
+        <View style={[styles.legendBox, { backgroundColor: color }]} />
+        <Text style={styles.legendText}>{label}</Text>
+      </View>
+    ))}
+  </View>
+</View>
 
-        <View style={styles.legendContainer}>
-          {[
-            { color: "green", label: "Open" },
-            { color: "yellow", label: "Reserved" },
-            { color: "red", label: "Occupied" },
-            { color: "blue", label: "Selected" },
-          ].map(({ color, label }) => (
-            <View style={styles.legendItem} key={label}>
-              <View style={[styles.legendBox, { backgroundColor: color }]} />
-              <Text style={styles.legendText}>{label}</Text>
-            </View>
-          ))}
-        </View>
-        <GestureDetector gesture={composedGesture}>
+  
+      {/* Gesture-enabled map area */}
+      <GestureDetector gesture={composedGesture}>
         <Animated.View style={[animatedStyles, styles.mapWrapper]}>
           <ImageBackground source={cottageMap} style={styles.mapImage}>
             {filteredSpaces.map((space) => {
               const coords = layoutMap[space.id];
               if (!coords) return null;
-
+  
               const isSelected = selectedSpot === space.id;
-              const color = isSelected
-                ? "blue"
-                : statusColors[space.status] || "gray";
-
+              const color = isSelected ? "blue" : statusColors[space.status] || "gray";
+  
               return (
                 <TouchableOpacity
                   key={space.id}
@@ -286,21 +292,24 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
               );
             })}
           </ImageBackground>
-          </Animated.View>
-          </GestureDetector>
-
+        </Animated.View>
+      </GestureDetector>
+  
+      {/* Info and action buttons in white background */}
+      <View style={styles.infoSection}>
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
           <Text style={styles.stepsText}>1. Click on an available green spot</Text>
           <Text style={styles.stepsText}>2. Hit the reserve button after selecting</Text>
           <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
-
+  
         <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
           <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
         </TouchableOpacity>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
+  </View>
   );
 };
 
@@ -335,7 +344,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 5 * Screenscale,
   },
-  legendContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 10 },
+  legendContainer: {   flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "white",
+    paddingVertical: 2,
+    width: "100%", },
   legendItem: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
   legendBox: { width: 20, height: 20, marginRight: 5 },
   legendText: { fontSize: 16, fontWeight: "bold" },
@@ -357,6 +370,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
     marginVertical: 10,
+    backgroundColor: "white",
+    paddingVertical: 5,
+    width: "100%",
   },
   filterOption: {
     flexDirection: "row",
@@ -365,6 +381,12 @@ const styles = StyleSheet.create({
   },
   checkbox: { fontSize: 20, marginRight: 5 },
   filterLabel: { fontSize: 16 },
+  infoSection: {
+    backgroundColor: "white",
+    width: "100%",
+    alignItems: "center",
+    zIndex:1,
+  },  
 });
 
 export default ParkingMap;
