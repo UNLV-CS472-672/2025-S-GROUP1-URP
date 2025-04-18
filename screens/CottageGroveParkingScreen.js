@@ -35,6 +35,12 @@ const screenWidth = Dimensions.get("window").width;
 const baseWidth = 300; // width of design reference image
 const Screenscale = screenWidth / baseWidth;
 
+const { width, height } = Dimensions.get('screen');
+
+function clamp(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+}
+
 const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
   const navigation = useNavigation();
   const [selectedSpot, setSelectedSpot] = useState(null);
@@ -42,41 +48,58 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
   const [filter, setFilter] = useState("student");
 
   const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
+  const startScale = useSharedValue(0);
 
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
+  const translationX = useSharedValue(0);
+  const translationY = useSharedValue(0);
+  const prevTranslationX = useSharedValue(0);
+  const prevTranslationY = useSharedValue(0);
 
-  const pinchGesture = Gesture.Pinch()
-  .onUpdate((e) => {
-    scale.value = savedScale.value * e.scale;
-  })
-  .onEnd(() => {
-    savedScale.value = scale.value;
-  });
 
-  const panGesture = Gesture.Pan()
-  .onUpdate((e) => {
-    translateX.value = savedTranslateX.value + e.translationX;
-    translateY.value = savedTranslateY.value + e.translationY;
-  })
-  .onEnd(() => {
-    savedTranslateX.value = translateX.value;
-    savedTranslateY.value = translateY.value;
-  });
-  const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture);
-const animatedStyle = useAnimatedStyle(() => {
-  return {
+  const pinch = Gesture.Pinch()
+    .onStart(() => {
+      startScale.value = scale.value;
+    })
+    .onUpdate((event) => {
+      scale.value = clamp(
+        startScale.value * event.scale,
+        1, 3
+      );
+    })
+    .runOnJS(true);
+
+  const animatedStyles = useAnimatedStyle(() => ({
     transform: [
       { scale: scale.value },
-      { translateX: translateX.value },
-      { translateY: translateY.value },
+      { translateX: translationX.value },
+      { translateY: translationY.value },
     ],
-  };
-  });
+  }));
+
+  const pan = Gesture.Pan()
+    .minDistance(1)
+    .onStart(() => {
+      prevTranslationX.value = translationX.value;
+      prevTranslationY.value = translationY.value;
+    })
+    .onUpdate((event) => {
+      const maxTranslateX = width / 2 - 50;
+      const maxTranslateY = height / 2 - 50;
+
+      translationX.value = clamp(
+        prevTranslationX.value + event.translationX,
+        -maxTranslateX,
+        maxTranslateX
+      );
+      translationY.value = clamp(
+        prevTranslationY.value + event.translationY,
+        -maxTranslateY,
+        maxTranslateY
+      );
+    })
+    .runOnJS(true);
   
+    const composedGesture = Gesture.Simultaneous(pinch, pan);
 
   const statusColors = {
     available: "green",
@@ -197,12 +220,11 @@ const animatedStyle = useAnimatedStyle(() => {
 
   return (
     <View style={styles.container}>
-          <GestureDetector gesture={composedGesture}>
-          <Animated.View style={animatedStyle}>
+
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
         <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
       </TouchableOpacity>
-
+      
       <Text style={styles.title}>{parkingLot}</Text>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -232,8 +254,8 @@ const animatedStyle = useAnimatedStyle(() => {
             </View>
           ))}
         </View>
-
-        <View style={styles.mapWrapper}>
+        <GestureDetector gesture={composedGesture}>
+        <Animated.View style={[animatedStyles, styles.mapWrapper]}>
           <ImageBackground source={cottageMap} style={styles.mapImage}>
             {filteredSpaces.map((space) => {
               const coords = layoutMap[space.id];
@@ -264,7 +286,8 @@ const animatedStyle = useAnimatedStyle(() => {
               );
             })}
           </ImageBackground>
-        </View>
+          </Animated.View>
+          </GestureDetector>
 
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
@@ -277,8 +300,6 @@ const animatedStyle = useAnimatedStyle(() => {
           <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
         </TouchableOpacity>
       </ScrollView>
-      </Animated.View>
-      </GestureDetector>
     </View>
   );
 };
