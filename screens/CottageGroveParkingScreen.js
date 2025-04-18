@@ -7,9 +7,8 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
+  ImageBackground,
 } from "react-native";
-import Svg, { Rect, Text as SvgText, Image as SvgImage } from "react-native-svg";
-import carIcon from "../assets/car_icon.png";
 import {
   getFirestore,
   doc,
@@ -20,15 +19,19 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
-// Firebase setup
+// Replace this with your layout image
+import cottageMap from "../assets/cottage_map.png";
+
 const db = getFirestore();
 const auth = getAuth();
 const screenWidth = Dimensions.get("window").width;
+const baseWidth = 300; // width of design reference image
+const scale = screenWidth / baseWidth;
 
 const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
   const navigation = useNavigation();
@@ -140,7 +143,18 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
     }
   };
 
-  const filteredSpaces = parkingSpaces.filter(space => space.type === filter);
+  // Adjust this map to your actual layout
+  const layoutMap = {
+    spot1: { top: 110, left: 75 },
+    spot3: { top: 120, left: 75 },
+    spot5: { top: 80, left: 75 },
+    spot7: { top: 90, left: 75 },
+    spot9: { top: 100, left: 75 },
+    spot11: { top: 220, left: 75 },
+    // Add more spots as needed
+  };
+
+  const filteredSpaces = parkingSpaces.filter((space) => space.type === filter);
 
   return (
     <View style={styles.container}>
@@ -152,13 +166,13 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.filterContainer}>
-          {['student', 'staff', 'accessible'].map((type) => (
+          {["student", "staff", "accessible"].map((type) => (
             <TouchableOpacity
               key={type}
               style={styles.filterOption}
               onPress={() => setFilter(type)}
             >
-              <Text style={styles.checkbox}>{filter === type ? '☑' : '☐'}</Text>
+              <Text style={styles.checkbox}>{filter === type ? "☑" : "☐"}</Text>
               <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
             </TouchableOpacity>
           ))}
@@ -169,7 +183,7 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
             { color: "green", label: "Open" },
             { color: "yellow", label: "Reserved" },
             { color: "red", label: "Occupied" },
-            { color: "blue", label: "Selected" }
+            { color: "blue", label: "Selected" },
           ].map(({ color, label }) => (
             <View style={styles.legendItem} key={label}>
               <View style={[styles.legendBox, { backgroundColor: color }]} />
@@ -179,72 +193,36 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
         </View>
 
         <View style={styles.mapWrapper}>
-          <Svg height="400" width="300" viewBox="0 0 300 400">
-            <Rect x="0" y="0" width="300" height="400" fill="lightgray" />
+          <ImageBackground source={cottageMap} style={styles.mapImage}>
             {filteredSpaces.map((space) => {
-              const col = space.location % 2 === 0 ? 1 : 0;
-              const row = Math.floor((space.location - 1) / 2);
-              const xPos = col === 0 ? 30 : 160;
-              const yPos = row * 60 + 40;
+              const coords = layoutMap[space.id];
+              if (!coords) return null;
+
               const isSelected = selectedSpot === space.id;
+              const color = isSelected
+                ? "blue"
+                : statusColors[space.status] || "gray";
 
               return (
-                <React.Fragment key={space.id}>
-                  <Rect
-                    x={xPos}
-                    y={yPos}
-                    width="100"
-                    height="50"
-                    fill={isSelected ? "blue" : statusColors[space.status]}
-                    stroke="black"
-                    strokeWidth="2"
-                    rx="5"
-                    ry="5"
-                  />
-                  <SvgText
-                    x={xPos + 50}
-                    y={yPos + 30}
-                    fontSize="18"
-                    fill="black"
-                    textAnchor="middle"
-                    fontWeight="bold"
-                  >
-                    {space.location}
-                  </SvgText>
-                  {(space.status === "occupied" || space.status === "held") && (
-                    <SvgImage
-                      x={xPos + 10}
-                      y={yPos + 5}
-                      width="80"
-                      height="40"
-                      href={carIcon}
-                    />
-                  )}
-                </React.Fragment>
+                <TouchableOpacity
+                  key={space.id}
+                  onPress={() =>
+                    space.status === "available" ? setSelectedSpot(space.id) : null
+                  }
+                  style={[
+                    styles.spotButton,
+                    {
+                      top: coords.top * scale,
+                      left: coords.left * scale,
+                      backgroundColor: color,
+                    },
+                  ]}
+                >
+                  <Text style={styles.spotText}>{space.id}</Text>
+                </TouchableOpacity>
               );
             })}
-          </Svg>
-
-          {filteredSpaces.map((space) => {
-            const col = space.location % 2 === 0 ? 1 : 0;
-            const row = Math.floor((space.location - 1) / 2);
-            const xPos = col === 0 ? 30 : 160;
-            const yPos = row * 60 + 40;
-
-            return space.status === "available" ? (
-              <TouchableOpacity
-                key={`touch-${space.id}`}
-                style={{
-                  position: "absolute",
-                  left: xPos,
-                  top: yPos,
-                  width: 100,
-                  height: 50,
-                }}
-                onPress={() => setSelectedSpot(space.id)}
-              />
-            ) : null;
-          })}
+          </ImageBackground>
         </View>
 
         <View style={styles.stepsContainer}>
@@ -266,11 +244,37 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "white", paddingTop: 40 },
   scrollContent: { alignItems: "center", paddingBottom: 60 },
   title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
+  mapWrapper: {
+    width: screenWidth,
+    height: screenWidth, // maintain 300x400 aspect ratio
+    position: "relative",
+    marginBottom: 20,
+  },
+  mapImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+    position: "relative",
+  },
+  spotButton: {
+    position: "absolute",
+    width: 20 * scale,
+    height: 10 * scale,
+    //borderRadius: 20 * scale,
+    justifyContent: "center",
+    alignItems: "center",
+    //borderWidth: 1,
+    //borderColor: "black",
+  },
+  spotText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 5 * scale,
+  },
   legendContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 10 },
   legendItem: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
   legendBox: { width: 20, height: 20, marginRight: 5 },
   legendText: { fontSize: 16, fontWeight: "bold" },
-  mapWrapper: { width: 300, height: 400, position: "relative", marginBottom: 20 },
   stepsContainer: { alignItems: "center", padding: 10 },
   stepsTitle: { fontSize: 18, fontWeight: "bold" },
   stepsText: { fontSize: 16 },
