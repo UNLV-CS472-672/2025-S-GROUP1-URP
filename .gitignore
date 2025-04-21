@@ -38,3 +38,6 @@ yarn-error.*
 
 # test coverage reports
 coverage
+
+# keys
+**\serviceAccountKey.json
