@@ -3,12 +3,12 @@ import numpy as np
 import json
 
 # === Load class names ===
-with open("coco.names.txt", "rt") as f:
+with open("Camera/coco.names.txt", "rt") as f:
     classNames = f.read().rstrip("\n").split("\n")
 
 # === Load model ===
-configPath = "ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
-weightsPath = "frozen_inference_graph.pb"
+configPath = "Camera/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
+weightsPath = "Camera/frozen_inference_graph.pb"
 
 net = cv2.dnn_DetectionModel(weightsPath, configPath)
 net.setInputSize(320, 320)
@@ -17,7 +17,7 @@ net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
 
 # === Load Parking Spots from external JSON ===
-with open("parking_spots.json", "r") as f:
+with open("Camera/parking_spots.json", "r") as f:
     parking_spots = json.load(f)
 
 # === Spot status history for smoothing ===
