@@ -76,8 +76,13 @@ export default function MyAccountScreen({ navigation }) {
    * Navigates to the "AddVehicle" screen when the user presses the "Add Another Vehicle" button.
    */
   const handleAddAnotherVehicle = () => {
-    navigation.navigate("AddVehicle");
+    if (vehicles.length >= 3) {
+      Alert.alert("Limit Reached", "You can only register up to 3 vehicles.");
+    } else {
+      navigation.navigate("AddVehicle");
+    }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -109,7 +114,8 @@ export default function MyAccountScreen({ navigation }) {
           <Button
             title="Add Another Vehicle"
             onPress={handleAddAnotherVehicle}
-            color="blue"
+            color={vehicles.length >= 3 ? "gray" : "blue"}
+            disabled={vehicles.length >= 3}
           />
           <Button
             title="Remove a Vehicle"
