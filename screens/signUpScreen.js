@@ -40,18 +40,77 @@ const SignUpScreen = ({ navigation }) => {
 UNLV Reserved Parking Terms and Conditions
 Effective Date: 04/21/2025
 
-1. By using this service, you agree to abide by UNLV’s parking rules.
+Welcome to URP! These Terms and Conditions ("Terms") govern your use of our mobile application (the "App") provided by URP Inc ("we", "us", or "our"). By using the App, you agree to these Terms. If you do not agree, please do not use the App.
 
-2. Reservations expire at their designated time and must not be exceeded.
+1. Do Not Use While Driving
+Safety First: You must not interact with or use the App while operating a vehicle. Distracted driving is dangerous and may be illegal. By using this App, you acknowledge that it is your responsibility to comply with all traffic laws. We are not liable for any accidents, injuries, citations, or damages that result from using the App while driving.
 
-3. Misuse of the system may result in penalties or bans.
+2. Parking Reservation System
+The App provides a reservation service for parking spots at participating garages. Reservations are not guaranteed in cases of technical failures, user error, or third-party interference. The availability of spots and services is subject to change without notice.
 
-4. Do Not Use While Driving. By using this App, you acknowledge that it is 
-your responsibility to comply with all traffic laws. We are not liable for 
-any accidents, injuries, citations, or damages that result from using the App 
-while driving.
+3. User Responsibilities
+By using the App, you agree to:
+Provide accurate, current, and complete information.
 
-5. UNLV reserves the right to modify these terms at any time.
+
+Keep your login credentials secure.
+
+
+Use the App only for lawful and intended purposes.
+
+
+Not misuse or attempt to reverse-engineer the App’s systems.
+
+
+4. Garage-Specific Rules
+Each garage location may have its own policies, such as:
+Time Limits: Reservations may expire after a set duration. Your spot is not guaranteed after expiration.
+
+
+Vehicle Requirements: Some spots may be designated for compact cars, electric vehicles, or ADA-accessible vehicles only.
+
+
+Enforcement: Violations of garage rules (e.g., overstaying, parking in the wrong spot) may result in fines, towing, or bans from future reservations.
+
+
+Please refer to signage and instructions provided at each garage.
+
+5. Data Privacy
+We value your privacy. By using the App, you consent to the collection and use of your information as outlined below:
+We collect data such as your name, email, reservation history, and parking activity.
+
+
+Your data is used to provide services, improve the App, and support customer service.
+
+
+We do not sell your personal information to third parties.
+
+
+We may share data with trusted partners who help us operate the App, under strict confidentiality agreements.
+
+
+You can request to view, edit, or delete your data by contacting us.
+
+
+Please see our full [Privacy Policy] for detailed information.
+
+6. Limitation of Liability
+To the maximum extent allowed by law, we are not liable for any:
+Loss of reservation due to app errors or outages.
+
+
+Parking violations, tickets, or towing.
+
+
+Indirect, incidental, or consequential damages from using the App.
+
+
+7. Changes to Terms
+We reserve the right to modify these Terms at any time. Continued use of the App constitutes acceptance of the revised Terms. Check this page periodically for updates.
+
+8. Termination
+We may suspend or terminate your account without notice if you violate these Terms, misuse the App, or engage in behavior that disrupts service to others.
+
 
 Please review and accept the Terms and Conditions before creating an account.
   `;
