@@ -41,9 +41,17 @@ UNLV Reserved Parking Terms and Conditions
 Effective Date: 04/21/2025
 
 1. By using this service, you agree to abide by UNLV’s parking rules.
+
 2. Reservations expire at their designated time and must not be exceeded.
+
 3. Misuse of the system may result in penalties or bans.
-4. UNLV reserves the right to modify these terms at any time.
+
+4. Do Not Use While Driving. By using this App, you acknowledge that it is 
+your responsibility to comply with all traffic laws. We are not liable for 
+any accidents, injuries, citations, or damages that result from using the App 
+while driving.
+
+5. UNLV reserves the right to modify these terms at any time.
 
 Please review and accept the Terms and Conditions before creating an account.
   `;
