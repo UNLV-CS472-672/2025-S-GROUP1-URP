@@ -9,7 +9,7 @@ def mouse_callback(event, x, y, flags, param):
     global current_polygon, spot_id
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        current_polygon.append((x, y))
+        current_polygon.append([x, y])
         print(f"Point added: ({x}, {y})")
 
 # === Setup ===
