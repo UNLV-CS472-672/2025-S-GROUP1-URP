@@ -53,10 +53,6 @@
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|native-notify|firebase|@firebase/.*)"
     ],
-    "testPathIgnorePatterns": [
-    "/screens/__tests__/AddVehicleScreen.test.js",
-    "/screens/__tests__/RemoveVehicleScreen.test.js"
-    ],
     "collectCoverage": true,
     "coverageReporters": [
       "json",

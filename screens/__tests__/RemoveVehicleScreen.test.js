@@ -15,6 +15,18 @@ jest.mock("../../firebaseConfig", () => ({
     db: {},
 }));
 
+jest.mock("firebase/storage", () => ({
+    getStorage: jest.fn(() => ({
+      app: {
+        options: {
+          storageBucket: "mock-bucket",
+        },
+      },
+    })),
+    ref: jest.fn(),
+    deleteObject: jest.fn(() => Promise.resolve()),
+  }));
+
 describe("<RemoveVehicleScreen />", () => {
     const mockNavigation = { navigate: jest.fn() };
     const mockRoute = {
