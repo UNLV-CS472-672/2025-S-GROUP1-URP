@@ -5,7 +5,7 @@ import { db, auth } from "../firebaseConfig";
 
 const TIMER_DURATION_MINUTES = 30;
 
-// ✅ CHANGE: Detect test environment
+// CHANGE: Detect test environment
 const isTestEnv = process.env.NODE_ENV === 'test';
 
 export default function ReservationStatusScreen({ navigation }) {

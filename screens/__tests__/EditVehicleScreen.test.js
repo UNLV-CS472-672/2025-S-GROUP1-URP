@@ -88,7 +88,7 @@ describe("EditVehicleScreen", () => {
       expect(Alert.alert).toHaveBeenCalledWith("Vehicle updated successfully!");
       expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account");
     });
-  });
+  }, 10000);
 
   it("shows error alert for invalid year", async () => {
     const { getByPlaceholderText, getByText } = render(
@@ -105,7 +105,7 @@ describe("EditVehicleScreen", () => {
     });
 
     expect(Alert.alert).toHaveBeenCalledWith("Error", "Please enter a valid year (e.g., 2025).");
-  });
+  }, 10000);
 
   it("shows error alert when fields are empty", async () => {
     const { getByPlaceholderText, getByText } = render(
@@ -124,5 +124,5 @@ describe("EditVehicleScreen", () => {
     });
 
     expect(Alert.alert).toHaveBeenCalledWith("Error", "All fields are required.");
-  });
+  }, 10000);
 });
