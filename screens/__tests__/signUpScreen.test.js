@@ -63,7 +63,10 @@ describe("<SignUpScreen />", () => {
     // Accept Terms and Conditions
     fireEvent.press(getByTestId("checkbox")); // The checkbox
 
-    fireEvent.press(getByText("Create Account"));
+    // ✅ Wrap the "Create Account" press inside waitFor
+    await waitFor(() => {
+        fireEvent.press(getByText("Create Account"));
+    });
 
     await waitFor(() => {
       expect(createUserWithEmailAndPassword).toHaveBeenCalled();
@@ -85,7 +88,8 @@ describe("<SignUpScreen />", () => {
 
   it("navigates back to login screen", () => {
     const { getByText } = render(<SignUpScreen navigation={mockNavigation} />);
-    fireEvent.press(getByText("Back to Login"));
+    const { getByTestId } = render(<SignUpScreen navigation={mockNavigation} />);
+    fireEvent.press(getByTestId("back-button"));
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });
 });

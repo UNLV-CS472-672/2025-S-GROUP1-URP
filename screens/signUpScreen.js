@@ -200,7 +200,7 @@ Please review and accept the Terms and Conditions before creating an account.
         </TouchableOpacity>
 
         {/* Back to Login Navigation */}
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity testID="back-button" onPress={() => navigation.goBack()}>
           <Text style={styles.backText}>Back to Login</Text>
         </TouchableOpacity>
 
