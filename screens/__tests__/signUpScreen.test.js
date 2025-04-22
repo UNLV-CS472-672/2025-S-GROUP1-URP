@@ -88,8 +88,7 @@ describe("<SignUpScreen />", () => {
 
   it("navigates back to login screen", () => {
     const { getByText } = render(<SignUpScreen navigation={mockNavigation} />);
-    const { getByTestId } = render(<SignUpScreen navigation={mockNavigation} />);
-    fireEvent.press(getByTestId("back-button"));
+    fireEvent.press(getByText("Back to Login"));
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });
 });
