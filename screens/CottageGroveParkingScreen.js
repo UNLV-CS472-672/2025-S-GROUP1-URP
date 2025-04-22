@@ -207,6 +207,82 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
     }
   }
 
+  const handleReserveRandomSpot = async () => {
+    try {
+      // Step 1: Filter available spots
+      const availableSpots = parkingSpaces.filter(
+        (space) => space.status === "available" && space.type === filter
+      );
+
+      if (availableSpots.length === 0) {
+        Alert.alert(
+          "No Available Spots",
+          "There are no available spots to reserve."
+        );
+        return;
+      }
+
+      // Step 2: Select a random spot
+      const randomSpot =
+        availableSpots[Math.floor(Math.random() * availableSpots.length)];
+
+      // Step 3: Reserve the spot
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert("Not Signed In", "Please log in to reserve a spot.");
+        return;
+      }
+
+      const reservationQuery = query(
+        collection(db, "Reservations"),
+        where("userID", "==", user.uid),
+        where("status", "==", "held")
+      );
+      const reservationSnapshot = await getDocs(reservationQuery);
+
+      if (!reservationSnapshot.empty) {
+        Alert.alert(
+          "Active Reservation Found",
+          "You already have an active reservation. You must cancel it before reserving a new spot."
+        );
+        return;
+      }
+
+      const spotDocRef = doc(db, collectionName, randomSpot.id);
+      const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
+      const now = Timestamp.now();
+      const holdExpires = Timestamp.fromDate(
+        new Date(Date.now() + 2 * 60 * 1000)
+      ); // 2 minutes hold
+
+      await updateDoc(spotDocRef, {
+        status: "held",
+        heldBy: user.uid,
+        holdExpiresAt: holdExpires,
+      });
+
+      await setDoc(doc(db, "Reservations", reservationId), {
+        userID: user.uid,
+        spotId: randomSpot.id,
+        status: "held",
+        startTime: now,
+        endTime: holdExpires,
+        createdAt: now,
+      });
+
+      Alert.alert(
+        "Success",
+        `Spot ${randomSpot.location} reserved for 2 minutes.`
+      );
+    } catch (error) {
+      console.error("Error reserving random spot:", error);
+      Alert.alert(
+        "Error",
+        "Failed to reserve a random spot. Please try again."
+      );
+    }
+  };
+
   // Adjust this map to your actual layout
   const layoutMap = {
     spot1: { top: 110, left: 75 },
@@ -284,7 +360,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
                       }
                     ]}
                   >
-                    <Text style={styles.spotText}>{space.id}</Text>
+                    <Text style={styles.spotText}>{space.location}</Text>
                   </TouchableOpacity>
                 )
               })}
@@ -304,6 +380,17 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
           <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
             <Text style={{ color: 'white', fontSize: 16 }}>Reserve</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+          style={[
+            styles.reserveButton,
+            { backgroundColor: "#2196F3", marginTop: 10 , marginBottom: 10},
+          ]}
+          onPress={handleReserveRandomSpot}
+        >
+          <Text style={{ textAlign: "center", color: "white", fontSize: 16 }}>
+            Reserve Random Spot
+          </Text>
+        </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -312,7 +399,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white', paddingTop: 40 },
-  scrollContent: { alignItems: 'center', paddingBottom: 60 },
+  scrollContent: { alignItems: 'center'},
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
   mapWrapper: {
     width: screenWidth,
@@ -337,7 +424,7 @@ const styles = StyleSheet.create({
     // borderColor: "black",
   },
   spotText: {
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
     fontSize: 5 * Screenscale
   },
