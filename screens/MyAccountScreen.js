@@ -56,13 +56,13 @@ export default function MyAccountScreen({ navigation }) {
           // Navigate to AddVehicle screen if no vehicles are found
           if (userVehicles.length === 0) {
             setTimeout(() => {
-              navigation.replace("AddVehicle"); // changing from navigate function to replace function
+              navigation.replace("AddVehicle", { fromRedirect: true }); // changing from navigate function to replace function
             }, 1000); // 1 second delay
           }
         } else {
           // Navigate to AddVehicle screen if no document is found
           setTimeout(() => {
-            navigation.replace("AddVehicle"); // changing from navigate function to replace function
+            navigation.replace("AddVehicle", { fromRedirect: true }); // changing from navigate function to replace function
           }, 1000); // 1 second delay
         }
       }
