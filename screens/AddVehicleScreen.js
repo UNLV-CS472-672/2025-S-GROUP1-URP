@@ -261,7 +261,13 @@ export default function AddVehicleScreen ({ navigation }) {
       {!isKeyboardVisible && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate('My Account')}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Home" }],
+            })
+          }
+          
         >
           <Text style={styles.backButtonText}>Back to My Account</Text>
         </TouchableOpacity>
