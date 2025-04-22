@@ -4,7 +4,7 @@ import { getAnalytics } from 'firebase/analytics'
 
 // Replace these with your Firebase project configuration details
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: 'AIzaSyCATKript_QQeYBBoA4EFUi08va3oYj0zU',
   authDomain: 'fir-group1-urp.firebaseapp.com',
   projectId: 'fir-group1-urp',
   storageBucket: 'fir-group1-urp.firebasestorage.app',
