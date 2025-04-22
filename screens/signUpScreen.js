@@ -182,7 +182,7 @@ Please review and accept the Terms and Conditions before creating an account.
 
         {/* Terms and Conditions */}
         <View style={styles.termsRow}>
-          <TouchableOpacity onPress={() => setTermsAccepted(!termsAccepted)}>
+          <TouchableOpacity onPress={() => setTermsAccepted(!termsAccepted)} testID="checkbox">
             <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
               {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
             </View>
