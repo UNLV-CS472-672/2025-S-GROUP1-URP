@@ -13,7 +13,7 @@
  */
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import ParkingMap from "../components/ParkingMap/ParkingMap";
+import ParkingMap from "../src/components/ParkingMap/ParkingMap"; // Josh: fix file path for ParkingScreen.test.js unit test
 
 const ParkingScreen = ({ navigation }) => {
   return (
