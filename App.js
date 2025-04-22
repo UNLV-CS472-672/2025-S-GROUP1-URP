@@ -143,7 +143,7 @@ function HomeScreen({ navigation }) {
           </TouchableOpacity>
 
 
-          {/*-------UNCOMMENT THIS CODE TO POPULATE THE GARAGES--------
+          {
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#444" }]}
             onPress={async () => {
@@ -153,7 +153,7 @@ function HomeScreen({ navigation }) {
             >
             <Text style={styles.buttonText}>Initialize Parking Garages</Text>
           </TouchableOpacity>
-          */}
+          }
 
           {/* Logout button with confirmation alert */}
           <TouchableOpacity
