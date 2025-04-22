@@ -15,16 +15,28 @@ jest.mock('../../firebaseConfig', () => ({
   db: {}
 }))
 
-describe('<RemoveVehicleScreen />', () => {
-  const mockNavigation = { navigate: jest.fn() }
-  const mockRoute = {
-    params: {
-      vehicles: [
-        { make: 'Toyota', model: 'Camry', year: '2022', licensePlate: 'XYZ123' },
-        { make: 'Honda', model: 'Civic', year: '2021', licensePlate: 'ABC789' }
-      ]
-    }
-  }
+jest.mock("firebase/storage", () => ({
+    getStorage: jest.fn(() => ({
+      app: {
+        options: {
+          storageBucket: "mock-bucket",
+        },
+      },
+    })),
+    ref: jest.fn(),
+    deleteObject: jest.fn(() => Promise.resolve()),
+  }));
+
+describe("<RemoveVehicleScreen />", () => {
+    const mockNavigation = { navigate: jest.fn() };
+    const mockRoute = {
+        params: {
+            vehicles: [
+                { make: "Toyota", model: "Camry", year: "2022", licensePlate: "XYZ123" },
+                { make: "Honda", model: "Civic", year: "2021", licensePlate: "ABC789" },
+            ],
+        },
+    };
 
   test('Displays list of vehicles', async () => {
     const { findByText } = render(

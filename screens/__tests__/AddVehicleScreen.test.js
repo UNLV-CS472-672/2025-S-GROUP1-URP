@@ -23,8 +23,35 @@ jest.mock('firebase/firestore', () => ({
   )
 }))
 
-describe('AddVehicleScreen', () => {
-  it('renders input fields and save button', () => {
+// Mock Expo Image Picker
+jest.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: jest.fn(() => Promise.resolve({ canceled: true })),
+  launchCameraAsync: jest.fn(() => Promise.resolve({ canceled: true })),
+  requestCameraPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
+  MediaTypeOptions: { Images: "Images" },
+}));
+
+// Mock Expo File System
+jest.mock("expo-file-system", () => ({
+  getInfoAsync: jest.fn(() => Promise.resolve({ size: 1024 })),
+  uploadAsync: jest.fn(() => Promise.resolve({ status: 200 })),
+  FileSystemUploadType: { BINARY_CONTENT: "binary" },
+}));
+
+// Mock Firebase Storage
+jest.mock("firebase/storage", () => ({
+  getStorage: jest.fn(() => ({
+    app: {
+      options: {
+        storageBucket: "mock-bucket",
+      },
+    },
+  })),
+}));
+
+
+describe("AddVehicleScreen", () => {
+  it("renders input fields and save button", () => {
     const { getByPlaceholderText, getByText } = render(
       <AddVehicleScreen navigation={{ navigate: jest.fn() }} />
     )
