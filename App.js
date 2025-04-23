@@ -194,57 +194,57 @@ export default function App () {
         <Stack.Screen
           name='ResetPassword'
           component={ResetPasswordScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Home'
           component={HomeScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='My Account'
           component={MyAccountScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Tropicana Parking'
           component={TropicanaScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Cottage Grove Parking'
           component={CottageGroveScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Gateway Parking'
           component={GatewayScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Reservation Status'
           component={ReservationStatusScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Report'
           component={ReportScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='AddVehicle'
           component={AddVehicleScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='RemoveVehicle'
           component={RemoveVehicleScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='EditVehicle'
           component={EditVehicleScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -271,7 +271,8 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
     height: 100, // Fixed height for the header
     justifyContent: 'center', // Center text vertically
-    alignItems: 'center' // Center text horizontally
+    alignItems: 'center', // Center text horizontally
+    marginTop: 50,
   },
   welcomeText: {
     fontSize: 18,
