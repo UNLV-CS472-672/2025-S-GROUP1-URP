@@ -1,21 +1,20 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, act, waitFor } from "@testing-library/react-native";
 import MyAccountScreen from "../MyAccountScreen";
 
-// Mock Firebase auth and Firestore
+// --- Firebase Mocks ---
+const mockGetDoc = jest.fn();
+const mockUpdateDoc = jest.fn();
+
 jest.mock("firebase/firestore", () => {
+  const doc = jest.fn((_, collection, docId) => ({
+    path: `${collection}/${docId}`,
+  }));
+
   return {
-    doc: jest.fn(),
-    getDoc: jest.fn(() =>
-      Promise.resolve({
-        exists: () => true,
-        data: () => ({
-          vehicles: [
-            { make: "Toyota", model: "Camry", year: "2022", licensePlate: "XYZ123" }
-          ]
-        })
-      })
-    ),
+    doc,
+    getDoc: (...args) => mockGetDoc(...args),
+    updateDoc: (...args) => mockUpdateDoc(...args),
   };
 });
 
@@ -24,60 +23,148 @@ jest.mock("../../firebaseConfig", () => ({
   db: {},
 }));
 
+// --- Icon Mocks ---
+jest.mock("@expo/vector-icons", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  const MockIcon = (props) => <Text>{props.name}</Text>;
+  return {
+    Ionicons: MockIcon,
+    FontAwesome: MockIcon,
+  };
+});
+
+// --- Jest Timer Control ---
+beforeAll(() => {
+  jest.useFakeTimers();
+});
+
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 describe("<MyAccountScreen />", () => {
-  const mockNavigation = { navigate: jest.fn() };
+  let defaultNavigation;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    defaultNavigation = {
+      navigate: jest.fn(),
+      replace: jest.fn(),
+      canGoBack: jest.fn(() => false),
+    };
+
+    mockGetDoc.mockImplementation((ref) => {
+      if (ref.path === "vehicles/12345") {
+        return Promise.resolve({
+          exists: () => true,
+          data: () => ({
+            vehicles: [
+              { make: "Toyota", model: "Camry", year: "2022", licensePlate: "XYZ123" },
+            ],
+          }),
+        });
+      } else if (ref.path === "users/12345") {
+        return Promise.resolve({
+          exists: () => true,
+          data: () => ({
+            name: "Test User",
+            profilePicture: null,
+          }),
+        });
+      }
+      return Promise.resolve({ exists: () => false });
+    });
+  });
 
   test("Displays user email", async () => {
-    const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
-    await findByText("User Information:");
-    await findByText("Email: test@example.com");
+    const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
+    await findByText("test@example.com");
   }, 20000);
 
   test("Displays vehicle information", async () => {
-    const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
+    const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
     await findByText("Make: Toyota");
     await findByText("Model: Camry");
     await findByText("Year: 2022");
-    await findByText("License Plate: XYZ123");
+    await findByText("License: XYZ123");
   }, 20000);
 
-  test("Navigates to AddVehicle when 'Add Another Vehicle' is pressed", async () => {
-    const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
-    const button = await findByText("Add Another Vehicle");
+  test("Navigates to AddVehicle when 'Add Vehicle' is pressed", async () => {
+    const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
+    const button = await findByText("Add Vehicle");
     fireEvent.press(button);
-    expect(mockNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
+    expect(defaultNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
   }, 20000);
 
-  test("Navigates to RemoveVehicle when 'Remove a Vehicle' is pressed", async () => {
-    const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
-    const button = await findByText("Remove a Vehicle");
+  test("Navigates to Home when back button is pressed", async () => {
+    const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
+    const button = await findByText("Back");
     fireEvent.press(button);
-    expect(mockNavigation.navigate).toHaveBeenCalledWith("RemoveVehicle", expect.any(Object));
+    expect(defaultNavigation.navigate).toHaveBeenCalledWith("Home");
   }, 20000);
 
-  test("Redirects to AddVehicle screen when no vehicles are found", async () => {
-    jest.mock("firebase/firestore", () => {
-      return {
-        doc: jest.fn(),
-        getDoc: jest.fn(() => Promise.resolve({ exists: () => false })),
-      };
+  test("Redirects to AddVehicle when no vehicles are found", async () => {
+    const mockNavigation = {
+      navigate: jest.fn(),
+      replace: jest.fn(),
+      canGoBack: jest.fn(() => false),
+    };
+
+    mockGetDoc.mockImplementation((ref) => {
+      if (ref.path === "vehicles/12345") {
+        return Promise.resolve({
+          exists: () => true,
+          data: () => ({ vehicles: [] }),
+        });
+      } else if (ref.path === "users/12345") {
+        return Promise.resolve({
+          exists: () => true,
+          data: () => ({ name: "", profilePicture: null }),
+        });
+      }
+      return Promise.resolve({ exists: () => false });
     });
-    
+
     render(<MyAccountScreen navigation={mockNavigation} />);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for redirect timeout
-    expect(mockNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
-  }, 20000);
 
-  test("Handles case when Firestore document does not exist", async () => {
-    jest.mock("firebase/firestore", () => {
-      return {
-        doc: jest.fn(),
-        getDoc: jest.fn(() => Promise.resolve({ exists: () => false })),
-      };
+    await act(async () => {
+      jest.advanceTimersByTime(1100);
     });
-    
-    const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
-    await findByText("No vehicles found. Redirecting to add vehicle screen...");
+
+    await waitFor(() =>
+      expect(mockNavigation.replace).toHaveBeenCalledWith("AddVehicle")
+    );
   }, 20000);
 
+  test("Redirects to AddVehicle when vehicle document does not exist", async () => {
+    const mockNavigation = {
+      navigate: jest.fn(),
+      replace: jest.fn(),
+      canGoBack: jest.fn(() => false),
+    };
+
+    mockGetDoc.mockImplementation((ref) => {
+      if (ref.path === "vehicles/12345") {
+        return Promise.resolve({ exists: () => false });
+      } else if (ref.path === "users/12345") {
+        return Promise.resolve({
+          exists: () => true,
+          data: () => ({ name: "Test User", profilePicture: null }),
+        });
+      }
+      return Promise.resolve({ exists: () => false });
+    });
+
+    render(<MyAccountScreen navigation={mockNavigation} />);
+
+    await act(async () => {
+      jest.advanceTimersByTime(1100);
+    });
+
+    await waitFor(() =>
+      expect(mockNavigation.replace).toHaveBeenCalledWith("AddVehicle")
+    );
+  }, 20000);
 });
