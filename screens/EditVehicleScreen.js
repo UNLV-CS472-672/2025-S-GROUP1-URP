@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Alert,
   StyleSheet,
   TouchableOpacity,
@@ -13,19 +12,16 @@ import {
 import { db, auth } from '../firebaseConfig'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 
-import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system'
-import { getStorage, ref, deleteObject } from 'firebase/storage'
 
-export default function EditVehicleScreen ({ route, navigation }) {
-  const { vehicle, index } = route.params
-  const [make, setMake] = useState(vehicle.make)
-  const [model, setModel] = useState(vehicle.model)
-  const [year, setYear] = useState(vehicle.year)
-  const [licensePlate, setLicensePlate] = useState(vehicle.licensePlate)
-  const [image, setImage] = useState(vehicle.imageUrl || null)
-  const [isModalVisible, setModalVisible] = useState(false)
-  const [isSaving, setIsSaving] = useState(false) // Prevent duplicate saves
+export default function EditVehicleScreen({ route, navigation }) {
+  const { vehicle, index } = route.params;
+  const [make, setMake] = useState(vehicle.make);
+  const [model, setModel] = useState(vehicle.model);
+  const [year, setYear] = useState(vehicle.year);
+  const [licensePlate, setLicensePlate] = useState(vehicle.licensePlate);
+  const [image, setImage] = useState(vehicle.imageUrl || null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const pickImageFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -54,13 +50,12 @@ export default function EditVehicleScreen ({ route, navigation }) {
   }
 
   const removeImage = () => {
-    // Set the image state to null (mark for removal)
-    setImage(null)
-  }
+    setImage(null);
+  };
 
   const handleSave = async () => {
-    if (isSaving) return // Prevent duplicate calls
-    setIsSaving(true)
+    if (isSaving) return;
+    setIsSaving(true);
 
     if (!make.trim() || !model.trim() || !year.trim() || !licensePlate.trim()) {
       Alert.alert('Error', 'All fields are required.')
@@ -93,8 +88,9 @@ export default function EditVehicleScreen ({ route, navigation }) {
       const docSnap = await getDoc(docRef)
 
       if (image === null && vehicle.imageUrl) {
-        // Remove the image from Firebase Storage if the user has cleared it
-        const storage = getStorage()
+
+        const storage = getStorage();
+
         const oldImageRef = ref(
           storage,
           decodeURIComponent(vehicle.imageUrl.split('/o/')[1].split('?')[0])
@@ -103,10 +99,10 @@ export default function EditVehicleScreen ({ route, navigation }) {
           console.warn('Failed to delete old image:', error.message)
         })
 
-        imageUrl = null // Clear the image URL
+
+        imageUrl = null;
       } else if (image && image !== vehicle.imageUrl) {
-        // Upload the new image
-        const fileInfo = await FileSystem.getInfoAsync(image)
+        const fileInfo = await FileSystem.getInfoAsync(image);
         if (fileInfo.size > 5 * 1024 * 1024) {
           Alert.alert('File Too Large', 'Image must be smaller than 5MB.')
           setIsSaving(false)
@@ -152,56 +148,58 @@ export default function EditVehicleScreen ({ route, navigation }) {
     } catch (error) {
       Alert.alert('Error', error.message)
     } finally {
-      setIsSaving(false) // Re-enable the button after the operation
+      setIsSaving(false);
     }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Edit Vehicle Information</Text>
+      <View style={styles.titleBox}>
+        <Text style={styles.label}>Edit Vehicle Information</Text>
+      </View>
+
+      <Text style={styles.fieldLabel}>Make</Text>
       <TextInput
-        placeholder='Make'
+        placeholder="Enter Make"
         value={make}
         onChangeText={setMake}
         style={styles.input}
       />
+
+      <Text style={styles.fieldLabel}>Model</Text>
       <TextInput
-        placeholder='Model'
+        placeholder="Enter Model"
         value={model}
         onChangeText={setModel}
         style={styles.input}
       />
+
+      <Text style={styles.fieldLabel}>Year</Text>
       <TextInput
-        placeholder='Year'
+        placeholder="Enter Year"
         value={year}
         onChangeText={setYear}
         style={styles.input}
         keyboardType='numeric'
       />
+
+      <Text style={styles.fieldLabel}>License Plate</Text>
       <TextInput
-        placeholder='License Plate'
+        placeholder="Enter License Plate"
         value={licensePlate}
         onChangeText={setLicensePlate}
         style={styles.input}
       />
 
-      {/* Image Buttons */}
       <View style={styles.imageButtons}>
-        <TouchableOpacity
-          style={styles.imageButton}
-          onPress={takePhotoWithCamera}
-        >
+        <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
           <Text style={styles.imageButtonText}>Take Photo</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.imageButton}
-          onPress={pickImageFromLibrary}
-        >
+        <TouchableOpacity style={styles.imageButton} onPress={pickImageFromLibrary}>
           <Text style={styles.imageButtonText}>Choose Photo</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Show Image and Remove Image Buttons */}
       {image && (
         <View style={styles.imageActions}>
           <TouchableOpacity
@@ -219,14 +217,14 @@ export default function EditVehicleScreen ({ route, navigation }) {
         </View>
       )}
 
-      <Button
-        title='Save Changes'
+      <TouchableOpacity
+        style={styles.saveButton}
         onPress={handleSave}
-        color='green'
-        disabled={isSaving} // Disable the button while saving
-      />
+        disabled={isSaving}
+      >
+        <Text style={styles.saveButtonText}>Save Changes</Text>
+      </TouchableOpacity>
 
-      {/* Modal for Image Preview */}
       <Modal
         visible={isModalVisible}
         transparent
@@ -248,13 +246,14 @@ export default function EditVehicleScreen ({ route, navigation }) {
         </View>
       </Modal>
 
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.navigate('My Account')}
-      >
-        <Text style={styles.backButtonText}>Back to My Account</Text>
-      </TouchableOpacity>
+      <View style={styles.backButtonContainer}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate("My Account")}
+        >
+          <Text style={styles.backButtonText}>Back to My Account</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -264,10 +263,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20
   },
+  titleBox: {
+    backgroundColor: "#CC0000",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
   input: {
     height: 40,
@@ -282,7 +293,7 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   imageButton: {
-    backgroundColor: '#B0463C',
+    backgroundColor: "#CC0000",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5
@@ -301,9 +312,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#007BFF',
     padding: 10,
     borderRadius: 5,
-    alignItems: 'center',
     flex: 1,
-    marginRight: 10
+    marginRight: 10,
+    alignItems: "center",
   },
   showImageButtonText: {
     color: '#fff',
@@ -314,13 +325,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF0000',
     padding: 10,
     borderRadius: 5,
-    alignItems: 'center',
-    flex: 1
+    flex: 1,
+    alignItems: "center",
   },
   removeImageButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14
+  },
+  saveButton: {
+    backgroundColor: "#CC0000",
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   modalContainer: {
     flex: 1,
@@ -334,7 +357,7 @@ const styles = StyleSheet.create({
   },
   closeModalButton: {
     marginTop: 20,
-    backgroundColor: '#B0463C',
+    backgroundColor: "#CC0000",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5
@@ -344,16 +367,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold'
   },
+  backButtonContainer: {
+    alignItems: "flex-start",
+    marginTop: 10,
+  },
   backButton: {
-    marginTop: 20,
-    backgroundColor: '#B0463C',
-    paddingVertical: 15,
-    alignItems: 'center',
-    borderRadius: 5
+    backgroundColor: "#CC0000",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold'
-  }
-})
+    fontWeight: "bold",
+  },
+});
