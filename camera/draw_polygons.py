@@ -13,7 +13,7 @@ def mouse_callback(event, x, y, flags, param):
         print(f"Point added: ({x}, {y})")
 
 # === Setup ===
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 cv2.namedWindow("Polygon Drawer")
 cv2.setMouseCallback("Polygon Drawer", mouse_callback)
 

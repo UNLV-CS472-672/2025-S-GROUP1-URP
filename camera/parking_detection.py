@@ -35,14 +35,14 @@ spot_history = {
     } for spot in parking_spots
 }
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    classIds, confs, boxes = net.detect(frame, confThreshold=0.45)
+    classIds, confs, boxes = net.detect(frame, confThreshold=0.4)
     detected_centers = []
 
     if len(classIds) > 0:
@@ -81,7 +81,7 @@ while True:
         spot_history[spot_id]["status"] = status
 
         # === 🔥 Update Firebase ===
-        firebase_status = "held" if status == "OCCUPIED" else "available"
+        firebase_status = "occupied" if status == "OCCUPIED" else "available"
         try:
             doc_ref = db.collection("parkingSpotsCottage").document(f"spot{spot_id}")
             doc_ref.update({"status": firebase_status})
