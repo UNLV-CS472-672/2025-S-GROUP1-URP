@@ -18,10 +18,10 @@ jest.mock("firebase/firestore", () => {
   };
 });
 
-jest.mock("../../firebaseConfig", () => ({
-  auth: { currentUser: { email: "test@example.com", uid: "12345" } },
-  db: {},
-}));
+jest.mock('../../firebaseConfig', () => ({
+  auth: { currentUser: { email: 'test@example.com', uid: '12345' } },
+  db: {}
+}))
 
 // --- Icon Mocks ---
 jest.mock("@expo/vector-icons", () => {

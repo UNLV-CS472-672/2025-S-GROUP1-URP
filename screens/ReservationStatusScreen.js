@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { collection, query, where, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 
-const TIMER_DURATION_MINUTES = 30;
+const TIMER_DURATION_MINUTES = 30
 
 // ✅ CHANGE: Detect test environment
-const isTestEnv = process.env.NODE_ENV === 'test';
+const isTestEnv = process.env.NODE_ENV === 'test'
 
 export default function ReservationStatusScreen({ navigation }) {
   const [reservation, setReservation] = useState(null);
@@ -17,22 +17,22 @@ export default function ReservationStatusScreen({ navigation }) {
 
   useEffect(() => {
     const fetchReservation = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const user = auth.currentUser;
+        const user = auth.currentUser
         if (!user) {
-          setLoading(false);
-          return;
+          setLoading(false)
+          return
         }
 
-        const reservationsRef = collection(db, "Reservations");
-        const q = query(reservationsRef, where("userID", "==", user.uid), where("status", "==", "held"));
-        const querySnapshot = await getDocs(q);
+        const reservationsRef = collection(db, 'Reservations')
+        const q = query(reservationsRef, where('userID', '==', user.uid), where('status', '==', 'held'))
+        const querySnapshot = await getDocs(q)
 
         if (!querySnapshot.empty) {
-          const resDoc = querySnapshot.docs[0];
-          const resData = resDoc.data();
-          setReservation({ id: resDoc.id, ...resData });
+          const resDoc = querySnapshot.docs[0]
+          const resData = resDoc.data()
+          setReservation({ id: resDoc.id, ...resData })
 
           const startTime = resData.startTime.toDate();
           const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
@@ -59,94 +59,94 @@ export default function ReservationStatusScreen({ navigation }) {
             }
           }
         } else {
-          setReservation(null);
+          setReservation(null)
         }
       } catch (error) {
-        console.error("Error fetching reservation:", error);
+        console.error('Error fetching reservation:', error)
       }
-      setLoading(false);
-    };
+      setLoading(false)
+    }
 
-    fetchReservation();
-  }, []);
+    fetchReservation()
+  }, [])
 
   // ✅ CHANGE: Skip timer interval during tests
   useEffect(() => {
-    if (!reservation || isTestEnv) return;
+    if (!reservation || isTestEnv) return
 
     const interval = setInterval(() => {
-      const startTime = reservation.startTime.toDate();
+      const startTime = reservation.startTime.toDate()
       const endTime = new Date(startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000);
 
       (async () => {
-        await updateTimer(endTime);
-      })();
-    }, 1000);
+        await updateTimer(endTime)
+      })()
+    }, 1000)
 
-    return () => clearInterval(interval);
-  }, [reservation]);
+    return () => clearInterval(interval)
+  }, [reservation])
 
   // ✅ CHANGE: Marked async and added auto-deletion for expired
   const updateTimer = async (endTime) => {
-    const now = new Date();
-    const diff = endTime - now;
+    const now = new Date()
+    const diff = endTime - now
 
     if (diff <= 0) {
       if (!timerExpired && reservation) {
-        setTimerExpired(true);
-        setTimeLeft({ minutes: "00", seconds: "00", expired: true });
+        setTimerExpired(true)
+        setTimeLeft({ minutes: '00', seconds: '00', expired: true })
 
         try {
-          await deleteDoc(doc(db, "Reservations", reservation.id));
-          setReservation(null);
-          console.log("Expired reservation auto-deleted");
+          await deleteDoc(doc(db, 'Reservations', reservation.id))
+          setReservation(null)
+          console.log('Expired reservation auto-deleted')
         } catch (error) {
-          console.error("Error auto-deleting expired reservation:", error);
+          console.error('Error auto-deleting expired reservation:', error)
         }
       }
     } else {
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
       setTimeLeft({
         minutes: minutes < 10 ? `0${minutes}` : `${minutes}`,
         seconds: seconds < 10 ? `0${seconds}` : `${seconds}`,
-        expired: false,
-      });
+        expired: false
+      })
     }
-  };
+  }
 
   const handleCancel = () => {
     if (timerExpired || !reservation) {
-      console.log("Reservation already expired or does not exist.");
-      return;
+      console.log('Reservation already expired or does not exist.')
+      return
     }
 
     Alert.alert(
-      "Cancel Reservation",
-      "Are you sure you want to cancel your current reservation?",
+      'Cancel Reservation',
+      'Are you sure you want to cancel your current reservation?',
       [
         {
-          text: "No",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
+          text: 'No',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
         },
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: async () => {
             try {
-              await deleteDoc(doc(db, "Reservations", reservation.id));
-              setReservation(null);
-              console.log("Reservation canceled and deleted");
+              await deleteDoc(doc(db, 'Reservations', reservation.id))
+              setReservation(null)
+              console.log('Reservation canceled and deleted')
             } catch (error) {
-              console.error("Error canceling reservation:", error);
+              console.error('Error canceling reservation:', error)
             }
-          },
-        },
+          }
+        }
       ],
       { cancelable: false }
-    );
-  };
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -171,18 +171,20 @@ export default function ReservationStatusScreen({ navigation }) {
           <Text style={styles.timerLabel}>Reservation Timer:</Text>
 
           {/* ✅ CHANGE: Check if timeLeft exists before rendering timer */}
-          {timeLeft ? (
-            <View style={[styles.timerBox, timeLeft.expired && styles.expiredTimerBox]}>
-              <Text style={[styles.timerText, timeLeft.expired && styles.expiredTimerText]}>
-                {timeLeft.minutes} : {timeLeft.seconds}
-              </Text>
-              <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
-            </View>
-          ) : (
-            <View style={styles.timerBox}>
-              <Text style={styles.timerText}>Loading...</Text>
-            </View>
-          )}
+          {timeLeft
+            ? (
+              <View style={[styles.timerBox, timeLeft.expired && styles.expiredTimerBox]}>
+                <Text style={[styles.timerText, timeLeft.expired && styles.expiredTimerText]}>
+                  {timeLeft.minutes} : {timeLeft.seconds}
+                </Text>
+                <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
+              </View>
+              )
+            : (
+              <View style={styles.timerBox}>
+                <Text style={styles.timerText}>Loading...</Text>
+              </View>
+              )}
 
           <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
             <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
@@ -192,98 +194,98 @@ export default function ReservationStatusScreen({ navigation }) {
         <Text style={styles.noReservationText}>No current reservation at this time.</Text>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center'
   },
   header: {
-    width: "100%",
-    backgroundColor: "red",
+    width: '100%',
+    backgroundColor: 'red',
     paddingVertical: 20,
-    alignItems: "center",
+    alignItems: 'center',
     borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomRightRadius: 30
   },
   headerText: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-    textShadowColor: "black",
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
-    textShadowRadius: 5,
+    textShadowRadius: 5
   },
   backButton: {
-    color: "red",
+    color: 'red',
     fontSize: 16,
-    textDecorationLine: "underline",
-    marginTop: 10,
+    textDecorationLine: 'underline',
+    marginTop: 10
   },
   label: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
+    fontWeight: 'bold',
+    marginTop: 20
   },
   inputBox: {
-    width: "90%",
+    width: '90%',
     height: 40,
-    borderColor: "gray",
+    borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#eee",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee'
   },
   timerLabel: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 30,
+    fontWeight: 'bold',
+    marginTop: 30
   },
   timerBox: {
     width: 150,
     height: 80,
-    backgroundColor: "gray",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 10
   },
   expiredTimerBox: {
-    backgroundColor: "red",
+    backgroundColor: 'red'
   },
   timerText: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: 'bold',
+    color: 'white'
   },
   expiredTimerText: {
-    color: "yellow",
+    color: 'yellow'
   },
   dateText: {
-    color: "white",
-    marginTop: 5,
+    color: 'white',
+    marginTop: 5
   },
   cancelButton: {
-    marginTop: 20,
+    marginTop: 20
   },
   cancelButtonText: {
-    color: "red",
-    textDecorationLine: "underline",
-    fontSize: 16,
+    color: 'red',
+    textDecorationLine: 'underline',
+    fontSize: 16
   },
   noReservationText: {
     fontSize: 16,
-    color: "gray",
-    marginTop: 50,
+    color: 'gray',
+    marginTop: 50
   },
   loadingText: {
     fontSize: 16,
-    color: "gray",
-    marginTop: 50,
-  },
-});
+    color: 'gray',
+    marginTop: 50
+  }
+})

@@ -16,7 +16,7 @@
  *
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -205,7 +205,7 @@ export default function MyAccountScreen({ navigation }) {
       {vehicles.length > 0 && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
@@ -325,8 +325,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   backButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold'
   },
 });
