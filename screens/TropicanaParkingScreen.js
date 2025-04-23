@@ -115,7 +115,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       const spotDocRef = doc(db, collectionName, selectedSpot)
       const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`
       const now = Timestamp.now()
-      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000))
+      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 30 * 60 * 1000)) // 30 minutes hold
 
       await updateDoc(spotDocRef, {
         status: 'held',
@@ -132,7 +132,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
         createdAt: now
       })
 
-      Alert.alert('Success', `Spot ${selectedSpot} reserved for 2 minutes.`)
+      Alert.alert('Success', `Spot ${selectedSpot} reserved for 30 minutes.`)
       setSelectedSpot(null)
     } catch (err) {
       console.error('Reservation error:', err)
@@ -185,8 +185,8 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
       const now = Timestamp.now();
       const holdExpires = Timestamp.fromDate(
-        new Date(Date.now() + 2 * 60 * 1000)
-      ); // 2 minutes hold
+        new Date(Date.now() + 30 * 60 * 1000)
+      ); // 30 minutes hold
 
       await updateDoc(spotDocRef, {
         status: "held",
@@ -205,7 +205,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 
       Alert.alert(
         "Success",
-        `Spot ${randomSpot.location} reserved for 2 minutes.`
+        `Spot ${randomSpot.location} reserved for 30 minutes.`
       );
     } catch (error) {
       console.error("Error reserving random spot:", error);
