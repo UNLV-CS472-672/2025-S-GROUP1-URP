@@ -206,14 +206,15 @@ const styles = StyleSheet.create({
   },
   header: {
     width: '100%',
+    height: 80,
     backgroundColor: 'red',
-    paddingVertical: 20,
+    justifyContent: 'center',
     alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 27,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: 'black',
