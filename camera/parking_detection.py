@@ -1,6 +1,13 @@
 import cv2
 import numpy as np
 import json
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# === Initialize Firebase ===
+cred = credentials.Certificate("camera/serviceAccountKey.json")  # Ensure your key is here
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # === Load class names ===
 with open("camera/coco.names.txt", "rt") as f:
@@ -9,7 +16,6 @@ with open("camera/coco.names.txt", "rt") as f:
 # === Load model ===
 configPath = "camera/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
 weightsPath = "camera/frozen_inference_graph.pb"
-
 net = cv2.dnn_DetectionModel(weightsPath, configPath)
 net.setInputSize(320, 320)
 net.setInputScale(1.0 / 127.5)
@@ -36,7 +42,7 @@ while True:
     if not ret:
         break
 
-    classIds, confs, boxes = net.detect(frame, confThreshold=0.45)
+    classIds, confs, boxes = net.detect(frame, confThreshold=0.4)
     detected_centers = []
 
     if len(classIds) > 0:
@@ -50,7 +56,6 @@ while True:
                 x, y, w, h = box
                 cx, cy = x + w // 2, y + h // 2
                 detected_centers.append((cx, cy))
-
                 cv2.rectangle(frame, box, (255, 255, 0), 2)
                 cv2.circle(frame, (cx, cy), 12, (0, 0, 255), -1)
                 cv2.putText(frame, f"{className} {confidence:.2f}", (x, y - 10),
@@ -74,6 +79,14 @@ while True:
 
         status = "OCCUPIED" if history.count("OCCUPIED") > history.count("FREE") else "FREE"
         spot_history[spot_id]["status"] = status
+
+        # === 🔥 Update Firebase ===
+        firebase_status = "occupied" if status == "OCCUPIED" else "available"
+        try:
+            doc_ref = db.collection("parkingSpotsCottage").document(f"spot{spot_id}")
+            doc_ref.update({"status": firebase_status})
+        except Exception as e:
+            print(f"Firebase update failed for spot {spot_id}: {e}")
 
     for spot in parking_spots:
         pts = spot["points"]
