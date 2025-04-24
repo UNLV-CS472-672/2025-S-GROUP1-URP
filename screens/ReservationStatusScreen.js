@@ -201,13 +201,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
     alignItems: 'center'
   },
   header: {
     width: '100%',
     backgroundColor: 'red',
-    paddingVertical: 20,
+    paddingVertical: 50,
     alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30
