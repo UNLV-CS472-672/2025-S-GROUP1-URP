@@ -16,65 +16,87 @@
  *
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
-  Button,
-  Alert,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  Alert,
+  TextInput,
+  Image,
 } from "react-native";
-import { db } from "../firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
-import { auth } from "../firebaseConfig";
+import * as ImagePicker from "expo-image-picker"; // To handle image picking
+import { db, auth } from "../firebaseConfig";
+import { doc, getDoc, updateDoc } from "firebase/firestore"; 
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
-// MyAccountScreen component
 export default function MyAccountScreen({ navigation }) {
-  const [vehicles, setVehicles] = useState([]); // State to store user's vehicles
-
-  /**
-   * useEffect Hook
-   *
-   * Fetches the user's vehicle information from Firestore when the component mounts.
-   * If no vehicles are found, the user is redirected to the "AddVehicle" screen after a 1-second delay.
-   */
+  const [vehicles, setVehicles] = useState([]);
+  const [name, setName] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null); // To hold the profile picture
+  const user = auth.currentUser;
 
   useEffect(() => {
-    // Fetch vehicle information when the component mounts
-    const fetchVehicleInfo = async () => {
-      const user = auth.currentUser;
+    const fetchData = async () => {
       if (user) {
-        const docRef = doc(db, "vehicles", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        // Fetch vehicle info
+        const vehicleDocRef = doc(db, "vehicles", user.uid);
+        const vehicleSnap = await getDoc(vehicleDocRef);
+        if (vehicleSnap.exists()) {
+          const data = vehicleSnap.data();
           const userVehicles = data.vehicles || [];
           setVehicles(userVehicles);
-
-          // Navigate to AddVehicle screen if no vehicles are found
           if (userVehicles.length === 0) {
             setTimeout(() => {
-              navigation.replace("AddVehicle"); // changing from navigate function to replace function
-            }, 1000); // 1 second delay
+              navigation.replace("AddVehicle");
+            }, 1000);
           }
         } else {
-          // Navigate to AddVehicle screen if no document is found
           setTimeout(() => {
-            navigation.replace("AddVehicle"); // changing from navigate function to replace function
-          }, 1000); // 1 second delay
+            navigation.replace("AddVehicle");
+          }, 1000);
+        }
+
+        // Fetch user profile info
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          setName(data.name || "");
+          setProfilePicture(data.profilePicture || null); // Get profile picture from database
         }
       }
     };
-    fetchVehicleInfo();
-  }, [navigation]);
+    fetchData();
+  }, []);
 
-  /**
-   * handleAddAnotherVehicle Function
-   *
-   * Navigates to the "AddVehicle" screen when the user presses the "Add Another Vehicle" button.
-   */
+  const handleProfilePicturePick = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setProfilePicture(result.uri);
+      // You can upload the image to Firebase Storage and update the user profile document with the image URL if needed.
+    }
+  };
+
+  const handleDeleteVehicle = async (index) => {
+    const updatedVehicles = [...vehicles];
+    updatedVehicles.splice(index, 1);
+    setVehicles(updatedVehicles);
+
+    const userDocRef = doc(db, "vehicles", user.uid);
+    await updateDoc(userDocRef, {
+      vehicles: updatedVehicles,
+    });
+  };
+
   const handleAddAnotherVehicle = () => {
     if (vehicles.length >= 3) {
       Alert.alert("Limit Reached", "You can only register up to 3 vehicles.");
@@ -82,96 +104,230 @@ export default function MyAccountScreen({ navigation }) {
       navigation.navigate("AddVehicle");
     }
   };
-  
+
+  const handleSaveProfile = async () => {
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, {
+        name,
+        profilePicture, // Save the profile picture URI
+      });
+      Alert.alert("Success", "Profile updated!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to update profile.");
+      console.error(error);
+    }
+  };
+
+  const getOrdinalSuffix = (index) => {
+    if (index === 0) return "1st";
+    if (index === 1) return "2nd";
+    if (index === 2) return "3rd";
+    return `${index + 1}th`;
+  };
 
   return (
-    <View style={styles.container}>
-      {vehicles.length > 0 ? (
-        <View style={styles.infoContainer}>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            User Information:
-          </Text>
-          <Text>Email: {auth.currentUser.email}</Text>
-          <Text></Text>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            Vehicle(s) Information:
-          </Text>
-          {vehicles.map((vehicle, index) => (
-            <View key={index} style={styles.vehicleContainer}>
-              <Text>Make: {vehicle.make}</Text>
-              <Text>Model: {vehicle.model}</Text>
-              <Text>Year: {vehicle.year}</Text>
-              <Text>License Plate: {vehicle.licensePlate}</Text>
-              <Button
-                title="Edit"
-                onPress={() =>
-                  navigation.navigate("EditVehicle", { vehicle, index })
-                }
-                color="orange"
-              />
+    <ScrollView style={styles.container}>
+      <View style={styles.profileHeader}>
+        <Text style={styles.header}>Profile Information</Text>
+      </View>
+
+      <View style={styles.profileSection}>
+        <View style={styles.profileRow}>
+          <Text style={styles.label}>Profile Picture</Text>
+          <TouchableOpacity onPress={handleProfilePicturePick}>
+            <View style={styles.profilePictureContainer}>
+              {profilePicture ? (
+                <Image
+                  source={{ uri: profilePicture }}
+                  style={styles.profilePicture}
+                />
+              ) : (
+                <Ionicons name="person-circle" size={60} color="gray" />
+              )}
             </View>
-          ))}
-          <Button
-            title="Add Another Vehicle"
-            onPress={handleAddAnotherVehicle}
-            color={vehicles.length >= 3 ? "gray" : "blue"}
-            disabled={vehicles.length >= 3}
-          />
-          <Button
-            title="Remove a Vehicle"
-            onPress={() => navigation.navigate("RemoveVehicle", { vehicles })}
-            color="red"
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.profileRow}>
+          <Text style={styles.label}>Name</Text>
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter your name"
           />
         </View>
-      ) : (
-        <View>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-            No vehicles found. Redirecting to add vehicle screen...
-          </Text>
+
+        <View style={styles.profileRow}>
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.infoText}>{user?.email || "N/A"}</Text>
         </View>
-      )}
+      </View>
+
+      <View style={styles.vehiclesHeader}>
+        <Text style={styles.vehicleTitle}>Registered Vehicles</Text>
+        <TouchableOpacity onPress={handleAddAnotherVehicle}>
+          <Text style={styles.addVehicleText}>Add Vehicle</Text>
+        </TouchableOpacity>
+      </View>
+
+      {vehicles.map((vehicle, index) => {
+        const vehicleLabel = `${getOrdinalSuffix(index)} Vehicle`;
+        return (
+          <View key={index} style={styles.vehicleCard}>
+            <View style={styles.vehicleHeader}>
+              <View style={styles.vehicleLabel}>
+                <FontAwesome name="car" size={20} color="#CC0000" />
+                <Text style={styles.vehicleType}>{vehicleLabel}</Text>
+              </View>
+              <TouchableOpacity onPress={() => handleDeleteVehicle(index)}>
+                <Ionicons name="trash" size={20} color="gray" />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.vehicleInfo}>Make: {vehicle.make}</Text>
+            <Text style={styles.vehicleInfo}>Model: {vehicle.model}</Text>
+            <Text style={styles.vehicleInfo}>Year: {vehicle.year}</Text>
+            <Text style={styles.vehicleInfo}>
+              License: {vehicle.licensePlate}
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("EditVehicle", { vehicle, index })
+              }
+            >
+              <Text style={styles.editText}>Edit</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      })}
+
       {vehicles.length > 0 && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
-// Styles for the MyAccountScreen component
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    justifyContent: "space-between", // Ensure the back button is at the bottom
+    marginTop:40,
+    backgroundColor: "#fff",
+  },
+  profileHeader: {
+    backgroundColor: "#CC0000", // Updated red color
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+  },
+  header: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  profileSection: {
+    marginBottom: 30,
+  },
+  profileRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  label: {
+    fontWeight: "bold",
+    color: "#444",
+    flex: 1,
+  },
+  infoText: {
+    fontSize: 14,
+    color: "#555",
+    flex: 2,
+    textAlign: "right",
+  },
+  input: {
+    flex: 2,
+    fontSize: 14,
+    color: "#555",
+    textAlign: "right",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    paddingVertical: 2,
+  },
+  profilePictureContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  profilePicture: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  vehiclesHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  vehicleTitle: {
+    fontWeight: "bold",
+    fontSize: 15,
+    color: "#444",
+  },
+  addVehicleText: {
+    color: "#CC0000", // Updated red color
+    fontWeight: "500",
+  },
+  vehicleCard: {
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  vehicleHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  vehicleLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  vehicleType: {
+    marginLeft: 5,
+    fontWeight: "bold",
+    color: "#555",
+  },
+  vehicleInfo: {
+    fontSize: 14,
+    marginTop: 5,
+  },
+  editText: {
+    marginTop: 10,
+    color: "blue",
+    fontWeight: "500",
   },
   backButton: {
-    width: "50%", // Half the width of the screen
-    backgroundColor: "#B0463C",
+    backgroundColor: "#CC0000", // Updated red color
     paddingVertical: 15,
+    borderRadius: 10,
     alignItems: "center",
-    borderRadius: 5,
-    position: "absolute",
-    bottom: 20, // Position it at the bottom
-    left: 20, // Position it at the left
+    marginTop: 30,
   },
   backButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
-  },
-  infoContainer: {
-    marginBottom: 20,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "red",
-    backgroundColor: "#f0f0f0",
-  },
-  vehicleContainer: {
-    marginBottom: 10,
+    fontWeight: 'bold'
   },
 });

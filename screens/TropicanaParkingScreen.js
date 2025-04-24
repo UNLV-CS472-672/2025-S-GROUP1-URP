@@ -6,14 +6,10 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
-  Dimensions,
-} from "react-native";
-import Svg, {
-  Rect,
-  Text as SvgText,
-  Image as SvgImage,
-} from "react-native-svg";
-import carIcon from "../../../assets/car_icon.png";
+  Dimensions
+} from 'react-native'
+import Svg, { Rect, Text as SvgText, Image as SvgImage } from 'react-native-svg'
+import carIcon from '../assets/car_icon.png'
 import {
   getFirestore,
   doc,
@@ -24,10 +20,10 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs,
-} from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { useNavigation } from "@react-navigation/native";
+  getDocs
+} from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
+import { useNavigation } from '@react-navigation/native'
 
 // Firebase setup
 const db = getFirestore()
@@ -116,12 +112,10 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
         return
       }
 
-      const spotDocRef = doc(db, collectionName, selectedSpot);
-      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
-      const now = Timestamp.now();
-      const holdExpires = Timestamp.fromDate(
-        new Date(Date.now() + 2 * 60 * 1000)
-      );
+      const spotDocRef = doc(db, collectionName, selectedSpot)
+      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`
+      const now = Timestamp.now()
+      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000))
 
       await updateDoc(spotDocRef, {
         status: 'held',
@@ -222,48 +216,52 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
     }
   };
 
-  const filteredSpaces = parkingSpaces.filter((space) => space.type === filter);
+  const filteredSpaces = parkingSpaces.filter(space => space.type === filter)
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={{ marginLeft: 10 }}
-      >
-        <Text style={{ fontSize: 16, color: "blue" }}>← Back</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
+        <Text style={{ fontSize: 16, color: 'blue' }}>← Back</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>{parkingLot}</Text>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.filterContainer}>
-          {["student", "staff", "accessible"].map((type) => (
+          {['student', 'staff', 'accessible'].map((type) => (
             <TouchableOpacity
               key={type}
               style={styles.filterOption}
               onPress={() => setFilter(type)}
             >
-              <Text style={styles.checkbox}>{filter === type ? "☑" : "☐"}</Text>
-              <Text style={styles.filterLabel}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Text>
+              <Text style={styles.checkbox}>{filter === type ? '☑' : '☐'}</Text>
+              <Text style={styles.filterLabel}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <View style={styles.legendContainer}>
-          {[
-            { color: "green", label: "Open" },
-            { color: "yellow", label: "Reserved" },
-            { color: "red", label: "Occupied" },
-            { color: "blue", label: "Selected" },
-          ].map(({ color, label }) => (
-            <View style={styles.legendItem} key={label}>
-              <View style={[styles.legendBox, { backgroundColor: color }]} />
-              <Text style={styles.legendText}>{label}</Text>
-            </View>
-          ))}
-        </View>
+          <View style={styles.legendContainer}>
+            {[
+              { color: 'green', label: 'Open' },
+              { color: 'yellow', label: 'Reserved' },
+            ].map(({ color, label }) => (
+              <View style={styles.legendItem} key={label}>
+                <View style={[styles.legendBox, { backgroundColor: color }]} />
+                <Text style={styles.legendText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.legendContainer}>
+            {[
+              { color: 'red', label: 'Occupied' },
+              { color: 'blue', label: 'Selected' }
+            ].map(({ color, label }) => (
+              <View style={styles.legendItem} key={label}>
+                <View style={[styles.legendBox, { backgroundColor: color }]} />
+                <Text style={styles.legendText}>{label}</Text>
+              </View>
+            ))}
+          </View>
 
         <View style={styles.mapWrapper}>
           <Svg height='400' width='300' viewBox='0 0 300 400'>
@@ -338,19 +336,14 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 
         <View style={styles.stepsContainer}>
           <Text style={styles.stepsTitle}>Steps:</Text>
-          <Text style={styles.stepsText}>
-            1. Click on an available green spot
-          </Text>
-          <Text style={styles.stepsText}>
-            2. Hit the reserve button after selecting
-          </Text>
+          <Text style={styles.stepsText}>1. Click on an available green spot</Text>
+          <Text style={styles.stepsText}>2. Hit the reserve button after selecting</Text>
           <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
 
         <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
           <Text style={{ color: 'white', fontSize: 16 }}>Reserve</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={[
             styles.reserveButton,
@@ -368,34 +361,16 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "white", paddingTop: 40 },
-  scrollContent: { alignItems: "center", paddingBottom: 60 },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  legendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
+  container: { flex: 1, backgroundColor: 'white', paddingTop: 40 },
+  scrollContent: { alignItems: 'center', paddingBottom: 60 },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
+  legendContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 10 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 },
   legendBox: { width: 20, height: 20, marginRight: 5 },
-  legendText: { fontSize: 16, fontWeight: "bold" },
-  mapWrapper: {
-    width: 300,
-    height: 400,
-    position: "relative",
-    marginBottom: 20,
-  },
-  stepsContainer: { alignItems: "center", padding: 10 },
-  stepsTitle: { fontSize: 18, fontWeight: "bold" },
+  legendText: { fontSize: 16, fontWeight: 'bold' },
+  mapWrapper: { width: 300, height: 400, position: 'relative', marginBottom: 20 },
+  stepsContainer: { alignItems: 'center', padding: 10 },
+  stepsTitle: { fontSize: 18, fontWeight: 'bold' },
   stepsText: { fontSize: 16 },
   reserveButton: {
     backgroundColor: 'red',
