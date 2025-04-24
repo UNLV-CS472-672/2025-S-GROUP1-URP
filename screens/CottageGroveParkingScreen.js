@@ -324,6 +324,15 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
             {[
               { color: 'green', label: 'Open' },
               { color: 'yellow', label: 'Reserved' },
+            ].map(({ color, label }) => (
+              <View style={styles.legendItem} key={label}>
+                <View style={[styles.legendBox, { backgroundColor: color }]} />
+                <Text style={styles.legendText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.legendContainer}>
+            {[
               { color: 'red', label: 'Occupied' },
               { color: 'blue', label: 'Selected' }
             ].map(({ color, label }) => (
@@ -383,7 +392,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
           <TouchableOpacity
           style={[
             styles.reserveButton,
-            { backgroundColor: "#2196F3", marginTop: 10 , marginBottom: 10},
+            { backgroundColor: "#2196F3", marginTop: 10 , marginBottom: 80},
           ]}
           onPress={handleReserveRandomSpot}
         >
@@ -400,7 +409,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white', paddingTop: 40 },
   scrollContent: { alignItems: 'center'},
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 },
   mapWrapper: {
     width: screenWidth,
     height: screenWidth, // maintain 300x400 aspect ratio
@@ -433,12 +442,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'white',
     paddingVertical: 2,
-    width: '100%'
+    width: '50%'
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 },
   legendBox: { width: 20, height: 20, marginRight: 5 },
   legendText: { fontSize: 16, fontWeight: 'bold' },
-  stepsContainer: { alignItems: 'center', padding: 10 },
+  stepsContainer: { alignItems: 'center', padding: 5 },
   stepsTitle: { fontSize: 18, fontWeight: 'bold' },
   stepsText: { fontSize: 16 },
   reserveButton: {
@@ -455,7 +464,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginVertical: 10,
+    marginVertical: 5,
     backgroundColor: 'white',
     paddingVertical: 5,
     width: '100%'

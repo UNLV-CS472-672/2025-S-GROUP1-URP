@@ -240,19 +240,28 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
           ))}
         </View>
 
-        <View style={styles.legendContainer}>
-          {[
-            { color: 'green', label: 'Open' },
-            { color: 'yellow', label: 'Reserved' },
-            { color: 'red', label: 'Occupied' },
-            { color: 'blue', label: 'Selected' }
-          ].map(({ color, label }) => (
-            <View style={styles.legendItem} key={label}>
-              <View style={[styles.legendBox, { backgroundColor: color }]} />
-              <Text style={styles.legendText}>{label}</Text>
-            </View>
-          ))}
-        </View>
+          <View style={styles.legendContainer}>
+            {[
+              { color: 'green', label: 'Open' },
+              { color: 'yellow', label: 'Reserved' },
+            ].map(({ color, label }) => (
+              <View style={styles.legendItem} key={label}>
+                <View style={[styles.legendBox, { backgroundColor: color }]} />
+                <Text style={styles.legendText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.legendContainer}>
+            {[
+              { color: 'red', label: 'Occupied' },
+              { color: 'blue', label: 'Selected' }
+            ].map(({ color, label }) => (
+              <View style={styles.legendItem} key={label}>
+                <View style={[styles.legendBox, { backgroundColor: color }]} />
+                <Text style={styles.legendText}>{label}</Text>
+              </View>
+            ))}
+          </View>
 
         <View style={styles.mapWrapper}>
           <Svg height='400' width='300' viewBox='0 0 300 400'>
