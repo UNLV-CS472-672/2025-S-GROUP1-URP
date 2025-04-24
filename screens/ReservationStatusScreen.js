@@ -154,8 +154,8 @@ export default function ReservationStatusScreen({ navigation }) {
         <Text style={styles.headerText}>Reservation Status</Text>
       </View>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>Back</Text>
+      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -221,11 +221,15 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5
   },
-  backButton: {
+  backWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginBottom: 10,
+    paddingLeft: 5
+  },
+  backText: {
     color: 'red',
     fontSize: 16,
-    textDecorationLine: 'underline',
-    marginTop: 10
   },
   label: {
     fontSize: 16,
@@ -289,4 +293,4 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginTop: 50
   }
-})
+});
