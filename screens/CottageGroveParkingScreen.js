@@ -375,10 +375,19 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 
           <View style={styles.legendContainer}>
             {[
-              { color: "green", label: "Open" },
-              { color: "yellow", label: "Reserved" },
-              { color: "red", label: "Occupied" },
-              { color: "blue", label: "Selected" },
+              { color: 'green', label: 'Open' },
+              { color: 'yellow', label: 'Reserved' },
+            ].map(({ color, label }) => (
+              <View style={styles.legendItem} key={label}>
+                <View style={[styles.legendBox, { backgroundColor: color }]} />
+                <Text style={styles.legendText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.legendContainer}>
+            {[
+              { color: 'red', label: 'Occupied' },
+              { color: 'blue', label: 'Selected' }
             ].map(({ color, label }) => (
               <View style={styles.legendItem} key={label}>
                 <View style={[styles.legendBox, { backgroundColor: color }]} />
@@ -446,16 +455,16 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
             <Text style={{ color: "white", fontSize: 16 }}>Reserve</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.reserveButton,
-              { backgroundColor: "#2196F3", marginTop: 10, marginBottom: 10 },
-            ]}
-            onPress={handleReserveRandomSpot}
-          >
-            <Text style={{ textAlign: "center", color: "white", fontSize: 16 }}>
-              Reserve Random Spot
-            </Text>
-          </TouchableOpacity>
+          style={[
+            styles.reserveButton,
+            { backgroundColor: "#2196F3", marginTop: 10 , marginBottom: 80},
+          ]}
+          onPress={handleReserveRandomSpot}
+        >
+          <Text style={{ textAlign: "center", color: "white", fontSize: 16 }}>
+            Reserve Random Spot
+          </Text>
+        </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -463,14 +472,9 @@ const ParkingMap = ({ parkingLot = "Tropicana Parking" }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "white", paddingTop: 40 },
-  scrollContent: { alignItems: "center" },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
+  container: { flex: 1, backgroundColor: 'white', paddingTop: 40 },
+  scrollContent: { alignItems: 'center'},
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 },
   mapWrapper: {
     width: screenWidth,
     height: screenWidth, // maintain 300x400 aspect ratio
@@ -503,17 +507,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
     paddingVertical: 2,
-    width: "100%",
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
+    width: '50%'
   },
   legendBox: { width: 20, height: 20, marginRight: 5 },
-  legendText: { fontSize: 16, fontWeight: "bold" },
-  stepsContainer: { alignItems: "center", padding: 10 },
-  stepsTitle: { fontSize: 18, fontWeight: "bold" },
+  legendText: { fontSize: 16, fontWeight: 'bold' },
+  stepsContainer: { alignItems: 'center', padding: 5 },
+  stepsTitle: { fontSize: 18, fontWeight: 'bold' },
   stepsText: { fontSize: 16 },
   reserveButton: {
     backgroundColor: "red",
@@ -525,12 +524,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   filterContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    flexWrap: "wrap",
-    marginVertical: 10,
-    backgroundColor: "white",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginVertical: 5,
+    backgroundColor: 'white',
+
     paddingVertical: 5,
     width: "100%",
   },

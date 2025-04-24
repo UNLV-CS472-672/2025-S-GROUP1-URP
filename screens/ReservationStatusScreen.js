@@ -246,15 +246,14 @@ export default function ReservationStatusScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
-    alignItems: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center'
   },
   header: {
-    width: "100%",
-    backgroundColor: "red",
-    paddingVertical: 20,
-    alignItems: "center",
+    width: '100%',
+    backgroundColor: 'red',
+    paddingVertical: 50,
+    alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
