@@ -1,4 +1,17 @@
-import React, { useState, useEffect } from 'react'
+/**
+ * File: AddVehicleScreen.js
+ * Purpose: Provides a screen for users to add a new vehicle to their account.
+ * Dependencies:
+ *   - React and React Native components for UI rendering.
+ *   - Firebase Firestore for storing vehicle data.
+ *   - Firebase Storage for uploading vehicle images.
+ *   - Expo ImagePicker for selecting or capturing images.
+ * Usage:
+ *   - This screen is navigated to when a user wants to register a new vehicle.
+ *   - Call `handleSave()` to save the vehicle details and image to Firestore.
+ */
+
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,18 +23,24 @@ import {
   ScrollView,
   Keyboard,
   Image,
-  Modal
-} from 'react-native'
-import { db, auth } from '../firebaseConfig'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
+  Modal,
+} from "react-native";
+import { db, auth } from "../firebaseConfig";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { getStorage } from "firebase/storage";
 
-import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system'
-import { getStorage } from 'firebase/storage'
-
-
-
-// AddVehicleScreen component
+/**
+ * AddVehicleScreen Component
+ *
+ * This component allows users to add a new vehicle to their account. Users can input
+ * vehicle details (make, model, year, license plate) and optionally upload an image.
+ *
+ * @param {object} navigation - React Navigation prop for navigating between screens.
+ * @param {object} route - React Navigation route prop for passing parameters.
+ * @returns {JSX.Element} - The rendered AddVehicleScreen component.
+ */
 export default function AddVehicleScreen({ navigation, route }) {
   const [make, setMake] = useState(""); // Vehicle make
   const [model, setModel] = useState(""); // Vehicle model
@@ -35,58 +54,73 @@ export default function AddVehicleScreen({ navigation, route }) {
 
   // Listen to keyboard show/hide events
   useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', () =>
+    const showSub = Keyboard.addListener("keyboardDidShow", () =>
       setKeyboardVisible(true)
-    )
-    const hideSub = Keyboard.addListener('keyboardDidHide', () =>
+    );
+    const hideSub = Keyboard.addListener("keyboardDidHide", () =>
       setKeyboardVisible(false)
-    )
+    );
 
     return () => {
-      showSub.remove()
-      hideSub.remove()
-    }
-  }, [])
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
+  /**
+   * Opens the image library for the user to select an image.
+   * Sets the selected image URI to the `image` state.
+   */
   const pickImageFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 1
-    })
+      quality: 1,
+    });
     if (!result.canceled && result.assets?.length > 0) {
-      setImage(result.assets[0].uri)
+      setImage(result.assets[0].uri);
     }
-  }
+  };
 
+  /**
+   * Opens the camera for the user to take a photo.
+   * Sets the captured image URI to the `image` state.
+   */
   const takePhotoWithCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync()
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission required', 'Camera access is needed.')
-      return
+      Alert.alert("Permission required", "Camera access is needed.");
+      return;
     }
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      quality: 1
-    })
+      quality: 1,
+    });
     if (!result.canceled && result.assets?.length > 0) {
-      setImage(result.assets[0].uri)
+      setImage(result.assets[0].uri);
     }
-  }
+  };
 
+  /**
+   * Removes the currently selected image by setting the `image` state to null.
+   */
   const removeImage = () => {
-    // Set the image state to null (mark for removal)
-    setImage(null)
-  }
+    setImage(null);
+  };
 
+  /**
+   * Saves the vehicle details and image to Firestore.
+   * Validates the input fields and uploads the image to Firebase Storage if provided.
+   * Updates the user's vehicle list in Firestore.
+   */
   const handleSave = async () => {
-    if (isSaving) return // Prevent duplicate saves
-    setIsSaving(true) // Disable the button immediately
+    if (isSaving) return; // Prevent duplicate saves
+    setIsSaving(true); // Disable the button immediately
 
     if (!make.trim() || !model.trim() || !year.trim() || !licensePlate.trim()) {
-      Alert.alert('Error', 'All fields are required.')
-      setIsSaving(false) // Re-enable the button
-      return
+      Alert.alert("Error", "All fields are required.");
+      setIsSaving(false); // Re-enable the button
+      return;
     }
 
     if (
@@ -95,102 +129,102 @@ export default function AddVehicleScreen({ navigation, route }) {
       parseInt(year) < 1886 ||
       parseInt(year) > new Date().getFullYear()
     ) {
-      Alert.alert('Error', 'Please enter a valid year (e.g., 2025).')
-      setIsSaving(false) // Re-enable the button
-      return
+      Alert.alert("Error", "Please enter a valid year (e.g., 2025).");
+      setIsSaving(false); // Re-enable the button
+      return;
     }
 
-    let imageUrl = null
+    let imageUrl = null;
 
     try {
       if (image) {
-        const fileInfo = await FileSystem.getInfoAsync(image)
+        const fileInfo = await FileSystem.getInfoAsync(image);
         if (fileInfo.size > 5 * 1024 * 1024) {
-          Alert.alert('File Too Large', 'Image must be smaller than 5MB.')
-          setIsSaving(false) // Re-enable the button
-          return
+          Alert.alert("File Too Large", "Image must be smaller than 5MB.");
+          setIsSaving(false); // Re-enable the button
+          return;
         }
 
-        const storage = getStorage()
-        const filename = `vehicleImages/${licensePlate}_${Date.now()}.jpg`
+        const storage = getStorage();
+        const filename = `vehicleImages/${licensePlate}_${Date.now()}.jpg`;
         const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${
           storage.app.options.storageBucket
-        }/o/${encodeURIComponent(filename)}?uploadType=media`
+        }/o/${encodeURIComponent(filename)}?uploadType=media`;
 
         const uploadResult = await FileSystem.uploadAsync(uploadUrl, image, {
-          httpMethod: 'POST',
-          headers: { 'Content-Type': 'image/jpeg' },
-          uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT
-        })
+          httpMethod: "POST",
+          headers: { "Content-Type": "image/jpeg" },
+          uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+        });
 
         if (uploadResult.status !== 200) {
-          throw new Error('Upload failed with status ' + uploadResult.status)
+          throw new Error("Upload failed with status " + uploadResult.status);
         }
 
         imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
           storage.app.options.storageBucket
-        }/o/${encodeURIComponent(filename)}?alt=media`
+        }/o/${encodeURIComponent(filename)}?alt=media`;
       }
 
-      const user = auth.currentUser
+      const user = auth.currentUser;
       if (user) {
-        const docRef = doc(db, 'vehicles', user.uid)
-        const docSnap = await getDoc(docRef)
+        const docRef = doc(db, "vehicles", user.uid);
+        const docSnap = await getDoc(docRef);
 
-        let updatedVehicles = []
+        let updatedVehicles = [];
 
         if (docSnap.exists()) {
-          const data = docSnap.data()
-          updatedVehicles = data.vehicles || []
+          const data = docSnap.data();
+          updatedVehicles = data.vehicles || [];
         }
 
-        const newVehicle = { make, model, year, licensePlate, imageUrl }
-        updatedVehicles.push(newVehicle)
+        const newVehicle = { make, model, year, licensePlate, imageUrl };
+        updatedVehicles.push(newVehicle);
 
-        await setDoc(doc(db, 'vehicles', user.uid), {
-          vehicles: updatedVehicles
-        })
+        await setDoc(doc(db, "vehicles", user.uid), {
+          vehicles: updatedVehicles,
+        });
 
-        Alert.alert('Vehicle information saved successfully!')
-        navigation.navigate('My Account')
+        Alert.alert("Vehicle information saved successfully!");
+        navigation.navigate("My Account");
       } else {
-        Alert.alert('Error', 'User not logged in')
+        Alert.alert("Error", "User not logged in");
       }
     } catch (error) {
-      Alert.alert('Error', error.message)
+      Alert.alert("Error", error.message);
     } finally {
-      setIsSaving(false) // Re-enable the button after the operation
+      setIsSaving(false); // Re-enable the button after the operation
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
           Enter the car information that you would like to register with UNLV
-          Reserve Parking:{'\n\n'}
+          Reserve Parking:{"\n\n"}
         </Text>
         <TextInput
-          placeholder='Make'
+          placeholder="Make"
           value={make}
           onChangeText={setMake}
           style={styles.input}
         />
         <TextInput
-          placeholder='Model'
+          placeholder="Model"
           value={model}
           onChangeText={setModel}
           style={styles.input}
         />
         <TextInput
-          placeholder='Year'
+          placeholder="Year"
           value={year}
           onChangeText={setYear}
           style={styles.input}
-          keyboardType='numeric'
+          keyboardType="numeric"
         />
         <TextInput
-          placeholder='License Plate'
+          placeholder="License Plate"
           value={licensePlate}
           onChangeText={setLicensePlate}
           style={styles.input}
@@ -231,9 +265,9 @@ export default function AddVehicleScreen({ navigation, route }) {
         )}
 
         <Button
-          title='Save'
+          title="Save"
           onPress={handleSave}
-          color='red'
+          color="red"
           disabled={isSaving} // Disable the button while saving
         />
       </ScrollView>
@@ -242,14 +276,14 @@ export default function AddVehicleScreen({ navigation, route }) {
       <Modal
         visible={isModalVisible}
         transparent
-        animationType='slide'
+        animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
           <Image
             source={{ uri: image }}
             style={styles.modalImage}
-            resizeMode='contain'
+            resizeMode="contain"
           />
           <TouchableOpacity
             style={styles.closeModalButton}
@@ -278,110 +312,110 @@ export default function AddVehicleScreen({ navigation, route }) {
         </TouchableOpacity>
       )}
     </View>
-  )
+  );
 }
 
 // Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'flex-start'
+    justifyContent: "flex-start",
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 20,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   backButton: {
-    width: '50%',
-    backgroundColor: '#B0463C',
+    width: "50%",
+    backgroundColor: "#B0463C",
     paddingVertical: 15,
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: 5,
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
-    left: 20
+    left: 20,
   },
   backButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   imageButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
   imageButton: {
-    backgroundColor: '#B0463C',
+    backgroundColor: "#B0463C",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
     flex: 1,
     marginHorizontal: 5,
-    alignItems: 'center'
+    alignItems: "center",
   },
   imageButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   imageActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 10
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
   },
   showImageButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: "#007BFF",
     padding: 10,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
-    marginRight: 10
+    marginRight: 10,
   },
   showImageButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
   },
   removeImageButton: {
-    backgroundColor: '#FF0000',
+    backgroundColor: "#FF0000",
     padding: 10,
     borderRadius: 5,
-    alignItems: 'center',
-    flex: 1
+    alignItems: "center",
+    flex: 1,
   },
   removeImageButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalImage: {
-    width: '90%',
-    height: '70%'
+    width: "90%",
+    height: "70%",
   },
   closeModalButton: {
     marginTop: 20,
-    backgroundColor: '#B0463C',
+    backgroundColor: "#B0463C",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5
+    borderRadius: 5,
   },
   closeModalButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold'
-  }
-})
+    fontWeight: "bold",
+  },
+});

@@ -1,4 +1,18 @@
-import React, { useState } from 'react'
+/**
+ * File: ReportScreen.js
+ * Purpose: Allows users to report parking violations by submitting details and an optional image.
+ * Dependencies:
+ *   - React and React Native components for UI rendering.
+ *   - Firebase Firestore for storing violation reports.
+ *   - Firebase Storage for uploading images.
+ *   - Expo ImagePicker for selecting or capturing images.
+ * Usage:
+ *   - Users can input details such as license plate, color, make/model, and comments.
+ *   - Users can optionally upload an image of the violation.
+ *   - Call `handleSubmit()` to save the report to Firestore.
+ */
+
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,106 +22,132 @@ import {
   Alert,
   TouchableOpacity,
   Image,
-  ScrollView
-} from 'react-native'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
-import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system'
-import { db } from '../firebaseConfig'
-import { getAuth } from 'firebase/auth'
-const auth = getAuth()
+  ScrollView,
+} from "react-native";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { db } from "../firebaseConfig";
+import { getAuth } from "firebase/auth";
 
-export default function ReportScreen ({ navigation }) {
-  const [licensePlate, setLicensePlate] = useState('')
-  const [color, setColor] = useState('')
-  const [makeModel, setMakeModel] = useState('')
-  const [comments, setComments] = useState('')
-  const [image, setImage] = useState(null)
+const auth = getAuth();
 
+/**
+ * ReportScreen Component
+ *
+ * This component allows users to report parking violations by submitting details and an optional image.
+ *
+ * @param {object} navigation - React Navigation prop for navigating between screens.
+ * @returns {JSX.Element} - The rendered ReportScreen component.
+ */
+export default function ReportScreen({ navigation }) {
+  const [licensePlate, setLicensePlate] = useState(""); // License plate of the reported vehicle
+  const [color, setColor] = useState(""); // Color of the reported vehicle
+  const [makeModel, setMakeModel] = useState(""); // Make and model of the reported vehicle
+  const [comments, setComments] = useState(""); // Additional comments about the violation
+  const [image, setImage] = useState(null); // Image of the violation
+
+  /**
+   * Opens the image library for the user to select an image.
+   * Sets the selected image URI to the `image` state.
+   */
   const pickImageFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 1
-    })
+      quality: 1,
+    });
     if (!result.canceled && result.assets?.length > 0) {
-      setImage(result.assets[0].uri)
+      setImage(result.assets[0].uri);
     }
-  }
+  };
 
+  /**
+   * Opens the camera for the user to take a photo.
+   * Sets the captured image URI to the `image` state.
+   */
   const takePhotoWithCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync()
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission required', 'Camera access is needed.')
-      return
+      Alert.alert("Permission required", "Camera access is needed.");
+      return;
     }
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      quality: 1
-    })
+      quality: 1,
+    });
     if (!result.canceled && result.assets?.length > 0) {
-      setImage(result.assets[0].uri)
+      setImage(result.assets[0].uri);
     }
-  }
+  };
 
+  /**
+   * Submits the violation report to Firestore.
+   * Validates the input fields and uploads the image to Firebase Storage if provided.
+   */
   const handleSubmit = async () => {
     if (!licensePlate || !color || !makeModel) {
-      Alert.alert('Missing Info', 'Please fill out all required fields.')
-      return
+      Alert.alert("Missing Info", "Please fill out all required fields.");
+      return;
     }
 
-    let imageUrl = null
+    let imageUrl = null;
 
     try {
       if (image) {
-        // 🔒 File size check
-        const fileInfo = await FileSystem.getInfoAsync(image)
+        // Check if the image file size is within the limit
+        const fileInfo = await FileSystem.getInfoAsync(image);
         if (fileInfo.size > 5 * 1024 * 1024) {
-          Alert.alert('File Too Large', 'Image must be smaller than 5MB.')
-          return
+          Alert.alert("File Too Large", "Image must be smaller than 5MB.");
+          return;
         }
 
-        const storage = getStorage()
-        const filename = `violationReports/test_${Date.now()}.jpg`
-        const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?uploadType=media`
+        const storage = getStorage();
+        const filename = `violationReports/test_${Date.now()}.jpg`;
+        const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${
+          storage.app.options.storageBucket
+        }/o/${encodeURIComponent(filename)}?uploadType=media`;
 
-        console.log('Uploading image from:', image)
+        console.log("Uploading image from:", image);
         const uploadResult = await FileSystem.uploadAsync(uploadUrl, image, {
-          httpMethod: 'POST',
-          headers: { 'Content-Type': 'image/jpeg' },
-          uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT
-        })
+          httpMethod: "POST",
+          headers: { "Content-Type": "image/jpeg" },
+          uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+        });
 
         if (uploadResult.status !== 200) {
-          throw new Error('Upload failed with status ' + uploadResult.status)
+          throw new Error("Upload failed with status " + uploadResult.status);
         }
 
-        imageUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?alt=media`
-        console.log('✅ Upload success:', imageUrl)
+        imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
+          storage.app.options.storageBucket
+        }/o/${encodeURIComponent(filename)}?alt=media`;
+        console.log("✅ Upload success:", imageUrl);
       }
 
-      await addDoc(collection(db, 'reports'), {
+      // Save the report to Firestore
+      await addDoc(collection(db, "reports"), {
         licensePlate,
         color,
         makeModel,
         comments,
         imageUrl,
         timestamp: serverTimestamp(),
-        userId: auth.currentUser?.uid || 'unknown'
-      })
+        userId: auth.currentUser?.uid || "unknown",
+      });
 
-      Alert.alert('Success', 'Report submitted.')
-      setLicensePlate('')
-      setColor('')
-      setMakeModel('')
-      setComments('')
-      setImage(null)
+      Alert.alert("Success", "Report submitted.");
+      setLicensePlate("");
+      setColor("");
+      setMakeModel("");
+      setComments("");
+      setImage(null);
     } catch (err) {
-      console.error('Upload failed:', err.message)
-      Alert.alert('Upload Error', 'Image upload or report save failed.')
+      console.error("Upload failed:", err.message);
+      Alert.alert("Upload Error", "Image upload or report save failed.");
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -124,7 +164,7 @@ export default function ReportScreen ({ navigation }) {
             style={styles.input}
             value={licensePlate}
             onChangeText={setLicensePlate}
-            placeholder='ABC123'
+            placeholder="ABC123"
           />
 
           <Text style={styles.label}>Color:</Text>
@@ -132,7 +172,7 @@ export default function ReportScreen ({ navigation }) {
             style={styles.input}
             value={color}
             onChangeText={setColor}
-            placeholder='Red, Blue, etc'
+            placeholder="Red, Blue, etc"
           />
 
           <Text style={styles.label}>Make/Model:</Text>
@@ -140,7 +180,7 @@ export default function ReportScreen ({ navigation }) {
             style={styles.input}
             value={makeModel}
             onChangeText={setMakeModel}
-            placeholder='e.g. Toyota Camry'
+            placeholder="e.g. Toyota Camry"
           />
 
           <Text style={styles.label}>Comments:</Text>
@@ -148,117 +188,130 @@ export default function ReportScreen ({ navigation }) {
             style={[styles.input, styles.commentInput]}
             value={comments}
             onChangeText={setComments}
-            placeholder='Additional comments'
+            placeholder="Additional comments"
             multiline
           />
 
           {/* Image Buttons */}
           <View style={styles.imageButtons}>
-            <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={takePhotoWithCamera}
+            >
               <Text style={styles.imageButtonText}>Take Photo</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.imageButton} onPress={pickImageFromLibrary}>
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={pickImageFromLibrary}
+            >
               <Text style={styles.imageButtonText}>Choose Photo</Text>
             </TouchableOpacity>
           </View>
 
           {/* Image Preview */}
           {image && (
-            <Image source={{ uri: image }} style={styles.imagePreview} resizeMode='cover' />
+            <Image
+              source={{ uri: image }}
+              style={styles.imagePreview}
+              resizeMode="cover"
+            />
           )}
 
           {/* Submit */}
-          <Button title='Submit Report' onPress={handleSubmit} color='red' />
+          <Button title="Submit Report" onPress={handleSubmit} color="red" />
         </View>
       </ScrollView>
 
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("Home")}
+      >
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: "#fff" },
   header: {
-    width: '100%',
+    width: "100%",
     height: 150,
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
     borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30
+    borderBottomRightRadius: 30,
   },
   headerText: {
     fontSize: 30,
-    fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'black',
+    fontWeight: "bold",
+    color: "white",
+    textShadowColor: "black",
     textShadowOffset: { width: 3, height: 1 },
-    textShadowRadius: 10
+    textShadowRadius: 10,
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120
+    paddingBottom: 120,
   },
   content: {},
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10
+    fontWeight: "bold",
+    marginTop: 10,
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginTop: 5
+    marginTop: 5,
   },
   commentInput: {
     height: 80,
-    textAlignVertical: 'top'
+    textAlignVertical: "top",
   },
   imageButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 15,
-    marginBottom: 10
+    marginBottom: 10,
   },
   imageButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
     padding: 10,
     borderRadius: 5,
     flex: 1,
     marginHorizontal: 5,
-    alignItems: 'center'
+    alignItems: "center",
   },
   imageButtonText: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 14
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 14,
   },
   imagePreview: {
-    width: '100%',
+    width: "100%",
     height: 200,
     borderRadius: 8,
-    marginBottom: 10
+    marginBottom: 10,
   },
   backButton: {
-    width: '50%',
-    backgroundColor: '#B0463C',
+    width: "50%",
+    backgroundColor: "#B0463C",
     paddingVertical: 15,
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: 5,
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
-    left: 20
+    left: 20,
   },
   backButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold'
-  }
-})
+    fontWeight: "bold",
+  },
+});
