@@ -2,7 +2,6 @@
 
 # dependencies
 node_modules/
-.conda
 
 # Expo
 .expo/
@@ -39,7 +38,3 @@ yarn-error.*
 
 # test coverage reports
 coverage
-
-# keys
-**\serviceAccountKey.json
-

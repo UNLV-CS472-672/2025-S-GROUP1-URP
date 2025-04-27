@@ -190,61 +190,61 @@ export default function App () {
           component={LoginScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name='SignUp' component={SignUpScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name='SignUp' component={SignUpScreen} />
         <Stack.Screen
           name='ResetPassword'
           component={ResetPasswordScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='Home'
           component={HomeScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='My Account'
           component={MyAccountScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='Tropicana Parking'
           component={TropicanaScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='Cottage Grove Parking'
           component={CottageGroveScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='Gateway Parking'
           component={GatewayScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='Reservation Status'
           component={ReservationStatusScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='Report'
           component={ReportScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='AddVehicle'
           component={AddVehicleScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='RemoveVehicle'
           component={RemoveVehicleScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
         <Stack.Screen
           name='EditVehicle'
           component={EditVehicleScreen}
-          options={{ headerShown: false }}
+          options={{ headerLeft: null }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -271,8 +271,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
     height: 100, // Fixed height for the header
     justifyContent: 'center', // Center text vertically
-    alignItems: 'center', // Center text horizontally
-    marginTop: 50,
+    alignItems: 'center' // Center text horizontally
   },
   welcomeText: {
     fontSize: 18,

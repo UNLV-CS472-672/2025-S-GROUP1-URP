@@ -261,8 +261,7 @@ export default function EditVehicleScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    marginTop:30,
+    padding: 20
   },
   titleBox: {
     backgroundColor: "#CC0000",
