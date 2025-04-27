@@ -136,14 +136,6 @@ export default function MyAccountScreen({ navigation }) {
         <Text style={styles.headerText}>My Account</Text>
       </View>
 
-      {/* Always show the Back button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.navigate('Home')}
-      >
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
-
       <View style={styles.profileHeader}>
         <Text style={styles.headerSection}>Profile Information</Text>
       </View>
@@ -217,6 +209,14 @@ export default function MyAccountScreen({ navigation }) {
           </View>
         );
       })}
+
+      {/* Always show the Back button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate('Home')}
+      >
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -244,16 +244,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5
-  },
-  backWrapper: {
-    alignSelf: 'flex-start',
-    marginTop: 10,
-    marginBottom: 10,
-    paddingLeft: 5
-  },
-  backText: {
-    color: 'red',
-    fontSize: 16,
   },
   profileHeader: {
     backgroundColor: "#CC0000", // Updated red color
@@ -353,5 +343,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: "blue",
     fontWeight: "500",
+  },
+  backButton: {
+    backgroundColor: "#CC0000", // Updated red color
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 1,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold'
   },
 });
