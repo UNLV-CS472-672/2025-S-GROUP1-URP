@@ -120,7 +120,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
       const now = Timestamp.now();
       const holdExpires = Timestamp.fromDate(
-        new Date(Date.now() + 2 * 60 * 1000)
+        new Date(Date.now() + 30 * 60 * 1000)
       );
 
       await updateDoc(spotDocRef, {
@@ -191,7 +191,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
       const now = Timestamp.now();
       const holdExpires = Timestamp.fromDate(
-        new Date(Date.now() + 2 * 60 * 1000)
+        new Date(Date.now() + 30 * 60 * 1000)
       ); // 2 minutes hold
 
       await updateDoc(spotDocRef, {
