@@ -116,6 +116,10 @@ export default function ReportScreen ({ navigation }) {
         <Text style={styles.headerText}>Report Violation</Text>
       </View>
 
+      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
@@ -172,10 +176,6 @@ export default function ReportScreen ({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
     </View>
   )
 }
@@ -202,6 +202,16 @@ const styles = StyleSheet.create({
     textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5
+  },
+  backWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginBottom: 10,
+    paddingLeft: 5
+  },
+  backText: {
+    color: 'red',
+    fontSize: 16,
   },
   scrollContent: {
     padding: 20,
