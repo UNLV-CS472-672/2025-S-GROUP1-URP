@@ -127,9 +127,16 @@ export default function MyAccountScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+     style={styles.container}
+     contentContainerStyle={{ paddingBottom: 40 }} 
+    >
+      {/* Red Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>My Account</Text>
+      </View>
       <View style={styles.profileHeader}>
-        <Text style={styles.header}>Profile Information</Text>
+        <Text style={styles.headerSection}>Profile Information</Text>
       </View>
 
       <View style={styles.profileSection}>
@@ -216,19 +223,38 @@ export default function MyAccountScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
     marginTop:40,
     backgroundColor: "#fff",
+  },
+  header: {
+    width: '100%',
+    height: 80,
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30
+  },
+  headerText: {
+    fontSize: 27,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'black',
+    textShadowOffset: { width: 3, height: 1 },
+    textShadowRadius: 5
   },
   profileHeader: {
     backgroundColor: "#CC0000", // Updated red color
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+    marginTop: 20,
     marginBottom: 20,
     alignSelf: "flex-start",
   },
-  header: {
+  headerSection: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
@@ -323,7 +349,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
-    marginTop: 30,
+    marginTop: 1,
   },
   backButtonText: {
     color: '#fff',
