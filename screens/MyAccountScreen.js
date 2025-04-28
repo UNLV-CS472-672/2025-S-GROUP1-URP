@@ -209,14 +209,13 @@ export default function MyAccountScreen({ navigation }) {
         );
       })}
 
-      {vehicles.length > 0 && (
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.backButtonText}>Back</Text>
-        </TouchableOpacity>
-      )}
+      {/* Always show the Back button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate('Home')}
+      >
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
