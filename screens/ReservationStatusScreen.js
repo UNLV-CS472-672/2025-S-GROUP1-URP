@@ -223,8 +223,6 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
     color:'red'
   },
   inputBox: {
