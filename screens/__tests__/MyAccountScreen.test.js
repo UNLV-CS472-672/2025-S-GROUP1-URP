@@ -100,10 +100,19 @@ describe("<MyAccountScreen />", () => {
 
   test("Navigates to Home when back button is pressed", async () => {
     const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
-    const button = await findByText("Back");
-    fireEvent.press(button);
+  
+    // Wait for the "Back" button to appear
+    const backButton = await findByText("← Back");
+  
+    // Check if the back button exists
+    expect(backButton).toBeTruthy();
+  
+    // Press the back button
+    fireEvent.press(backButton);
+  
+    // Verify that it navigated to the "Home" screen
     expect(defaultNavigation.navigate).toHaveBeenCalledWith("Home");
-  }, 20000);
+  });
 
   test("Redirects to AddVehicle when no vehicles are found", async () => {
     const mockNavigation = {
