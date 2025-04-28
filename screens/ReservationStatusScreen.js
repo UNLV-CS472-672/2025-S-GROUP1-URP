@@ -201,13 +201,14 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
     backgroundColor: "red",
-    paddingVertical: 20,
+    height: 80,
+    justifyContent: 'center',
     alignItems: "center",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 27,
     fontWeight: "bold",
     color: "white",
     textShadowColor: "black",

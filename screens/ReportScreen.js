@@ -181,10 +181,14 @@ export default function ReportScreen ({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#fff', 
+    padding: 20
+  },
   header: {
     width: '100%',
-    height: 150,
+    height: 80,
     backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
@@ -192,12 +196,12 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
-    textShadowRadius: 10
+    textShadowRadius: 5
   },
   scrollContent: {
     padding: 20,
