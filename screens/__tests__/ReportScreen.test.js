@@ -41,7 +41,10 @@ jest.mock('../../firebaseConfig', () => ({
 jest.spyOn(Alert, 'alert').mockImplementation(() => {})
 
 describe('<ReportScreen />', () => {
-  const mockNavigation = { navigate: jest.fn() }
+  const mockNavigation = { 
+    navigate: jest.fn(),
+    goBack: jest.fn()  // Mocking the goBack function
+  }
 
   it('displays validation alert when required fields are missing', async () => {
     const { getByText } = render(<ReportScreen navigation={mockNavigation} />)
@@ -72,12 +75,12 @@ describe('<ReportScreen />', () => {
     })
   })
 
-  it('navigates to Home when Back button is pressed', () => {
+  it('navigates back when Back button is pressed', () => {
     const { getByText } = render(<ReportScreen navigation={mockNavigation} />)
-    const backButton = getByText('Back')
+    const backButton = getByText('← Back')
 
     fireEvent.press(backButton)
 
-    expect(mockNavigation.navigate).toHaveBeenCalledWith('Home')
+    expect(mockNavigation.goBack).toHaveBeenCalled()
   })
 })
