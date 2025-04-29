@@ -172,7 +172,7 @@ export default function ReportScreen ({ navigation }) {
           )}
 
           {/* Submit */}
-          <Button title='Submit Report' onPress={handleSubmit} color='red' />
+          <Button title='Submit Report' onPress={handleSubmit} color='#CC0000' />
         </View>
       </ScrollView>
 
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     height: 80,
-    backgroundColor: 'red',
+    backgroundColor: '#CC0000',
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomLeftRadius: 30,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     paddingLeft: 5
   },
   backText: {
-    color: 'red',
+    color: '#CC0000',
     fontSize: 16,
   },
   scrollContent: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     width: '50%',
-    backgroundColor: '#B0463C',
+    backgroundColor: '#CC0000',
     paddingVertical: 15,
     alignItems: 'center',
     borderRadius: 5,

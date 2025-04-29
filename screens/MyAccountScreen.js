@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     height: 80,
-    backgroundColor: 'red',
+    backgroundColor: '#CC0000',
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomLeftRadius: 30,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     paddingLeft: 5
   },
   backText: {
-    color: 'red',
+    color: '#CC0000',
     fontSize: 16,
   },
   profileHeader: {

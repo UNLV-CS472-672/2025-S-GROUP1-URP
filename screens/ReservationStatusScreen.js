@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    backgroundColor: "red",
+    backgroundColor: "#CC0000",
     height: 80,
     justifyContent: 'center',
     alignItems: "center",
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color:'red'
+    color:'#CC0000'
   },
   inputBox: {
     width: "90%",
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   expiredTimerBox: {
-    backgroundColor: "red",
+    backgroundColor: "#CC0000",
   },
   timerText: {
     fontSize: 24,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   cancelButtonText: {
-    color: "red",
+    color: "#CC0000",
     textDecorationLine: "underline",
     fontSize: 16,
   },
