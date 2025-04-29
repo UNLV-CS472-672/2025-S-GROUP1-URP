@@ -45,121 +45,136 @@ import { onAuthStateChanged, signOut } from 'firebase/auth'
 import LoginScreen from './screens/LoginScreen'
 import ResetPasswordScreen from './screens/ResetPasswordScreen'
 import SignUpScreen from './screens/signUpScreen'
-import ReportScreen from './screens/ReportScreen' // Import the Report Page
+import ReportScreen from './screens/ReportScreen'
 import MyAccountScreen from './screens/MyAccountScreen'
-// import ParkingMap from './src/components/ParkingMap/ParkingMap'
 import TropicanaParkingScreen from './screens/TropicanaParkingScreen'
 import CottageGroveParkingScreen from './screens/CottageGroveParkingScreen'
 import GatewayParkingScreen from './screens/GatewayParkingScreen'
 import ReservationStatusScreen from './screens/ReservationStatusScreen'
 import AddVehicleScreen from './screens/AddVehicleScreen'
 import RemoveVehicleScreen from './screens/RemoveVehicleScreen'
-// import ReservationConfirmationScreen from './screens/ReservationConfirmationScreen'
-import EditVehicleScreen from './screens/EditVehicleScreen' // Import the Edit Vehicle Screen
-// import initializeParkingCollections from './src/components/ParkingMap/initParkingData'
+import EditVehicleScreen from './screens/EditVehicleScreen'
 
-// Stack navigator creation for screen transitions
+// 🔄 Tutorial Feature: Import AsyncStorage and TutorialScreen
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import TutorialScreen from './screens/TutorialScreen';
+
 const Stack = createStackNavigator()
 
 /**
  * HomeScreen Component
  *
  * Displays the user dashboard if authenticated, otherwise shows the login screen.
- *
- * @param {Object} navigation - React Navigation prop for navigating between screens.
  */
 function HomeScreen ({ navigation }) {
-  const [user, setUser] = useState(null) // State to track user authentication status
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true) // 🔄 Tutorial Feature: track loading state
 
-  // Effect hook to subscribe to authentication state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user) // Update user state when auth state changes
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user)
+
+      // 🔄 Tutorial Feature: check if tutorial has been seen
+      if (user) {
+        try {
+          const hasSeenTutorial = await AsyncStorage.getItem('hasSeenTutorial');
+          if (!hasSeenTutorial) {
+            await AsyncStorage.setItem('hasSeenTutorial', 'true');
+            navigation.navigate("Tutorial");
+          }
+        } catch (e) {
+          console.error("Error accessing AsyncStorage:", e);
+        }
+      }
+
+      setLoading(false)
     })
 
-    return unsubscribe // Clean up subscription when component unmounts
+    return unsubscribe
   }, [])
+
+  // 🔄 Tutorial Feature: show loading indicator
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
-      {/* Displaying the header text */}
       <Text style={styles.header}>UNLV Reserved Parking Dashboard</Text>
 
-      {/* Conditionally render either user dashboard or login screen */}
       {user ? (
         <>
-          {/*If user is authenticated, show dashboard with navigation options */}
-          <ScrollView contentContainerStyle={styles.buttonContainer}> 
+          <ScrollView contentContainerStyle={styles.buttonContainer}>
             <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
 
-          {/* Navigation buttons for various screens */}
-          <TouchableOpacity onPress={() => navigation.navigate("Cottage Grove Parking")}>
-            <View style={styles.parkingCard}>
-              <Image
-                source={require("./assets/CottageGrove-ParkingGarage.jpg")}
-                style={styles.parkingImage}
-              />
-              <Text style={styles.parkingText}>Cottage Grove Parking</Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Cottage Grove Parking")}>
+              <View style={styles.parkingCard}>
+                <Image
+                  source={require("./assets/CottageGrove-ParkingGarage.jpg")}
+                  style={styles.parkingImage}
+                />
+                <Text style={styles.parkingText}>Cottage Grove Parking</Text>
+              </View>
+            </TouchableOpacity>
 
+            <TouchableOpacity onPress={() => navigation.navigate("Tropicana Parking")}>
+              <View style={styles.parkingCard}>
+                <Image
+                  source={require("./assets/Tropicana-ParkingGarage.jpg")}
+                  style={styles.parkingImage}
+                />
+                <Text style={styles.parkingText}>Tropicana Parking</Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Tropicana Parking")}>
-            <View style={styles.parkingCard}>
-              <Image
-                source={require("./assets/Tropicana-ParkingGarage.jpg")}
-                style={styles.parkingImage}
-              />
-              <Text style={styles.parkingText}>Tropicana Parking</Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Gateway Parking")}>
+              <View style={styles.parkingCard}>
+                <Image
+                  source={require("./assets/Gateway-ParkingGarage.jpg")}
+                  style={styles.parkingImage}
+                />
+                <Text style={styles.parkingText}>Gateway Parking</Text>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Gateway Parking")}>
-            <View style={styles.parkingCard}>
-              <Image
-                source={require("./assets/Gateway-ParkingGarage.jpg")}
-                style={styles.parkingImage}
-              />
-              <Text style={styles.parkingText}>Gateway Parking</Text>
-            </View>
-          </TouchableOpacity>
-
-        </ScrollView>
-
-        <View style={styles.bottomNav}>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Yes, Logout",
-                  onPress: () => {
-                    signOut(auth);
-                    navigation.navigate("Login");
+          <View style={styles.bottomNav}>
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Yes, Logout",
+                    onPress: () => {
+                      signOut(auth);
+                      navigation.navigate("Login");
+                    },
                   },
-                },
-              ]);
-            }}
-          >
-          <Text style={styles.navIcon}>✖</Text>
-          <Text style={styles.navLabel}>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Report")}>
-          <Text style={styles.navIcon}>❗</Text>
-          <Text style={styles.navLabel}>Report</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Reservation Status")}>
-          <Text style={styles.navIcon}>🚗</Text>
-          <Text style={styles.navLabel}>Reservations</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("My Account")}>
-          <Text style={styles.navIcon}>👤</Text>
-          <Text style={styles.navLabel}>Account</Text>
-        </TouchableOpacity>
-        </View>
+                ]);
+              }}
+            >
+              <Text style={styles.navIcon}>✖</Text>
+              <Text style={styles.navLabel}>Logout</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Report")}>
+              <Text style={styles.navIcon}>❗</Text>
+              <Text style={styles.navLabel}>Report</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Reservation Status")}>
+              <Text style={styles.navIcon}>🚗</Text>
+              <Text style={styles.navLabel}>Reservations</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("My Account")}>
+              <Text style={styles.navIcon}>👤</Text>
+              <Text style={styles.navLabel}>Account</Text>
+            </TouchableOpacity>
+          </View>
         </>
       ) : (
-        // If user is not authenticated, show login screen
         <LoginScreen />
       )}
     </View>
@@ -179,77 +194,30 @@ function GatewayScreen () {
   return <GatewayParkingScreen parkingLot='Gateway Parking' />
 }
 
-// App component that includes the navigator and stack of screens
+// App component with navigation
 export default function App () {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
-        {/* Defining screen routes */}
-        <Stack.Screen
-          name='Login'
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name='SignUp' component={SignUpScreen} options={{ headerShown: false }}/>
-        <Stack.Screen
-          name='ResetPassword'
-          component={ResetPasswordScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='Home'
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='My Account'
-          component={MyAccountScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='Tropicana Parking'
-          component={TropicanaScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='Cottage Grove Parking'
-          component={CottageGroveScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='Gateway Parking'
-          component={GatewayScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='Reservation Status'
-          component={ReservationStatusScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='Report'
-          component={ReportScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='AddVehicle'
-          component={AddVehicleScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='RemoveVehicle'
-          component={RemoveVehicleScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='EditVehicle'
-          component={EditVehicleScreen}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name='Login' component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='SignUp' component={SignUpScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='ResetPassword' component={ResetPasswordScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Home' component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='My Account' component={MyAccountScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Tropicana Parking' component={TropicanaScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Cottage Grove Parking' component={CottageGroveScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Gateway Parking' component={GatewayScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Reservation Status' component={ReservationStatusScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Report' component={ReportScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='AddVehicle' component={AddVehicleScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='RemoveVehicle' component={RemoveVehicleScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='EditVehicle' component={EditVehicleScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Tutorial" component={TutorialScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
