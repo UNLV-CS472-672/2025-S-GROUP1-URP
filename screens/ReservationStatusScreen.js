@@ -23,10 +23,8 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 
-const TIMER_DURATION_MINUTES = 30; // Duration of the reservation timer in minutes
+//const TIMER_DURATION_MINUTES = 30;
 
-// Detect test environment
-const isTestEnv = process.env.NODE_ENV === "test";
 
 /**
  * ReservationStatusScreen Component
@@ -59,11 +57,7 @@ export default function ReservationStatusScreen({ navigation }) {
         }
 
         const reservationsRef = collection(db, "Reservations");
-        const q = query(
-          reservationsRef,
-          where("userID", "==", user.uid),
-          where("status", "==", "held")
-        );
+        const q = query(reservationsRef, where("userID", "==", user.uid), where("status", "==", "held"));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -71,13 +65,12 @@ export default function ReservationStatusScreen({ navigation }) {
           const resData = resDoc.data();
           setReservation({ id: resDoc.id, ...resData });
 
+          // Get startTime and endTime from reservation document
           const startTime = resData.startTime.toDate();
-          const endTime = new Date(
-            startTime.getTime() + TIMER_DURATION_MINUTES * 60 * 1000
-          );
-          updateTimer(endTime);
+          const endTime = resData.endTime.toDate();
+          updateTimer(startTime, endTime);
 
-          // Determine the garage name based on the spot ID
+          // Get the garage name from the parking spot collection
           const spotId = resData.spotId;
           const collections = [
             { name: "parkingSpotsTrop", displayName: "Tropicana Garage" },
@@ -112,11 +105,8 @@ export default function ReservationStatusScreen({ navigation }) {
     fetchReservation();
   }, []);
 
-  /**
-   * Updates the reservation timer and handles expiration.
-   * @param {Date} endTime - The end time of the reservation.
-   */
-  const updateTimer = async (endTime) => {
+  // Function to update the timer
+  const updateTimer = (startTime, endTime) => {
     const now = new Date();
     const diff = endTime - now;
 
@@ -126,7 +116,8 @@ export default function ReservationStatusScreen({ navigation }) {
         setTimeLeft({ minutes: "00", seconds: "00", expired: true });
 
         try {
-          await deleteDoc(doc(db, "Reservations", reservation.id));
+          // Auto-delete expired reservation
+          deleteDoc(doc(db, "Reservations", reservation.id));
           setReservation(null);
           console.log("Expired reservation auto-deleted");
         } catch (error) {
@@ -144,6 +135,19 @@ export default function ReservationStatusScreen({ navigation }) {
       });
     }
   };
+
+  // Timer refresh interval
+  useEffect(() => {
+    if (!reservation) return;
+
+    const interval = setInterval(() => {
+      const startTime = reservation.startTime.toDate();
+      const endTime = reservation.endTime.toDate();
+      updateTimer(startTime, endTime);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [reservation]);
 
   /**
    * Cancels the user's current reservation.
@@ -186,8 +190,8 @@ export default function ReservationStatusScreen({ navigation }) {
         <Text style={styles.headerText}>Reservation Status</Text>
       </View>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>Back</Text>
+      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -205,24 +209,14 @@ export default function ReservationStatusScreen({ navigation }) {
           </View>
 
           <Text style={styles.timerLabel}>Reservation Timer:</Text>
+
+          {/* Check if timeLeft exists before rendering timer */}
           {timeLeft ? (
-            <View
-              style={[
-                styles.timerBox,
-                timeLeft.expired && styles.expiredTimerBox,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.timerText,
-                  timeLeft.expired && styles.expiredTimerText,
-                ]}
-              >
+            <View style={[styles.timerBox, timeLeft.expired && styles.expiredTimerBox]}>
+              <Text style={[styles.timerText, timeLeft.expired && styles.expiredTimerText]}>
                 {timeLeft.minutes} : {timeLeft.seconds}
               </Text>
-              <Text style={styles.dateText}>
-                {reservation.startTime.toDate().toDateString()}
-              </Text>
+              <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
             </View>
           ) : (
             <View style={styles.timerBox}>
@@ -246,35 +240,36 @@ export default function ReservationStatusScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center'
+    backgroundColor: "#fff",
+    padding: 20,
+    alignItems: "center",
   },
   header: {
-    width: '100%',
-    backgroundColor: 'red',
-    paddingVertical: 50,
-    alignItems: 'center',
+    width: "100%",
+    backgroundColor: "#CC0000",
+    height: 80,
+    justifyContent: 'center',
+    alignItems: "center",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 27,
     fontWeight: "bold",
     color: "white",
     textShadowColor: "black",
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5,
   },
-  backButton: {
-    color: "red",
-    fontSize: 16,
-    textDecorationLine: "underline",
+  backWrapper: {
+    alignSelf: 'flex-start',
     marginTop: 10,
+    marginBottom: 10,
+    paddingLeft: 5
   },
-  label: {
+  backText: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
+    color:'#CC0000'
   },
   inputBox: {
     width: "90%",
@@ -301,7 +296,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   expiredTimerBox: {
-    backgroundColor: "red",
+    backgroundColor: "#CC0000",
   },
   timerText: {
     fontSize: 24,
@@ -319,7 +314,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   cancelButtonText: {
-    color: "red",
+    color: "#CC0000",
     textDecorationLine: "underline",
     fontSize: 16,
   },
