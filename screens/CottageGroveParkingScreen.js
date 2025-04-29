@@ -89,14 +89,14 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       const maxTranslateY = Math.max((scaledHeight - screenWidth) / 2, 0)
 
       translationX.value = clamp(
-        prevTranslationX.value + event.translationX,
-        -maxTranslateX,
-        maxTranslateX
+        prevTranslationX.value + event.translationX/scale.value,
+        -maxTranslateX/scale.value,
+        maxTranslateX/scale.value
       )
       translationY.value = clamp(
-        prevTranslationY.value + event.translationY,
-        -maxTranslateY,
-        maxTranslateY
+        prevTranslationY.value + event.translationY/scale.value,
+        -maxTranslateY/scale.value,
+        maxTranslateY/scale.value
       )
     })
     .runOnJS(true)
