@@ -150,8 +150,8 @@ export default function ReservationStatusScreen({ navigation }) {
         <Text style={styles.headerText}>Reservation Status</Text>
       </View>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>Back</Text>
+      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -200,30 +200,30 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    backgroundColor: "red",
-    paddingVertical: 20,
+    backgroundColor: "#CC0000",
+    height: 80,
+    justifyContent: 'center',
     alignItems: "center",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 27,
     fontWeight: "bold",
     color: "white",
     textShadowColor: "black",
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5,
   },
-  backButton: {
-    color: "red",
-    fontSize: 16,
-    textDecorationLine: "underline",
+  backWrapper: {
+    alignSelf: 'flex-start',
     marginTop: 10,
+    marginBottom: 10,
+    paddingLeft: 5
   },
-  label: {
+  backText: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
+    color:'#CC0000'
   },
   inputBox: {
     width: "90%",
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   expiredTimerBox: {
-    backgroundColor: "red",
+    backgroundColor: "#CC0000",
   },
   timerText: {
     fontSize: 24,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   cancelButtonText: {
-    color: "red",
+    color: "#CC0000",
     textDecorationLine: "underline",
     fontSize: 16,
   },
