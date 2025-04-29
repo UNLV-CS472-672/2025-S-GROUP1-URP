@@ -81,15 +81,24 @@ while True:
         spot_history[spot_id]["status"] = status
 
         # === 🔥 Update Firebase ===
-        firebase_status = ""
-        if status == "OCCUPIED" and firebase_status == "held":
+        try:
+            doc_ref = db.collection("parkingSpotsCottage").document(f"spot{spot_id}")
+            doc = doc_ref.get()
+            firebase_status = doc.to_dict().get("status")
+        except Exception as e:
+            print(f"Firebase read failed for spot {spot_id}: {e}")
+            firebase_status = "available"
+            
+        if status == "OCCUPIED" and firebase_status == "occupied":
+            firebase_status = "occupied"
+        elif status == "OCCUPIED" and firebase_status == "held":
             firebase_status = "occupied"
         elif status == "FREE" and firebase_status == "held":
             firebase_status = "held"
-        elif status == "FREE":
-            firebase_status = "available"
+        else:
+            firebase_status = "available"    
+                 
         try:
-            doc_ref = db.collection("parkingSpotsCottage").document(f"spot{spot_id}")
             doc_ref.update({"status": firebase_status})
         except Exception as e:
             print(f"Firebase update failed for spot {spot_id}: {e}")
