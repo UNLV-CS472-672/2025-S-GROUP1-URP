@@ -153,59 +153,78 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 
   const handleReserve = async () => {
     if (selectedSpot === null) {
-      Alert.alert('No spot selected', 'Please select an available spot.')
-      return
+      Alert.alert('No Spot Selected', 'Please select an available spot first.');
+      return;
     }
-
-    try {
-      const user = auth.currentUser
-      if (!user) {
-        Alert.alert('Not signed in', 'Please log in to reserve a spot.')
-        return
-      }
-
-      const reservationQuery = query(
-        collection(db, 'Reservations'),
-        where('userID', '==', user.uid),
-        where('status', '==', 'held')
-      )
-      const reservationSnapshot = await getDocs(reservationQuery)
-
-      if (!reservationSnapshot.empty) {
-        Alert.alert(
-          'Active Reservation Found',
-          'You already have an active reservation. You must cancel it before reserving a new spot.'
-        )
-        return
-      }
-
-      const spotDocRef = doc(db, collectionName, selectedSpot)
-      const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`
-      const now = Timestamp.now()
-      const holdExpires = Timestamp.fromDate(new Date(Date.now() + 30 * 60 * 1000))
-
-      await updateDoc(spotDocRef, {
-        status: 'held',
-        heldBy: user.uid,
-        holdExpiresAt: holdExpires
-      })
-
-      await setDoc(doc(db, 'Reservations', reservationId), {
-        userID: user.uid,
-        spotId: selectedSpot,
-        status: 'held',
-        startTime: now,
-        endTime: holdExpires,
-        createdAt: now
-      })
-
-      Alert.alert('Success', `Spot ${selectedSpot} reserved for 30 minutes.`)
-      setSelectedSpot(null)
-    } catch (err) {
-      console.error('Reservation error:', err)
-      Alert.alert('Error', 'Failed to reserve spot.')
+  
+    const spot = parkingSpaces.find((s) => s.id === selectedSpot);
+    if (!spot) {
+      Alert.alert('Invalid Spot', 'Selected spot does not exist.');
+      return;
     }
-  }
+  
+    Alert.alert(
+      'Confirm Reservation',
+      `Do you want to reserve spot ${spot.location}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            try {
+              const user = auth.currentUser;
+              if (!user) {
+                Alert.alert('Not Signed In', 'Please log in to reserve a spot.');
+                return;
+              }
+  
+              const reservationQuery = query(
+                collection(db, 'Reservations'),
+                where('userID', '==', user.uid),
+                where('status', '==', 'held')
+              );
+              const reservationSnapshot = await getDocs(reservationQuery);
+  
+              if (!reservationSnapshot.empty) {
+                Alert.alert(
+                  'Active Reservation Found',
+                  'You already have an active reservation. Please cancel it before reserving a new spot.'
+                );
+                return;
+              }
+  
+              const spotDocRef = doc(db, collectionName, selectedSpot);
+              const reservationId = `${user.uid}_${selectedSpot}_${Date.now()}`;
+              const now = Timestamp.now();
+              const holdExpires = Timestamp.fromDate(new Date(Date.now() + 30 * 60 * 1000));
+  
+              await updateDoc(spotDocRef, {
+                status: 'held',
+                heldBy: user.uid,
+                holdExpiresAt: holdExpires
+              });
+  
+              await setDoc(doc(db, 'Reservations', reservationId), {
+                userID: user.uid,
+                spotId: selectedSpot,
+                status: 'held',
+                startTime: now,
+                endTime: holdExpires,
+                createdAt: now
+              });
+  
+              Alert.alert('Success', `Spot ${spot.location} reserved for 30 minutes.`);
+              setSelectedSpot(null);
+            } catch (error) {
+              console.error('Error reserving spot:', error);
+              Alert.alert('Error', 'Failed to reserve spot. Please try again.');
+            }
+          }
+        }
+      ]
+    );
+  };
+  
 
   const handleReserveRandomSpot = async () => {
     try {
@@ -213,7 +232,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       const availableSpots = parkingSpaces.filter(
         (space) => space.status === "available" && space.type === filter
       );
-
+  
       if (availableSpots.length === 0) {
         Alert.alert(
           "No Available Spots",
@@ -221,58 +240,70 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
         );
         return;
       }
-
+  
       // Step 2: Select a random spot
       const randomSpot =
         availableSpots[Math.floor(Math.random() * availableSpots.length)];
-
-      // Step 3: Reserve the spot
-      const user = auth.currentUser;
-      if (!user) {
-        Alert.alert("Not Signed In", "Please log in to reserve a spot.");
-        return;
-      }
-
-      const reservationQuery = query(
-        collection(db, "Reservations"),
-        where("userID", "==", user.uid),
-        where("status", "==", "held")
-      );
-      const reservationSnapshot = await getDocs(reservationQuery);
-
-      if (!reservationSnapshot.empty) {
-        Alert.alert(
-          "Active Reservation Found",
-          "You already have an active reservation. You must cancel it before reserving a new spot."
-        );
-        return;
-      }
-
-      const spotDocRef = doc(db, collectionName, randomSpot.id);
-      const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
-      const now = Timestamp.now();
-      const holdExpires = Timestamp.fromDate(
-        new Date(Date.now() + 30 * 60 * 1000)
-      ); // 2 minutes hold
-
-      await updateDoc(spotDocRef, {
-        status: "held",
-        heldBy: user.uid,
-        holdExpiresAt: holdExpires,
-      });
-
-      await setDoc(doc(db, "Reservations", reservationId), {
-        userID: user.uid,
-        spotId: randomSpot.id,
-        status: "held",
-        startTime: now,
-        endTime: holdExpires,
-        createdAt: now,
-      });
-
+  
+      // Step 3: Ask for user confirmation
       Alert.alert(
-        "Success",
-        `Spot ${randomSpot.location} reserved for 30 minutes.`
+        "Confirm Random Reservation",
+        `Do you want to reserve spot ${randomSpot.location}?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Confirm",
+            onPress: async () => {
+              const user = auth.currentUser;
+              if (!user) {
+                Alert.alert("Not Signed In", "Please log in to reserve a spot.");
+                return;
+              }
+  
+              const reservationQuery = query(
+                collection(db, "Reservations"),
+                where("userID", "==", user.uid),
+                where("status", "==", "held")
+              );
+              const reservationSnapshot = await getDocs(reservationQuery);
+  
+              if (!reservationSnapshot.empty) {
+                Alert.alert(
+                  "Active Reservation Found",
+                  "You already have an active reservation. You must cancel it before reserving a new spot."
+                );
+                return;
+              }
+  
+              const spotDocRef = doc(db, collectionName, randomSpot.id);
+              const reservationId = `${user.uid}_${randomSpot.id}_${Date.now()}`;
+              const now = Timestamp.now();
+              const holdExpires = Timestamp.fromDate(
+                new Date(Date.now() + 30 * 60 * 1000)
+              );
+  
+              await updateDoc(spotDocRef, {
+                status: "held",
+                heldBy: user.uid,
+                holdExpiresAt: holdExpires,
+              });
+  
+              await setDoc(doc(db, "Reservations", reservationId), {
+                userID: user.uid,
+                spotId: randomSpot.id,
+                status: "held",
+                startTime: now,
+                endTime: holdExpires,
+                createdAt: now,
+              });
+  
+              Alert.alert(
+                "Success",
+                `Spot ${randomSpot.location} reserved for 30 minutes.`
+              );
+            }
+          }
+        ]
       );
     } catch (error) {
       console.error("Error reserving random spot:", error);
@@ -282,6 +313,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
       );
     }
   };
+  
 
   // Adjust this map to your actual layout
   const layoutMap = {
