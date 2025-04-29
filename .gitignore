@@ -43,3 +43,5 @@ coverage
 # keys
 **\serviceAccountKey.json
 
+firebase.js
+firebaseConfig.js
