@@ -29,7 +29,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker"; // To handle image picking
 import { db, auth } from "../firebaseConfig";
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore"; 
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
 export default function MyAccountScreen({ navigation }) {
@@ -138,9 +138,9 @@ export default function MyAccountScreen({ navigation }) {
   };
 
   return (
-    <ScrollView 
-     style={styles.container}
-     contentContainerStyle={{ paddingBottom: 40 }} 
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }}
     >
       {/* Red Header */}
       <View style={styles.header}>
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop:40,
+    marginTop: 40,
     backgroundColor: "#fff",
   },
   header: {
