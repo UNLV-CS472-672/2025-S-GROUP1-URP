@@ -25,40 +25,51 @@ export default function TutorialScreen({ navigation }) {
                     backgroundColor: '#f9f9f9',
                     image: (
                         <Image
-                            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/854/854894.png' }}
-                            style={{ width: 200, height: 200 }}
+                        source={require('../assets/tutorial/tut1.png')}
+                        style={{marginBottom: 130}}
                         />
                     ),
                     title: 'Find Parking',
-                    subtitle: 'Explore available spots in real-time across garages.',
-                    titleStyles: { marginTop: -100 },
-                    subTitleStyles: { marginTop: -50 },
+                    subtitle: 'Click on a parking garage!',
+                    titleStyles: { marginTop: -180 },
+                    subTitleStyles: { marginTop: -145 },
                 },
                 {
                     backgroundColor: '#fff',
                     image: (
                         <Image
-                            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png' }}
-                            style={{ width: 150, height: 150 }}
+                        source={require('../assets/tutorial/tut2.png')}
+                        style={{marginBottom: 130}}
                         />
                     ),
-                    title: 'Need Help?',
-                    subtitle: 'Tap the Help button any time to get guidance or support.',
-                    titleStyles: { marginTop: -100 },
-                    subTitleStyles: { marginTop: -50 },
+                    title: 'Pick a Parking Spot',
+                    subtitle: 'Select a parking spot or use the random spot button',
+                    titleStyles: { marginTop: -180 },
+                    subTitleStyles: { marginTop: -145 },
                 },
                 {
-                    backgroundColor: '#e6ffe6',
+                    backgroundColor: '#fff',
                     image: (
                         <Image
-                            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/190/190411.png' }}
-                            style={{ width: 180, height: 180 }}
+                        source={require('../assets/tutorial/tut3.png')}
+                        style={{marginBottom: 130}}
                         />
                     ),
-                    title: 'You’re All Set!',
-                    subtitle: 'Let’s go find your perfect parking spot.',
-                    titleStyles: { marginTop: -100 },
-                    subTitleStyles: { marginTop: -50 },
+                    title: 'Click on Here to Check on Your Reservation',
+                    titleStyles: { marginTop: -180 },
+                },
+                {
+                    backgroundColor: '#fff',
+                    image: (
+                        <Image
+                        source={require('../assets/tutorial/tut4.png')}
+                        style={{marginBottom: 130}}
+                        />
+                    ),
+                    title: 'Check Your Reservation!',
+                    subtitle: 'Look here to check on your spot number and the time left on your reservation',
+                    titleStyles: { marginTop: -170 },
+                    subTitleStyles: { marginTop: -130 },
                 },
             ]}
         />
