@@ -19,29 +19,20 @@ import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
 import { getStorage } from 'firebase/storage'
 
-
-
-// AddVehicleScreen component
 export default function AddVehicleScreen({ navigation, route }) {
-  const [make, setMake] = useState(""); // Vehicle make
-  const [model, setModel] = useState(""); // Vehicle model
-  const [year, setYear] = useState(""); // Vehicle year
-  const [licensePlate, setLicensePlate] = useState(""); // License plate
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false); // Keyboard visibility
-  const [image, setImage] = useState(null); // State for vehicle image
-  const [isModalVisible, setModalVisible] = useState(false); // Modal visibility
-  const [isSaving, setIsSaving] = useState(false); // Prevent duplicate saves
-  const fromRedirect = route?.params?.fromRedirect || false;
+  const [make, setMake] = useState("")
+  const [model, setModel] = useState("")
+  const [year, setYear] = useState("")
+  const [licensePlate, setLicensePlate] = useState("")
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false)
+  const [image, setImage] = useState(null)
+  const [isModalVisible, setModalVisible] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const fromRedirect = route?.params?.fromRedirect || false
 
-  // Listen to keyboard show/hide events
   useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', () =>
-      setKeyboardVisible(true)
-    )
-    const hideSub = Keyboard.addListener('keyboardDidHide', () =>
-      setKeyboardVisible(false)
-    )
-
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true))
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false))
     return () => {
       showSub.remove()
       hideSub.remove()
@@ -75,17 +66,16 @@ export default function AddVehicleScreen({ navigation, route }) {
   }
 
   const removeImage = () => {
-    // Set the image state to null (mark for removal)
     setImage(null)
   }
 
   const handleSave = async () => {
-    if (isSaving) return // Prevent duplicate saves
-    setIsSaving(true) // Disable the button immediately
+    if (isSaving) return
+    setIsSaving(true)
 
     if (!make.trim() || !model.trim() || !year.trim() || !licensePlate.trim()) {
       Alert.alert('Error', 'All fields are required.')
-      setIsSaving(false) // Re-enable the button
+      setIsSaving(false)
       return
     }
 
@@ -96,7 +86,7 @@ export default function AddVehicleScreen({ navigation, route }) {
       parseInt(year) > new Date().getFullYear()
     ) {
       Alert.alert('Error', 'Please enter a valid year (e.g., 2025).')
-      setIsSaving(false) // Re-enable the button
+      setIsSaving(false)
       return
     }
 
@@ -107,7 +97,7 @@ export default function AddVehicleScreen({ navigation, route }) {
         const fileInfo = await FileSystem.getInfoAsync(image)
         if (fileInfo.size > 5 * 1024 * 1024) {
           Alert.alert('File Too Large', 'Image must be smaller than 5MB.')
-          setIsSaving(false) // Re-enable the button
+          setIsSaving(false)
           return
         }
 
@@ -159,32 +149,22 @@ export default function AddVehicleScreen({ navigation, route }) {
     } catch (error) {
       Alert.alert('Error', error.message)
     } finally {
-      setIsSaving(false) // Re-enable the button after the operation
+      setIsSaving(false)
     }
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <View style={styles.rootContainer}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Add Vehicle</Text>
-        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.bodyContainer}>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-          Enter the car information that you would like to register with UNLV
-          Reserve Parking:{'\n\n'}
+          Enter the car information that you would like to register with UNLV Reserve Parking:{'\n\n'}
         </Text>
-        <TextInput
-          placeholder='Make'
-          value={make}
-          onChangeText={setMake}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder='Model'
-          value={model}
-          onChangeText={setModel}
-          style={styles.input}
-        />
+        <TextInput placeholder='Make' value={make} onChangeText={setMake} style={styles.input} />
+        <TextInput placeholder='Model' value={model} onChangeText={setModel} style={styles.input} />
         <TextInput
           placeholder='Year'
           value={year}
@@ -198,51 +178,44 @@ export default function AddVehicleScreen({ navigation, route }) {
           onChangeText={setLicensePlate}
           style={styles.input}
         />
-        
 
-        {/* Image Buttons */}
         <View style={styles.imageButtons}>
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={takePhotoWithCamera}
-          >
+          <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
             <Text style={styles.imageButtonText}>Take Photo</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={pickImageFromLibrary}
-          >
+          <TouchableOpacity style={styles.imageButton} onPress={pickImageFromLibrary}>
             <Text style={styles.imageButtonText}>Choose Photo</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Show Image and Remove Image Buttons */}
         {image && (
           <View style={styles.imageActions}>
-            <TouchableOpacity
-              style={styles.showImageButton}
-              onPress={() => setModalVisible(true)}
-            >
+            <TouchableOpacity style={styles.showImageButton} onPress={() => setModalVisible(true)}>
               <Text style={styles.showImageButtonText}>Show Image</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.removeImageButton}
-              onPress={removeImage}
-            >
+            <TouchableOpacity style={styles.removeImageButton} onPress={removeImage}>
               <Text style={styles.removeImageButtonText}>Remove Image</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        <Button
-          title='Save'
-          onPress={handleSave}
-          color='#CC0000'
-          disabled={isSaving} // Disable the button while saving
-        />
+        <Button title='Save' onPress={handleSave} color='#CC0000' disabled={isSaving} />
       </ScrollView>
 
-      {/* Modal for Image Preview */}
+      {!isKeyboardVisible && (
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' }]
+            })
+          }
+        >
+          <Text style={styles.backButtonText}>Back to {fromRedirect ? 'Home' : 'My Account'}</Text>
+        </TouchableOpacity>
+      )}
+
       <Modal
         visible={isModalVisible}
         transparent
@@ -250,64 +223,37 @@ export default function AddVehicleScreen({ navigation, route }) {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <Image
-            source={{ uri: image }}
-            style={styles.modalImage}
-            resizeMode='contain'
-          />
-          <TouchableOpacity
-            style={styles.closeModalButton}
-            onPress={() => setModalVisible(false)}
-          >
+          <Image source={{ uri: image }} style={styles.modalImage} resizeMode='contain' />
+          <TouchableOpacity style={styles.closeModalButton} onPress={() => setModalVisible(false)}>
             <Text style={styles.closeModalButtonText}>Back</Text>
           </TouchableOpacity>
         </View>
       </Modal>
-
-      {/* Only show back button when keyboard is hidden */}
-      {!isKeyboardVisible && (
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Home" }],
-            })
-          }
-        >
-          <Text style={styles.backButtonText}>
-            Back to {fromRedirect ? "Home" : "My Account"}
-          </Text>
-        </TouchableOpacity>
-      )}
     </View>
   )
 }
 
-// Styles
 const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+    marginTop: 50,
+    alignItems: 'center',
+    backgroundColor: '#fff'
+  },
   header: {
     backgroundColor: '#CC0000',
     paddingVertical: 20,
-    paddingTop: 20, // for status bar space
     width: '100%',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   headerText: {
     color: 'white',
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#CC0000',
-    marginBottom: 5
-  },
-  container: {
-    flex: 1,
+  bodyContainer: {
     padding: 20,
-    marginTop:40,
+    width: '100%'
   },
   scrollContainer: {
     flexGrow: 1,

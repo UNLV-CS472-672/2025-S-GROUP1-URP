@@ -61,7 +61,6 @@ export default function ReportScreen ({ navigation }) {
 
     try {
       if (image) {
-        // 🔒 File size check
         const fileInfo = await FileSystem.getInfoAsync(image)
         if (fileInfo.size > 5 * 1024 * 1024) {
           Alert.alert('File Too Large', 'Image must be smaller than 5MB.')
@@ -72,7 +71,6 @@ export default function ReportScreen ({ navigation }) {
         const filename = `violationReports/test_${Date.now()}.jpg`
         const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?uploadType=media`
 
-        console.log('Uploading image from:', image)
         const uploadResult = await FileSystem.uploadAsync(uploadUrl, image, {
           httpMethod: 'POST',
           headers: { 'Content-Type': 'image/jpeg' },
@@ -84,7 +82,6 @@ export default function ReportScreen ({ navigation }) {
         }
 
         imageUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/${encodeURIComponent(filename)}?alt=media`
-        console.log('✅ Upload success:', imageUrl)
       }
 
       await addDoc(collection(db, 'reports'), {
@@ -110,81 +107,82 @@ export default function ReportScreen ({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
       {/* Red Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Report Violation</Text>
       </View>
 
-      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
 
-      {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.label}>License Plate Number:</Text>
-          <TextInput
-            style={styles.input}
-            value={licensePlate}
-            onChangeText={setLicensePlate}
-            placeholder='ABC123'
-          />
+        {/* Scrollable Content */}
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.content}>
+            <Text style={styles.label}>License Plate Number:</Text>
+            <TextInput
+              style={styles.input}
+              value={licensePlate}
+              onChangeText={setLicensePlate}
+              placeholder='ABC123'
+            />
 
-          <Text style={styles.label}>Color:</Text>
-          <TextInput
-            style={styles.input}
-            value={color}
-            onChangeText={setColor}
-            placeholder='Red, Blue, etc'
-          />
+            <Text style={styles.label}>Color:</Text>
+            <TextInput
+              style={styles.input}
+              value={color}
+              onChangeText={setColor}
+              placeholder='Red, Blue, etc'
+            />
 
-          <Text style={styles.label}>Make/Model:</Text>
-          <TextInput
-            style={styles.input}
-            value={makeModel}
-            onChangeText={setMakeModel}
-            placeholder='e.g. Toyota Camry'
-          />
+            <Text style={styles.label}>Make/Model:</Text>
+            <TextInput
+              style={styles.input}
+              value={makeModel}
+              onChangeText={setMakeModel}
+              placeholder='e.g. Toyota Camry'
+            />
 
-          <Text style={styles.label}>Comments:</Text>
-          <TextInput
-            style={[styles.input, styles.commentInput]}
-            value={comments}
-            onChangeText={setComments}
-            placeholder='Additional comments'
-            multiline
-          />
+            <Text style={styles.label}>Comments:</Text>
+            <TextInput
+              style={[styles.input, styles.commentInput]}
+              value={comments}
+              onChangeText={setComments}
+              placeholder='Additional comments'
+              multiline
+            />
 
-          {/* Image Buttons */}
-          <View style={styles.imageButtons}>
-            <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
-              <Text style={styles.imageButtonText}>Take Photo</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.imageButton} onPress={pickImageFromLibrary}>
-              <Text style={styles.imageButtonText}>Choose Photo</Text>
-            </TouchableOpacity>
+            {/* Image Buttons */}
+            <View style={styles.imageButtons}>
+              <TouchableOpacity style={styles.imageButton} onPress={takePhotoWithCamera}>
+                <Text style={styles.imageButtonText}>Take Photo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.imageButton} onPress={pickImageFromLibrary}>
+                <Text style={styles.imageButtonText}>Choose Photo</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Image Preview */}
+            {image && (
+              <Image source={{ uri: image }} style={styles.imagePreview} resizeMode='cover' />
+            )}
+
+            {/* Submit */}
+            <Button title='Submit Report' onPress={handleSubmit} color='#CC0000' />
           </View>
-
-          {/* Image Preview */}
-          {image && (
-            <Image source={{ uri: image }} style={styles.imagePreview} resizeMode='cover' />
-          )}
-
-          {/* Submit */}
-          <Button title='Submit Report' onPress={handleSubmit} color='#CC0000' />
-        </View>
-      </ScrollView>
-
+        </ScrollView>
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#fff', 
-    padding: 20
+  screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+    marginTop: 50 // ✅ Push content below the notch
   },
   header: {
     width: '100%',
@@ -192,8 +190,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#CC0000',
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30
   },
   headerText: {
     fontSize: 27,
@@ -202,6 +198,10 @@ const styles = StyleSheet.create({
     textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5
+  },
+  container: {
+    flex: 1,
+    padding: 20
   },
   backWrapper: {
     alignSelf: 'flex-start',
@@ -214,7 +214,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   scrollContent: {
-    padding: 20,
     paddingBottom: 120
   },
   content: {},
@@ -259,20 +258,5 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginBottom: 10
-  },
-  backButton: {
-    width: '50%',
-    backgroundColor: '#CC0000',
-    paddingVertical: 15,
-    alignItems: 'center',
-    borderRadius: 5,
-    position: 'absolute',
-    bottom: 20,
-    left: 20
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold'
   }
 })
