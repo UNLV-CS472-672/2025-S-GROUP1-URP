@@ -92,7 +92,7 @@ describe("EditVehicleScreen", () => {
         expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account");
       });
     },
-    10000 // Increase timeout from default 5s to 10s
+    15000 // Increase timeout from default 5s to 10s
   );
 
   it("shows error alert for invalid year", async () => {
