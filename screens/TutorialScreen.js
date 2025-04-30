@@ -25,7 +25,7 @@ export default function TutorialScreen({ navigation }) {
                     backgroundColor: '#f9f9f9',
                     image: (
                         <Image
-                        source={require('../assets/tutorial/tut1.png')}
+                        source={require('../assets/tutorial/tutPic1.png')}
                         style={{marginBottom: 130}}
                         />
                     ),
@@ -38,7 +38,7 @@ export default function TutorialScreen({ navigation }) {
                     backgroundColor: '#fff',
                     image: (
                         <Image
-                        source={require('../assets/tutorial/tut2.png')}
+                        source={require('../assets/tutorial/tutPic2.png')}
                         style={{marginBottom: 130}}
                         />
                     ),
@@ -51,7 +51,7 @@ export default function TutorialScreen({ navigation }) {
                     backgroundColor: '#fff',
                     image: (
                         <Image
-                        source={require('../assets/tutorial/tut3.png')}
+                        source={require('../assets/tutorial/tutPic3.png')}
                         style={{marginBottom: 130}}
                         />
                     ),
@@ -62,7 +62,7 @@ export default function TutorialScreen({ navigation }) {
                     backgroundColor: '#fff',
                     image: (
                         <Image
-                        source={require('../assets/tutorial/tut4.png')}
+                        source={require('../assets/tutorial/tutPic4.png')}
                         style={{marginBottom: 130}}
                         />
                     ),
