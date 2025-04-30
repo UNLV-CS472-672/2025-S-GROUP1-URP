@@ -139,7 +139,7 @@ Please review and accept the Terms and Conditions before creating an account.
       Alert.alert('Account created and logged in successfully!') // Notify user of successful login
 
       // Navigate to the Home screen after successful login
-      navigation.navigate('Home')
+      navigation.navigate('Tutorial')
     } catch (error) {
       Alert.alert(error.message) // Display error message if something goes wrong
     }
