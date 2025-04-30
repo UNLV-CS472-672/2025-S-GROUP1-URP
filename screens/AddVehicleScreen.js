@@ -166,6 +166,9 @@ export default function AddVehicleScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Add Vehicle</Text>
+        </View>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
           Enter the car information that you would like to register with UNLV
           Reserve Parking:{'\n\n'}
@@ -195,6 +198,7 @@ export default function AddVehicleScreen({ navigation, route }) {
           onChangeText={setLicensePlate}
           style={styles.input}
         />
+        
 
         {/* Image Buttons */}
         <View style={styles.imageButtons}>
@@ -233,7 +237,7 @@ export default function AddVehicleScreen({ navigation, route }) {
         <Button
           title='Save'
           onPress={handleSave}
-          color='red'
+          color='#CC0000'
           disabled={isSaving} // Disable the button while saving
         />
       </ScrollView>
@@ -282,6 +286,24 @@ export default function AddVehicleScreen({ navigation, route }) {
 
 // Styles
 const styles = StyleSheet.create({
+  header: {
+    backgroundColor: '#CC0000',
+    paddingVertical: 20,
+    paddingTop: 20, // for status bar space
+    width: '100%',
+    alignItems: 'center',
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#CC0000',
+    marginBottom: 5
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -300,7 +322,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     width: '50%',
-    backgroundColor: '#B0463C',
+    backgroundColor: '#CC0000',
     paddingVertical: 15,
     alignItems: 'center',
     borderRadius: 5,
@@ -319,7 +341,7 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   imageButton: {
-    backgroundColor: '#B0463C',
+    backgroundColor: '#CC0000',
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
