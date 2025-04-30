@@ -116,6 +116,10 @@ export default function ReportScreen ({ navigation }) {
         <Text style={styles.headerText}>Report Violation</Text>
       </View>
 
+      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
@@ -168,36 +172,46 @@ export default function ReportScreen ({ navigation }) {
           )}
 
           {/* Submit */}
-          <Button title='Submit Report' onPress={handleSubmit} color='red' />
+          <Button title='Submit Report' onPress={handleSubmit} color='#CC0000' />
         </View>
       </ScrollView>
 
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#fff', 
+    padding: 20
+  },
   header: {
     width: '100%',
-    height: 150,
-    backgroundColor: 'red',
+    height: 80,
+    backgroundColor: '#CC0000',
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
-    textShadowRadius: 10
+    textShadowRadius: 5
+  },
+  backWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginBottom: 10,
+    paddingLeft: 5
+  },
+  backText: {
+    color: '#CC0000',
+    fontSize: 16,
   },
   scrollContent: {
     padding: 20,
@@ -248,7 +262,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     width: '50%',
-    backgroundColor: '#B0463C',
+    backgroundColor: '#CC0000',
     paddingVertical: 15,
     alignItems: 'center',
     borderRadius: 5,

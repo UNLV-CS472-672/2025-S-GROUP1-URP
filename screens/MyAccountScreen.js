@@ -29,7 +29,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker"; // To handle image picking
 import { db, auth } from "../firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore"; 
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore"; 
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
 export default function MyAccountScreen({ navigation }) {
@@ -108,10 +108,21 @@ export default function MyAccountScreen({ navigation }) {
   const handleSaveProfile = async () => {
     try {
       const userDocRef = doc(db, "users", user.uid);
-      await updateDoc(userDocRef, {
-        name,
-        profilePicture, // Save the profile picture URI
-      });
+      const userSnap = await getDoc(userDocRef);
+
+      if (userSnap.exists()) {
+        await updateDoc(userDocRef, {
+          name,
+          profilePicture,
+        });
+      } else {
+        await setDoc(userDocRef, {
+          name,
+          profilePicture,
+          email: user.email, // optional: save email
+        });
+      }
+
       Alert.alert("Success", "Profile updated!");
     } catch (error) {
       Alert.alert("Error", "Failed to update profile.");
@@ -127,9 +138,24 @@ export default function MyAccountScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+     style={styles.container}
+     contentContainerStyle={{ paddingBottom: 40 }} 
+    >
+      {/* Red Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>My Account</Text>
+      </View>
+      {/* Always show the Back button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate('Home')}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
       <View style={styles.profileHeader}>
-        <Text style={styles.header}>Profile Information</Text>
+        <Text style={styles.headerSection}>Profile Information</Text>
       </View>
 
       <View style={styles.profileSection}>
@@ -158,6 +184,9 @@ export default function MyAccountScreen({ navigation }) {
             placeholder="Enter your name"
           />
         </View>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
+          <Text style={styles.saveButtonText}>Save Profile</Text>
+        </TouchableOpacity>
 
         <View style={styles.profileRow}>
           <Text style={styles.label}>Email</Text>
@@ -202,32 +231,67 @@ export default function MyAccountScreen({ navigation }) {
         );
       })}
 
-      {vehicles.length > 0 && (
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.backButtonText}>Back</Text>
-        </TouchableOpacity>
-      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
+    marginTop:40,
     backgroundColor: "#fff",
+  },
+  header: {
+    width: '100%',
+    height: 80,
+    backgroundColor: '#CC0000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30
+  },
+  saveButton: {
+    backgroundColor: '#CC0000',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  headerText: {
+    fontSize: 27,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'black',
+    textShadowOffset: { width: 3, height: 1 },
+    textShadowRadius: 5
+  },
+  backWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginBottom: 10,
+    paddingLeft: 5
+  },
+  backText: {
+    color: '#CC0000',
+    fontSize: 16,
   },
   profileHeader: {
     backgroundColor: "#CC0000", // Updated red color
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+    marginTop: 20,
     marginBottom: 20,
     alignSelf: "flex-start",
   },
-  header: {
+  headerSection: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
@@ -316,17 +380,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: "blue",
     fontWeight: "500",
-  },
-  backButton: {
-    backgroundColor: "#CC0000", // Updated red color
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 30,
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold'
   },
 });

@@ -68,7 +68,7 @@ const Stack = createStackNavigator()
  *
  * @param {Object} navigation - React Navigation prop for navigating between screens.
  */
-function HomeScreen ({ navigation }) {
+function HomeScreen({ navigation }) {
   const [user, setUser] = useState(null) // State to track user authentication status
 
   // Effect hook to subscribe to authentication state changes
@@ -83,83 +83,95 @@ function HomeScreen ({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Displaying the header text */}
-      <Text style={styles.header}>UNLV Reserved Parking Dashboard</Text>
-
+      <Text style={styles.header}>
+        UNLV Reserved Parking{'\n'}Dashboard
+      </Text>
       {/* Conditionally render either user dashboard or login screen */}
       {user ? (
         <>
           {/*If user is authenticated, show dashboard with navigation options */}
-          <ScrollView contentContainerStyle={styles.buttonContainer}> 
+          <ScrollView contentContainerStyle={styles.buttonContainer}>
             <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
 
-          {/* Navigation buttons for various screens */}
-          <TouchableOpacity onPress={() => navigation.navigate("Cottage Grove Parking")}>
-            <View style={styles.parkingCard}>
-              <Image
-                source={require("./assets/CottageGrove-ParkingGarage.jpg")}
-                style={styles.parkingImage}
-              />
-              <Text style={styles.parkingText}>Cottage Grove Parking</Text>
-            </View>
-          </TouchableOpacity>
+            {/* Navigation buttons for various screens */}
+            <TouchableOpacity onPress={() => navigation.navigate("Cottage Grove Parking")}>
+              <View style={styles.parkingCard}>
+                <Image
+                  source={require("./assets/CottageGrove-ParkingGarage.jpg")}
+                  style={styles.parkingImage}
+                />
+                <Text style={styles.parkingText}>Cottage Grove Parking</Text>
+              </View>
+            </TouchableOpacity>
 
 
-          <TouchableOpacity onPress={() => navigation.navigate("Tropicana Parking")}>
-            <View style={styles.parkingCard}>
-              <Image
-                source={require("./assets/Tropicana-ParkingGarage.jpg")}
-                style={styles.parkingImage}
-              />
-              <Text style={styles.parkingText}>Tropicana Parking</Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Tropicana Parking")}>
+              <View style={styles.parkingCard}>
+                <Image
+                  source={require("./assets/Tropicana-ParkingGarage.jpg")}
+                  style={styles.parkingImage}
+                />
+                <Text style={styles.parkingText}>Tropicana Parking</Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Gateway Parking")}>
-            <View style={styles.parkingCard}>
-              <Image
-                source={require("./assets/Gateway-ParkingGarage.jpg")}
-                style={styles.parkingImage}
-              />
-              <Text style={styles.parkingText}>Gateway Parking</Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Gateway Parking")}>
+              <View style={styles.parkingCard}>
+                <Image
+                  source={require("./assets/Gateway-ParkingGarage.jpg")}
+                  style={styles.parkingImage}
+                />
+                <Text style={styles.parkingText}>Gateway Parking</Text>
+              </View>
+            </TouchableOpacity>
 
-        </ScrollView>
+          </ScrollView>
 
-        <View style={styles.bottomNav}>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Yes, Logout",
-                  onPress: () => {
-                    signOut(auth);
-                    navigation.navigate("Login");
+          {/* 🟥 REPLACED: bottomNav emoji icons */}
+          {/* ✅ NEW: Custom icon images */}
+          <View style={styles.bottomNav}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("My Account")}
+              style={{ alignItems: "center" }}
+            >
+              <Image source={require('./assets/icons/account.png')} style={styles.navIconImage} />
+              <Text style={styles.navLabel}>Account</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate("Reservation Status")}
+              style={{ alignItems: "center" }}
+            >
+              <Image source={require('./assets/icons/parking.png')} style={styles.navIconImage} />
+              <Text style={styles.navLabel}>Reservation</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate("Report")}
+              style={{ alignItems: "center" }}
+            >
+              <Image source={require('./assets/icons/report.png')} style={styles.navIconImage} />
+              <Text style={styles.navLabel}>Report</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Yes, Logout",
+                    onPress: () => {
+                      signOut(auth);
+                      navigation.navigate("Login");
+                    },
                   },
-                },
-              ]);
-            }}
-          >
-          <Text style={styles.navIcon}>✖</Text>
-          <Text style={styles.navLabel}>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Report")}>
-          <Text style={styles.navIcon}>❗</Text>
-          <Text style={styles.navLabel}>Report</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Reservation Status")}>
-          <Text style={styles.navIcon}>🚗</Text>
-          <Text style={styles.navLabel}>Reservations</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("My Account")}>
-          <Text style={styles.navIcon}>👤</Text>
-          <Text style={styles.navLabel}>Account</Text>
-        </TouchableOpacity>
-        </View>
+                ]);
+              }}
+            >
+              <Image source={require('./assets/icons/logout.png')} style={styles.navIconImage} />
+              <Text style={styles.navLabel}>Logout</Text>
+            </TouchableOpacity>
+          </View>
         </>
       ) : (
-        // If user is not authenticated, show login screen
         <LoginScreen />
       )}
     </View>
@@ -167,20 +179,20 @@ function HomeScreen ({ navigation }) {
 }
 
 // Screens for different parking lots
-function TropicanaScreen () {
+function TropicanaScreen() {
   return <TropicanaParkingScreen parkingLot='Tropicana Parking' />
 }
 
-function CottageGroveScreen () {
+function CottageGroveScreen() {
   return <CottageGroveParkingScreen parkingLot='Cottage Grove Parking' />
 }
 
-function GatewayScreen () {
+function GatewayScreen() {
   return <GatewayParkingScreen parkingLot='Gateway Parking' />
 }
 
 // App component that includes the navigator and stack of screens
-export default function App () {
+export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
@@ -190,61 +202,61 @@ export default function App () {
           component={LoginScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name='SignUp' component={SignUpScreen} />
+        <Stack.Screen name='SignUp' component={SignUpScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name='ResetPassword'
           component={ResetPasswordScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Home'
           component={HomeScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='My Account'
           component={MyAccountScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Tropicana Parking'
           component={TropicanaScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Cottage Grove Parking'
           component={CottageGroveScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Gateway Parking'
           component={GatewayScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Reservation Status'
           component={ReservationStatusScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='Report'
           component={ReportScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='AddVehicle'
           component={AddVehicleScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='RemoveVehicle'
           component={RemoveVehicleScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='EditVehicle'
           component={EditVehicleScreen}
-          options={{ headerLeft: null }}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -259,7 +271,7 @@ const styles = StyleSheet.create({
     margin: 0 // Remove margin to allow full-width header
   },
   header: {
-    fontSize: 26, // Larger font size
+    fontSize: 25, // Larger font size
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
@@ -267,11 +279,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#CC0000',
     width: '100%', // Span the entire width of the screen
     textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
+    textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
     height: 100, // Fixed height for the header
     justifyContent: 'center', // Center text vertically
-    alignItems: 'center' // Center text horizontally
+    alignItems: 'center', // Center text horizontally
+    marginTop: 50,
   },
   welcomeText: {
     fontSize: 18,
@@ -365,7 +378,13 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center",
   },
-  
+  navIconImage: {
+    width: 45,
+    height: 35,
+    resizeMode: "contain",
+    marginBottom: 3.7,
+    tintColor: "white", // change color icons
+  },
   navLabel: {
     fontSize: 12,
     color: "black",

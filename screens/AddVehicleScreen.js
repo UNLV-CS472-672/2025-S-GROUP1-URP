@@ -264,13 +264,12 @@ export default function AddVehicleScreen({ navigation, route }) {
       {!isKeyboardVisible && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => {
-            if (fromRedirect) {
-              navigation.navigate("Home");
-            } else {
-              navigation.navigate("My Account");
-            }
-          }}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Home" }],
+            })
+          }
         >
           <Text style={styles.backButtonText}>
             Back to {fromRedirect ? "Home" : "My Account"}
@@ -285,7 +284,8 @@ export default function AddVehicleScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
+    marginTop:40,
   },
   scrollContainer: {
     flexGrow: 1,
