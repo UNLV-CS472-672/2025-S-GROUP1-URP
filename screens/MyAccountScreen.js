@@ -29,7 +29,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker"; // To handle image picking
 import { db, auth } from "../firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore"; 
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore"; 
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
 export default function MyAccountScreen({ navigation }) {
@@ -108,10 +108,21 @@ export default function MyAccountScreen({ navigation }) {
   const handleSaveProfile = async () => {
     try {
       const userDocRef = doc(db, "users", user.uid);
-      await updateDoc(userDocRef, {
-        name,
-        profilePicture, // Save the profile picture URI
-      });
+      const userSnap = await getDoc(userDocRef);
+
+      if (userSnap.exists()) {
+        await updateDoc(userDocRef, {
+          name,
+          profilePicture,
+        });
+      } else {
+        await setDoc(userDocRef, {
+          name,
+          profilePicture,
+          email: user.email, // optional: save email
+        });
+      }
+
       Alert.alert("Success", "Profile updated!");
     } catch (error) {
       Alert.alert("Error", "Failed to update profile.");
@@ -173,6 +184,9 @@ export default function MyAccountScreen({ navigation }) {
             placeholder="Enter your name"
           />
         </View>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
+          <Text style={styles.saveButtonText}>Save Profile</Text>
+        </TouchableOpacity>
 
         <View style={styles.profileRow}>
           <Text style={styles.label}>Email</Text>
@@ -236,6 +250,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30
+  },
+  saveButton: {
+    backgroundColor: '#CC0000',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   headerText: {
     fontSize: 27,
