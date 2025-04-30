@@ -3,7 +3,6 @@ import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import EditVehicleScreen from "../EditVehicleScreen";
 import { Alert } from "react-native";
 
-// 🔧 Mock Firestore
 jest.mock("firebase/firestore", () => ({
   doc: jest.fn(),
   getDoc: jest.fn(() => Promise.resolve({
@@ -12,18 +11,16 @@ jest.mock("firebase/firestore", () => ({
       vehicles: [
         { make: "Toyota", model: "Camry", year: "2020", licensePlate: "XYZ123", imageUrl: null }
       ]
-    })
+    }),
   })),
   setDoc: jest.fn(() => Promise.resolve())
 }));
 
-// 🔧 Mock Firebase Auth
 jest.mock("../../firebaseConfig", () => ({
   db: {},
   auth: { currentUser: { uid: "test-user-id" } }
 }));
 
-// 🔧 Mock Firebase Storage
 jest.mock("firebase/storage", () => ({
   getStorage: jest.fn(() => ({
     app: { options: { storageBucket: "test-bucket" } }
@@ -32,7 +29,6 @@ jest.mock("firebase/storage", () => ({
   deleteObject: jest.fn(() => Promise.resolve())
 }));
 
-// 🔧 Mock Image Picker and FileSystem
 jest.mock("expo-image-picker", () => ({
   launchImageLibraryAsync: jest.fn(),
   launchCameraAsync: jest.fn(),
@@ -62,67 +58,54 @@ describe("EditVehicleScreen", () => {
     }
   };
 
-  it("renders inputs with prefilled values and updates vehicle info", async () => {
+  it("updates vehicle info successfully", async () => {
     const { getByPlaceholderText, getByText } = render(
       <EditVehicleScreen route={mockRoute} navigation={mockNavigation} />
     );
 
-    const makeInput = getByPlaceholderText("Make");
-    const modelInput = getByPlaceholderText("Model");
-    const yearInput = getByPlaceholderText("Year");
-    const plateInput = getByPlaceholderText("License Plate");
-
-    // Simulate input changes
-    fireEvent.changeText(makeInput, "Honda");
-    fireEvent.changeText(modelInput, "Civic");
-    fireEvent.changeText(yearInput, "2022");
-    fireEvent.changeText(plateInput, "ABC789");
-
-    const saveButton = getByText("Save Changes");
+    fireEvent.changeText(getByPlaceholderText("Enter Make"), "Honda");
+    fireEvent.changeText(getByPlaceholderText("Enter Model"), "Civic");
+    fireEvent.changeText(getByPlaceholderText("Enter Year"), "2022");
+    fireEvent.changeText(getByPlaceholderText("Enter License Plate"), "ABC789");
 
     await act(async () => {
-      fireEvent.press(saveButton);
+      fireEvent.press(getByText("Save Changes"));
     });
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith("Vehicle updated successfully!");
       expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account");
     });
-  }, 10000);
+  });
 
   it("shows error alert for invalid year", async () => {
     const { getByPlaceholderText, getByText } = render(
       <EditVehicleScreen route={mockRoute} navigation={mockNavigation} />
     );
 
-    const yearInput = getByPlaceholderText("Year");
-    fireEvent.changeText(yearInput, "abcd");
-
-    const saveButton = getByText("Save Changes");
+    fireEvent.changeText(getByPlaceholderText("Enter Year"), "abcd");
 
     await act(async () => {
-      fireEvent.press(saveButton);
+      fireEvent.press(getByText("Save Changes"));
     });
 
     expect(Alert.alert).toHaveBeenCalledWith("Error", "Please enter a valid year (e.g., 2025).");
-  }, 10000);
+  });
 
   it("shows error alert when fields are empty", async () => {
     const { getByPlaceholderText, getByText } = render(
       <EditVehicleScreen route={mockRoute} navigation={mockNavigation} />
     );
 
-    fireEvent.changeText(getByPlaceholderText("Make"), "");
-    fireEvent.changeText(getByPlaceholderText("Model"), "");
-    fireEvent.changeText(getByPlaceholderText("Year"), "");
-    fireEvent.changeText(getByPlaceholderText("License Plate"), "");
-
-    const saveButton = getByText("Save Changes");
+    fireEvent.changeText(getByPlaceholderText("Enter Make"), "");
+    fireEvent.changeText(getByPlaceholderText("Enter Model"), "");
+    fireEvent.changeText(getByPlaceholderText("Enter Year"), "");
+    fireEvent.changeText(getByPlaceholderText("Enter License Plate"), "");
 
     await act(async () => {
-      fireEvent.press(saveButton);
+      fireEvent.press(getByText("Save Changes"));
     });
 
     expect(Alert.alert).toHaveBeenCalledWith("Error", "All fields are required.");
-  }, 10000);
+  });
 });
