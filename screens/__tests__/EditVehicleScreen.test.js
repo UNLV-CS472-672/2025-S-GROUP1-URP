@@ -3,44 +3,57 @@ import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import EditVehicleScreen from "../EditVehicleScreen";
 import { Alert } from "react-native";
 
+// 🔧 Mock Firebase Firestore
 jest.mock("firebase/firestore", () => ({
   doc: jest.fn(),
-  getDoc: jest.fn(() => Promise.resolve({
-    exists: () => true,
-    data: () => ({
-      vehicles: [
-        { make: "Toyota", model: "Camry", year: "2020", licensePlate: "XYZ123", imageUrl: null }
-      ]
-    }),
-  })),
-  setDoc: jest.fn(() => Promise.resolve())
+  getDoc: jest.fn(() =>
+    Promise.resolve({
+      exists: () => true,
+      data: () => ({
+        vehicles: [
+          {
+            make: "Toyota",
+            model: "Camry",
+            year: "2020",
+            licensePlate: "XYZ123",
+            imageUrl: null,
+          },
+        ],
+      }),
+    })
+  ),
+  setDoc: jest.fn(() => Promise.resolve()),
 }));
 
+// 🔧 Mock Firebase Auth
 jest.mock("../../firebaseConfig", () => ({
   db: {},
-  auth: { currentUser: { uid: "test-user-id" } }
+  auth: { currentUser: { uid: "test-user-id" } },
 }));
 
+// 🔧 Mock Firebase Storage
 jest.mock("firebase/storage", () => ({
   getStorage: jest.fn(() => ({
-    app: { options: { storageBucket: "test-bucket" } }
+    app: { options: { storageBucket: "test-bucket" } },
   })),
   ref: jest.fn(),
-  deleteObject: jest.fn(() => Promise.resolve())
+  deleteObject: jest.fn(() => Promise.resolve()),
 }));
 
+// 🔧 Mock Expo Image Picker & File System
 jest.mock("expo-image-picker", () => ({
   launchImageLibraryAsync: jest.fn(),
   launchCameraAsync: jest.fn(),
   requestCameraPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
-  MediaTypeOptions: { Images: "Images" }
+  MediaTypeOptions: { Images: "Images" },
 }));
 
 jest.mock("expo-file-system", () => ({
   getInfoAsync: jest.fn(() => Promise.resolve({ size: 1000 })),
-  uploadAsync: jest.fn(() => Promise.resolve({ status: 200 }))
+  uploadAsync: jest.fn(() => Promise.resolve({ status: 200 })),
 }));
 
+// 🔧 Mock Alert
 jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
 describe("EditVehicleScreen", () => {
@@ -53,9 +66,9 @@ describe("EditVehicleScreen", () => {
         model: "Camry",
         year: "2020",
         licensePlate: "XYZ123",
-        imageUrl: null
-      }
-    }
+        imageUrl: null,
+      },
+    },
   };
 
   it("updates vehicle info successfully", async () => {
