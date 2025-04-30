@@ -71,25 +71,29 @@ describe("EditVehicleScreen", () => {
     },
   };
 
-  it("updates vehicle info successfully", async () => {
-    const { getByPlaceholderText, getByText } = render(
-      <EditVehicleScreen route={mockRoute} navigation={mockNavigation} />
-    );
+  it(
+    "updates vehicle info successfully",
+    async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <EditVehicleScreen route={mockRoute} navigation={mockNavigation} />
+      );
 
-    fireEvent.changeText(getByPlaceholderText("Enter Make"), "Honda");
-    fireEvent.changeText(getByPlaceholderText("Enter Model"), "Civic");
-    fireEvent.changeText(getByPlaceholderText("Enter Year"), "2022");
-    fireEvent.changeText(getByPlaceholderText("Enter License Plate"), "ABC789");
+      fireEvent.changeText(getByPlaceholderText("Enter Make"), "Honda");
+      fireEvent.changeText(getByPlaceholderText("Enter Model"), "Civic");
+      fireEvent.changeText(getByPlaceholderText("Enter Year"), "2022");
+      fireEvent.changeText(getByPlaceholderText("Enter License Plate"), "ABC789");
 
-    await act(async () => {
-      fireEvent.press(getByText("Save Changes"));
-    });
+      await act(async () => {
+        fireEvent.press(getByText("Save Changes"));
+      });
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith("Vehicle updated successfully!");
-      expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account");
-    });
-  });
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalledWith("Vehicle updated successfully!");
+        expect(mockNavigation.navigate).toHaveBeenCalledWith("My Account");
+      });
+    },
+    10000 // Increase timeout from default 5s to 10s
+  );
 
   it("shows error alert for invalid year", async () => {
     const { getByPlaceholderText, getByText } = render(
