@@ -34,12 +34,10 @@ export default function ReservationStatusScreen({ navigation }) {
           const resData = resDoc.data();
           setReservation({ id: resDoc.id, ...resData });
 
-          // Get startTime and endTime from reservation document
           const startTime = resData.startTime.toDate();
           const endTime = resData.endTime.toDate();
           updateTimer(startTime, endTime);
 
-          // Get the garage name from the parking spot collection
           const spotId = resData.spotId;
           const collections = [
             { name: "parkingSpotsTrop", displayName: "Tropicana Garage" },
@@ -71,7 +69,6 @@ export default function ReservationStatusScreen({ navigation }) {
     fetchReservation();
   }, []);
 
-  // Function to update the timer
   const updateTimer = (startTime, endTime) => {
     const now = new Date();
     const diff = endTime - now;
@@ -82,7 +79,6 @@ export default function ReservationStatusScreen({ navigation }) {
         setTimeLeft({ minutes: "00", seconds: "00", expired: true });
 
         try {
-          // Auto-delete expired reservation
           deleteDoc(doc(db, "Reservations", reservation.id));
           setReservation(null);
           console.log("Expired reservation auto-deleted");
@@ -102,7 +98,6 @@ export default function ReservationStatusScreen({ navigation }) {
     }
   };
 
-  // Timer refresh interval
   useEffect(() => {
     if (!reservation) return;
 
@@ -148,58 +143,58 @@ export default function ReservationStatusScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Reservation Status</Text>
       </View>
 
-      <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
 
-      {loading ? (
-        <Text style={styles.loadingText}>Loading...</Text>
-      ) : reservation ? (
-        <>
-          <Text style={styles.label}>Parking Garage:</Text>
-          <View style={styles.inputBox}><Text>{garageName}</Text></View>
+        {loading ? (
+          <Text style={styles.loadingText}>Loading...</Text>
+        ) : reservation ? (
+          <>
+            <Text style={styles.label}>Parking Garage:</Text>
+            <View style={styles.inputBox}><Text>{garageName}</Text></View>
 
-          <Text style={styles.label}>Parking Spot Number:</Text>
-          <View style={styles.inputBox}><Text>{reservation.spotId}</Text></View>
+            <Text style={styles.label}>Parking Spot Number:</Text>
+            <View style={styles.inputBox}><Text>{reservation.spotId}</Text></View>
 
-          <Text style={styles.timerLabel}>Reservation Timer:</Text>
+            <Text style={styles.timerLabel}>Reservation Timer:</Text>
 
-          {/* Check if timeLeft exists before rendering timer */}
-          {timeLeft ? (
-            <View style={[styles.timerBox, timeLeft.expired && styles.expiredTimerBox]}>
-              <Text style={[styles.timerText, timeLeft.expired && styles.expiredTimerText]}>
-                {timeLeft.minutes} : {timeLeft.seconds}
-              </Text>
-              <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
-            </View>
-          ) : (
-            <View style={styles.timerBox}>
-              <Text style={styles.timerText}>Loading...</Text>
-            </View>
-          )}
+            {timeLeft ? (
+              <View style={[styles.timerBox, timeLeft.expired && styles.expiredTimerBox]}>
+                <Text style={[styles.timerText, timeLeft.expired && styles.expiredTimerText]}>
+                  {timeLeft.minutes} : {timeLeft.seconds}
+                </Text>
+                <Text style={styles.dateText}>{reservation.startTime.toDate().toDateString()}</Text>
+              </View>
+            ) : (
+              <View style={styles.timerBox}>
+                <Text style={styles.timerText}>Loading...</Text>
+              </View>
+            )}
 
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <Text style={styles.noReservationText}>No current reservation at this time.</Text>
-      )}
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+              <Text style={styles.cancelButtonText}>Cancel Reservation</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Text style={styles.noReservationText}>No current reservation at this time.</Text>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 20,
-    alignItems: "center",
+    marginTop: 50, // Match dashboard behavior under notch
   },
   header: {
     width: "100%",
@@ -207,8 +202,6 @@ const styles = StyleSheet.create({
     height: 80,
     justifyContent: 'center',
     alignItems: "center",
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
   },
   headerText: {
     fontSize: 27,
@@ -217,6 +210,11 @@ const styles = StyleSheet.create({
     textShadowColor: "black",
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5,
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+    alignItems: "center",
   },
   backWrapper: {
     alignSelf: 'flex-start',
@@ -286,5 +284,3 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
 });
-
-

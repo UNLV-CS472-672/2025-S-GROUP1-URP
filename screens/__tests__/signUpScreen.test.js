@@ -72,7 +72,7 @@ describe("<SignUpScreen />", () => {
       expect(createUserWithEmailAndPassword).toHaveBeenCalled();
       expect(signInWithEmailAndPassword).toHaveBeenCalled();
       expect(Alert.alert).toHaveBeenCalledWith("Account created and logged in successfully!");
-      expect(mockNavigation.navigate).toHaveBeenCalledWith("Home");
+      expect(mockNavigation.navigate).toHaveBeenCalledWith("Tutorial");
     });
   });
 

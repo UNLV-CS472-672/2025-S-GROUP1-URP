@@ -27,7 +27,7 @@ import {
   TextInput,
   Image,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker"; // To handle image picking
+import * as ImagePicker from "expo-image-picker";
 import { db, auth } from "../firebaseConfig";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
@@ -35,13 +35,12 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 export default function MyAccountScreen({ navigation }) {
   const [vehicles, setVehicles] = useState([]);
   const [name, setName] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null); // To hold the profile picture
+  const [profilePicture, setProfilePicture] = useState(null);
   const user = auth.currentUser;
 
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
-        // Fetch vehicle info
         const vehicleDocRef = doc(db, "vehicles", user.uid);
         const vehicleSnap = await getDoc(vehicleDocRef);
         if (vehicleSnap.exists()) {
@@ -59,13 +58,12 @@ export default function MyAccountScreen({ navigation }) {
           }, 1000);
         }
 
-        // Fetch user profile info
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
           setName(data.name || "");
-          setProfilePicture(data.profilePicture || null); // Get profile picture from database
+          setProfilePicture(data.profilePicture || null);
         }
       }
     };
@@ -82,7 +80,6 @@ export default function MyAccountScreen({ navigation }) {
 
     if (!result.cancelled) {
       setProfilePicture(result.uri);
-      // You can upload the image to Firebase Storage and update the user profile document with the image URL if needed.
     }
   };
 
@@ -119,7 +116,7 @@ export default function MyAccountScreen({ navigation }) {
         await setDoc(userDocRef, {
           name,
           profilePicture,
-          email: user.email, // optional: save email
+          email: user.email,
         });
       }
 
@@ -138,108 +135,106 @@ export default function MyAccountScreen({ navigation }) {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 40 }}
-    >
-      {/* Red Header */}
+    <View style={styles.screen}>
       <View style={styles.header}>
         <Text style={styles.headerText}>My Account</Text>
       </View>
-      {/* Always show the Back button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.navigate('Home')}
-      >
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
 
-      <View style={styles.profileHeader}>
-        <Text style={styles.headerSection}>Profile Information</Text>
-      </View>
-
-      <View style={styles.profileSection}>
-        <View style={styles.profileRow}>
-          <Text style={styles.label}>Profile Picture</Text>
-          <TouchableOpacity onPress={handleProfilePicturePick}>
-            <View style={styles.profilePictureContainer}>
-              {profilePicture ? (
-                <Image
-                  source={{ uri: profilePicture }}
-                  style={styles.profilePicture}
-                />
-              ) : (
-                <Ionicons name="person-circle" size={60} color="gray" />
-              )}
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.profileRow}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter your name"
-          />
-        </View>
-        <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
-          <Text style={styles.saveButtonText}>Save Profile</Text>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
 
-        <View style={styles.profileRow}>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.infoText}>{user?.email || "N/A"}</Text>
-        </View>
-      </View>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+          <View style={styles.profileHeader}>
+            <Text style={styles.headerSection}>Profile Information</Text>
+          </View>
 
-      <View style={styles.vehiclesHeader}>
-        <Text style={styles.vehicleTitle}>Registered Vehicles</Text>
-        <TouchableOpacity onPress={handleAddAnotherVehicle}>
-          <Text style={styles.addVehicleText}>Add Vehicle</Text>
-        </TouchableOpacity>
-      </View>
-
-      {vehicles.map((vehicle, index) => {
-        const vehicleLabel = `${getOrdinalSuffix(index)} Vehicle`;
-        return (
-          <View key={index} style={styles.vehicleCard}>
-            <View style={styles.vehicleHeader}>
-              <View style={styles.vehicleLabel}>
-                <FontAwesome name="car" size={20} color="#CC0000" />
-                <Text style={styles.vehicleType}>{vehicleLabel}</Text>
-              </View>
-              <TouchableOpacity onPress={() => handleDeleteVehicle(index)}>
-                <Ionicons name="trash" size={20} color="gray" />
+          <View style={styles.profileSection}>
+            <View style={styles.profileRow}>
+              <Text style={styles.label}>Profile Picture</Text>
+              <TouchableOpacity onPress={handleProfilePicturePick}>
+                <View style={styles.profilePictureContainer}>
+                  {profilePicture ? (
+                    <Image
+                      source={{ uri: profilePicture }}
+                      style={styles.profilePicture}
+                    />
+                  ) : (
+                    <Ionicons name="person-circle" size={60} color="gray" />
+                  )}
+                </View>
               </TouchableOpacity>
             </View>
-            <Text style={styles.vehicleInfo}>Make: {vehicle.make}</Text>
-            <Text style={styles.vehicleInfo}>Model: {vehicle.model}</Text>
-            <Text style={styles.vehicleInfo}>Year: {vehicle.year}</Text>
-            <Text style={styles.vehicleInfo}>
-              License: {vehicle.licensePlate}
-            </Text>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("EditVehicle", { vehicle, index })
-              }
-            >
-              <Text style={styles.editText}>Edit</Text>
+
+            <View style={styles.profileRow}>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                placeholder="Enter your name"
+              />
+            </View>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
+              <Text style={styles.saveButtonText}>Save Profile</Text>
+            </TouchableOpacity>
+
+            <View style={styles.profileRow}>
+              <Text style={styles.label}>Email</Text>
+              <Text style={styles.infoText}>{user?.email || "N/A"}</Text>
+            </View>
+          </View>
+
+          <View style={styles.vehiclesHeader}>
+            <Text style={styles.vehicleTitle}>Registered Vehicles</Text>
+            <TouchableOpacity onPress={handleAddAnotherVehicle}>
+              <Text style={styles.addVehicleText}>Add Vehicle</Text>
             </TouchableOpacity>
           </View>
-        );
-      })}
 
-    </ScrollView>
+          {vehicles.map((vehicle, index) => {
+            const vehicleLabel = `${getOrdinalSuffix(index)} Vehicle`;
+            return (
+              <View key={index} style={styles.vehicleCard}>
+                <View style={styles.vehicleHeader}>
+                  <View style={styles.vehicleLabel}>
+                    <FontAwesome name="car" size={20} color="#CC0000" />
+                    <Text style={styles.vehicleType}>{vehicleLabel}</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handleDeleteVehicle(index)}>
+                    <Ionicons name="trash" size={20} color="gray" />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.vehicleInfo}>Make: {vehicle.make}</Text>
+                <Text style={styles.vehicleInfo}>Model: {vehicle.model}</Text>
+                <Text style={styles.vehicleInfo}>Year: {vehicle.year}</Text>
+                <Text style={styles.vehicleInfo}>
+                  License: {vehicle.licensePlate}
+                </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("EditVehicle", { vehicle, index })
+                  }
+                >
+                  <Text style={styles.editText}>Edit</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    padding: 20,
-    marginTop: 40,
+    marginTop: 50,
     backgroundColor: "#fff",
   },
   header: {
@@ -248,8 +243,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#CC0000',
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30
+  },
+  container: {
+    flex: 1,
+    padding: 20,
   },
   saveButton: {
     backgroundColor: '#CC0000',
@@ -272,7 +269,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5
   },
-  backWrapper: {
+  backButton: {
     alignSelf: 'flex-start',
     marginTop: 10,
     marginBottom: 10,
@@ -283,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   profileHeader: {
-    backgroundColor: "#CC0000", // Updated red color
+    backgroundColor: "#CC0000",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -347,7 +344,7 @@ const styles = StyleSheet.create({
     color: "#444",
   },
   addVehicleText: {
-    color: "#CC0000", // Updated red color
+    color: "#CC0000",
     fontWeight: "500",
   },
   vehicleCard: {

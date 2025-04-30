@@ -21,7 +21,7 @@ jest.mock("firebase/firestore", () => {
 jest.mock('../../firebaseConfig', () => ({
   auth: { currentUser: { email: 'test@example.com', uid: '12345' } },
   db: {}
-}))
+}));
 
 // --- Icon Mocks ---
 jest.mock("@expo/vector-icons", () => {
@@ -52,6 +52,7 @@ describe("<MyAccountScreen />", () => {
     defaultNavigation = {
       navigate: jest.fn(),
       replace: jest.fn(),
+      goBack: jest.fn(), // ✅ added for back button test
       canGoBack: jest.fn(() => false),
     };
 
@@ -98,26 +99,22 @@ describe("<MyAccountScreen />", () => {
     expect(defaultNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
   }, 20000);
 
-  test("Navigates to Home when back button is pressed", async () => {
-    const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
-  
-    // Wait for the "Back" button to appear
-    const backButton = await findByText("← Back");
-  
-    // Check if the back button exists
-    expect(backButton).toBeTruthy();
-  
-    // Press the back button
-    fireEvent.press(backButton);
-  
-    // Verify that it navigated to the "Home" screen
-    expect(defaultNavigation.navigate).toHaveBeenCalledWith("Home");
+  test("Goes back when back button is pressed", async () => {
+    const { getByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
+
+    await waitFor(() => {
+      expect(getByText("← Back")).toBeTruthy();
+    });
+
+    fireEvent.press(getByText("← Back"));
+    expect(defaultNavigation.goBack).toHaveBeenCalled(); // ✅ checks goBack now
   });
 
   test("Redirects to AddVehicle when no vehicles are found", async () => {
     const mockNavigation = {
       navigate: jest.fn(),
       replace: jest.fn(),
+      goBack: jest.fn(),
       canGoBack: jest.fn(() => false),
     };
 
@@ -151,6 +148,7 @@ describe("<MyAccountScreen />", () => {
     const mockNavigation = {
       navigate: jest.fn(),
       replace: jest.fn(),
+      goBack: jest.fn(),
       canGoBack: jest.fn(() => false),
     };
 
