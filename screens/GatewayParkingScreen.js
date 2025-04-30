@@ -224,7 +224,11 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
         <Text style={{ fontSize: 16, color: 'blue' }}>← Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>{parkingLot}</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>{parkingLot}</Text>
+      </View>
+      {/*  Spacer to push content down */}
+      <View style={{ height: 5 }} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.filterContainer}>
@@ -240,28 +244,28 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
           ))}
         </View>
 
-          <View style={styles.legendContainer}>
-            {[
-              { color: 'green', label: 'Open' },
-              { color: 'yellow', label: 'Reserved' },
-            ].map(({ color, label }) => (
-              <View style={styles.legendItem} key={label}>
-                <View style={[styles.legendBox, { backgroundColor: color }]} />
-                <Text style={styles.legendText}>{label}</Text>
-              </View>
-            ))}
-          </View>
-          <View style={styles.legendContainer}>
-            {[
-              { color: 'red', label: 'Occupied' },
-              { color: 'blue', label: 'Selected' }
-            ].map(({ color, label }) => (
-              <View style={styles.legendItem} key={label}>
-                <View style={[styles.legendBox, { backgroundColor: color }]} />
-                <Text style={styles.legendText}>{label}</Text>
-              </View>
-            ))}
-          </View>
+        <View style={styles.legendContainer}>
+          {[
+            { color: 'green', label: 'Open' },
+            { color: 'yellow', label: 'Reserved' },
+          ].map(({ color, label }) => (
+            <View style={styles.legendItem} key={label}>
+              <View style={[styles.legendBox, { backgroundColor: color }]} />
+              <Text style={styles.legendText}>{label}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={styles.legendContainer}>
+          {[
+            { color: 'red', label: 'Occupied' },
+            { color: 'blue', label: 'Selected' }
+          ].map(({ color, label }) => (
+            <View style={styles.legendItem} key={label}>
+              <View style={[styles.legendBox, { backgroundColor: color }]} />
+              <Text style={styles.legendText}>{label}</Text>
+            </View>
+          ))}
+        </View>
 
         <View style={styles.mapWrapper}>
           <Svg height='400' width='300' viewBox='0 0 300 400'>
@@ -329,7 +333,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
                   }}
                   onPress={() => setSelectedSpot(space.id)}
                 />
-                )
+              )
               : null
           })}
         </View>
@@ -341,20 +345,18 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
           <Text style={styles.stepsText}>3. Arrive within 30 minutes</Text>
         </View>
 
-        <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
-          <Text style={{ color: 'white', fontSize: 16 }}>Reserve</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.reserveButton,
-            { backgroundColor: "#2196F3", marginTop: 10 },
-          ]}
-          onPress={handleReserveRandomSpot}
-        >
-          <Text style={{ textAlign: "center", color: "white", fontSize: 16 }}>
-            Reserve Random Spot
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
+            <Text style={styles.reserveText}>Reserve</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.reserveButton, { backgroundColor: "#2196F3", marginLeft: 10 }]}
+            onPress={handleReserveRandomSpot}
+          >
+            <Text style={styles.reserveText}>Random Spot</Text>
+          </TouchableOpacity>
+        </View>
+
       </ScrollView>
     </View>
   )
@@ -392,6 +394,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 10
+  },
+  header: {
+    width: '100%',
+    height: 80,
+    backgroundColor: '#CC0000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30
+  },
+  headerText: {
+    fontSize: 27,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'black',
+    textShadowOffset: { width: 3, height: 1 },
+    textShadowRadius: 5
+  },
+
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 80
+  },
+
+  reserveText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   checkbox: { fontSize: 20, marginRight: 5 },
   filterLabel: { fontSize: 16 }
