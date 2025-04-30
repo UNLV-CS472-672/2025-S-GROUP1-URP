@@ -11,9 +11,9 @@
  * Dependencies:
  * - `ParkingMap` component: Handles the rendering and functionality of the parking garage map.
  */
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import ParkingMap from '../components/ParkingMap/ParkingMap'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import ParkingMap from "../src/components/ParkingMap/ParkingMap";
 
 const ParkingScreen = ({ navigation }) => {
   return (
