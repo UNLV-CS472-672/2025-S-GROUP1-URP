@@ -25,11 +25,13 @@ jest.mock("firebase/firestore", () => ({
   setDoc: jest.fn(() => Promise.resolve()),
 }));
 
+// 🔧 Mock Firebase Auth
 jest.mock("../../firebaseConfig", () => ({
   db: {},
   auth: { currentUser: { uid: "test-user-id" } },
 }));
 
+// 🔧 Mock Firebase Storage
 jest.mock("firebase/storage", () => ({
   getStorage: jest.fn(() => ({
     app: { options: { storageBucket: "test-bucket" } },
@@ -38,10 +40,7 @@ jest.mock("firebase/storage", () => ({
   deleteObject: jest.fn(() => Promise.resolve()),
 }));
 
-<<<<<<< HEAD
 // 🔧 Mock Expo Image Picker & File System
-=======
->>>>>>> 4e06bac (test: fix and stabilize unit tests for ParkingScreen, ReservationStatusScreen, and EditVehicleScreen)
 jest.mock("expo-image-picker", () => ({
   launchImageLibraryAsync: jest.fn(),
   launchCameraAsync: jest.fn(),
