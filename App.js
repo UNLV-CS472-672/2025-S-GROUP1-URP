@@ -58,6 +58,11 @@ import RemoveVehicleScreen from './screens/RemoveVehicleScreen'
 import EditVehicleScreen from './screens/EditVehicleScreen' // Import the Edit Vehicle Screen
 // import initializeParkingCollections from './src/components/ParkingMap/initParkingData'
 
+//Imports for the tutorial screen
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import TutorialScreen from './screens/TutorialScreen';
+
+
 // Stack navigator creation for screen transitions
 const Stack = createStackNavigator()
 
@@ -68,16 +73,32 @@ const Stack = createStackNavigator()
  *
  * @param {Object} navigation - React Navigation prop for navigating between screens.
  */
-function HomeScreen({ navigation }) {
-  const [user, setUser] = useState(null) // State to track user authentication status
+function HomeScreen ({ navigation }) {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true) // 🔄 Tutorial Feature: track loading state
 
-  // Effect hook to subscribe to authentication state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user) // Update user state when auth state changes
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user)
+
+      // 🔄 Tutorial Feature: check if tutorial has been seen
+      if (user) {
+        try {
+          const hasSeenTutorial = await AsyncStorage.getItem('hasSeenTutorial');
+          if (hasSeenTutorial) {
+
+            // await AsyncStorage.setItem('hasSeenTutorial', 'true');
+            navigation.navigate("Tutorial");
+          }
+        } catch (e) {
+          console.error("Error accessing AsyncStorage:", e);
+        }
+      }
+
+      setLoading(false)
     })
 
-    return unsubscribe // Clean up subscription when component unmounts
+    return unsubscribe
   }, [])
 
   return (
@@ -256,6 +277,11 @@ export default function App() {
         <Stack.Screen
           name='EditVehicle'
           component={EditVehicleScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Tutorial"
+          component={TutorialScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
