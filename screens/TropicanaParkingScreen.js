@@ -27,6 +27,7 @@ import { GestureDetector, Gesture } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated'
 
 import tropicanaMap from '../assets/trop_map.png' // your updated image
+import { getDoc } from "firebase/firestore";
 
 const db = getFirestore()
 const auth = getAuth()
@@ -135,7 +136,35 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
     return () => unsubscribe()
   }, [collectionName])
 
+  const userHasVehicles = async () => {
+    const user = auth.currentUser;
+    if (!user) return false;
+
+    const vehicleDocRef = doc(db, "vehicles", user.uid);
+    const vehicleSnap = await getDoc(vehicleDocRef);
+    if (vehicleSnap.exists()) {
+      const data = vehicleSnap.data();
+      return data.vehicles && data.vehicles.length > 0;
+    }
+    return false;
+  };
+
   const handleReserve = async () => {
+  const hasVehicles = await userHasVehicles();
+  if (!hasVehicles) {
+    Alert.alert(
+      "No Vehicle Found",
+      "Please add a vehicle before reserving a parking spot.",
+      [
+        {
+          text: "Add Vehicle",
+          onPress: () => navigation.navigate("AddVehicle"),
+        },
+        { text: "Cancel", style: "cancel" },
+      ]
+    );
+    return;
+  }
     if (!selectedSpot) return Alert.alert('No spot selected', 'Please select one.')
     try {
       const user = auth.currentUser
