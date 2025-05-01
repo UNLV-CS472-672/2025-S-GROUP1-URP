@@ -675,15 +675,14 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
-        <Text style={{ fontSize: 16, color: 'blue' }}>← Back</Text>
-      </TouchableOpacity>
-
       <View style={styles.header}>
-        <Text style={styles.headerText}>{parkingLot}</Text>
-      </View>
-      {/*  Spacer to push content down */}
-      <View style={{ height: 5 }} />  
+  <Text style={styles.headerText}>{parkingLot}</Text>
+</View>
+
+<TouchableOpacity style={styles.backWrapper} onPress={() => navigation.goBack()}>
+  <Text style={styles.backText}>← Back</Text>
+</TouchableOpacity>
+  
 
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -790,7 +789,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white', paddingTop: 40 },
+  container: { flex: 1, backgroundColor: 'white', paddingTop: 50 },
   scrollContent: { alignItems: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 },
   mapWrapper: {
@@ -866,13 +865,11 @@ const styles = StyleSheet.create({
     zIndex: 1
   },
   header: {
-    width: '100%',
+    width: "100%",
+    backgroundColor: "#CC0000",
     height: 80,
-    backgroundColor: '#CC0000',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30
+    alignItems: "center",
   },
   headerText: {
     fontSize: 27,
@@ -897,7 +894,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center'
   },
-
+  backWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginLeft: 15,
+    marginBottom: 5,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#CC0000',
+  },
+  
 
 })
 
