@@ -5,6 +5,13 @@
  * It sets up the navigation structure and integrates Firebase for user authentication.
  * The app includes screens for login, sign-up, password reset, parking management, reporting, and account settings.
  *
+ * 🔧 CHANGES MADE:
+ * -  Added onboarding tutorial screen (TutorialScreen) and logic using AsyncStorage to show it once after sign-up
+ * -  Replaced bottom navigation emojis with custom image icons (account, reservation, report, logout)
+ * -  Integrated separate parking screens for Tropicana, Cottage Grove, and Gateway garages
+ * -  Included EditVehicle and RemoveVehicle functionality in stack navigation
+ * -  Added conditional redirect from HomeScreen to Tutorial if it's a user's first login
+ *
  * Features:
  * - User authentication (login, sign-up, logout, password reset).
  * - Navigation between screens using React Navigation.
@@ -29,7 +36,10 @@
  * - ReportScreen: Allows users to report parking violations.
  * - AddVehicleScreen: Adds a vehicle to the user's account.
  * - RemoveVehicleScreen: Removes a vehicle from the user's account.
+ * - EditVehicleScreen: Edits existing vehicle info.
+ * - TutorialScreen: Onboarding tutorial shown only on first login.
  */
+
 
 // React imports for managing state and effects
 import React, { useState, useEffect } from 'react'

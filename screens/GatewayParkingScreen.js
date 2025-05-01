@@ -1,3 +1,23 @@
+/**
+ * GatewayParkingScreen
+ * ---------------------
+ * This screen displays a gesture-enabled interactive parking map for the Gateway Parking lot.
+ * 
+ * Features:
+ * - Pinch-to-zoom and pan functionality using gestures
+ * - Real-time parking spot updates from Firestore
+ * - Ability to filter by spot type (student, staff, accessible)
+ * - Manual and random parking spot reservation with 30-minute holds
+ * - Spot status indicators (available, held, occupied, selected)
+ * 
+ * Users can:
+ * - Visually select an available spot on the map
+ * - View the map with animated scale/position changes
+ * - Reserve a spot or assign one randomly
+ * 
+ * The layout is rendered dynamically based on predefined spot coordinates and Firestore data.
+ */
+
 import React, { useState, useEffect } from 'react'
 import {
   View, Text, TouchableOpacity, ScrollView,

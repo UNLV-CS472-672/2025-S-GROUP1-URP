@@ -1,8 +1,19 @@
+/**
+ * File: MyAccountScreen.test.js
+ * Purpose: Unit tests for the MyAccountScreen component.
+ * Verifies correct display of user/vehicle data, navigation to AddVehicle, and redirect logic
+ * based on Firestore data conditions.
+ * Dependencies: React Native Testing Library, Firebase Firestore, Firebase Auth, React Navigation.
+ * Usage: Run with Jest to validate the behavior of MyAccountScreen under various data conditions.
+ */
+
 import React from "react";
 import { render, fireEvent, act, waitFor } from "@testing-library/react-native";
 import MyAccountScreen from "../MyAccountScreen";
 
-// --- Firebase Mocks ---
+// ------------------ FIREBASE MOCKS ------------------
+
+// Create reusable Firestore mock functions
 const mockGetDoc = jest.fn();
 const mockUpdateDoc = jest.fn();
 
@@ -23,7 +34,9 @@ jest.mock('../../firebaseConfig', () => ({
   db: {}
 }));
 
-// --- Icon Mocks ---
+// ------------------ ICON MOCKS ------------------
+
+// Mock vector icons with text replacements for test compatibility
 jest.mock("@expo/vector-icons", () => {
   const React = require("react");
   const { Text } = require("react-native");
@@ -34,7 +47,7 @@ jest.mock("@expo/vector-icons", () => {
   };
 });
 
-// --- Jest Timer Control ---
+// ------------------ JEST TIMER MANAGEMENT ------------------
 beforeAll(() => {
   jest.useFakeTimers();
 });
@@ -42,7 +55,7 @@ beforeAll(() => {
 afterAll(() => {
   jest.useRealTimers();
 });
-
+// ------------------ TEST CASES ------------------
 describe("<MyAccountScreen />", () => {
   let defaultNavigation;
 
@@ -55,7 +68,7 @@ describe("<MyAccountScreen />", () => {
       goBack: jest.fn(), // ✅ added for back button test
       canGoBack: jest.fn(() => false),
     };
-
+    // Default Firestore mock data (user + 1 vehicle)
     mockGetDoc.mockImplementation((ref) => {
       if (ref.path === "vehicles/12345") {
         return Promise.resolve({
@@ -78,12 +91,16 @@ describe("<MyAccountScreen />", () => {
       return Promise.resolve({ exists: () => false });
     });
   });
-
+  /**
+    * ✅ Displays the authenticated user's email address
+    */
   test("Displays user email", async () => {
     const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
     await findByText("test@example.com");
   }, 20000);
-
+  /**
+    * ✅ Displays vehicle information from Firestore
+    */
   test("Displays vehicle information", async () => {
     const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
     await findByText("Make: Toyota");
@@ -91,14 +108,18 @@ describe("<MyAccountScreen />", () => {
     await findByText("Year: 2022");
     await findByText("License: XYZ123");
   }, 20000);
-
+  /**
+  * ✅ Navigates to AddVehicle screen when 'Add Vehicle' button is clicked
+  */
   test("Navigates to AddVehicle when 'Add Vehicle' is pressed", async () => {
     const { findByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
     const button = await findByText("Add Vehicle");
     fireEvent.press(button);
     expect(defaultNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
   }, 20000);
-
+  /**
+     * ✅ Triggers navigation.goBack when ← Back button is pressed
+     */
   test("Goes back when back button is pressed", async () => {
     const { getByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
 
@@ -109,7 +130,9 @@ describe("<MyAccountScreen />", () => {
     fireEvent.press(getByText("← Back"));
     expect(defaultNavigation.goBack).toHaveBeenCalled(); // ✅ checks goBack now
   });
-
+  /**
+    * ✅ Redirects to AddVehicle screen when vehicle list is empty
+    */
   test("Redirects to AddVehicle when no vehicles are found", async () => {
     const mockNavigation = {
       navigate: jest.fn(),
@@ -117,7 +140,7 @@ describe("<MyAccountScreen />", () => {
       goBack: jest.fn(),
       canGoBack: jest.fn(() => false),
     };
-
+    // Mock no vehicles in Firestore
     mockGetDoc.mockImplementation((ref) => {
       if (ref.path === "vehicles/12345") {
         return Promise.resolve({
@@ -143,7 +166,9 @@ describe("<MyAccountScreen />", () => {
       expect(mockNavigation.replace).toHaveBeenCalledWith("AddVehicle")
     );
   }, 20000);
-
+  /**
+    * ✅ Redirects to AddVehicle when vehicle document does not exist
+    */
   test("Redirects to AddVehicle when vehicle document does not exist", async () => {
     const mockNavigation = {
       navigate: jest.fn(),
@@ -151,7 +176,7 @@ describe("<MyAccountScreen />", () => {
       goBack: jest.fn(),
       canGoBack: jest.fn(() => false),
     };
-
+    // Simulate missing vehicles doc
     mockGetDoc.mockImplementation((ref) => {
       if (ref.path === "vehicles/12345") {
         return Promise.resolve({ exists: () => false });

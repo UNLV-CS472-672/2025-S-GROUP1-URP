@@ -1,3 +1,26 @@
+/**
+ * initParkingData.js
+ * ------------------
+ * This script initializes Firestore collections for parking spot data.
+ * It sets up each spot with default properties like location number, status,
+ * access type (student, staff, accessible), and availability metadata.
+ *
+ * Collections Initialized:
+ * - parkingSpotsCottage: 11 spots
+ * - parkingSpotsGateway: 10 spots
+ * (Tropicana is commented out but can be enabled as needed.)
+ *
+ * Spot Data Fields:
+ * - location: Number (1-based spot number)
+ * - status: 'available' (default)
+ * - heldBy: '' (no user initially)
+ * - holdExpiresAt: null
+ * - type: 'student', 'staff', or 'accessible' (based on index logic)
+ *
+ * Usage:
+ * Call `initializeParkingCollections()` to populate Firestore with parking spot documents.
+ */
+
 import { doc, setDoc, getFirestore } from 'firebase/firestore'
 
 const db = getFirestore()

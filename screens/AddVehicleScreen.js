@@ -1,3 +1,13 @@
+/**
+ * File: AddVehicleScreen.js
+ * Purpose: Allows users to register a new vehicle to their profile in the UNLV Reserved Parking app.
+ * Features:
+ * - Collects make, model, year, and license plate number.
+ * - Optionally allows users to upload or take a photo of their vehicle.
+ * - Saves vehicle info to Firebase Firestore and uploads image to Firebase Storage.
+ * - Redirects to 'My Account' or 'Home' after saving.
+ * Dependencies: React Native components, Firebase Auth/Firestore/Storage, Expo ImagePicker and FileSystem.
+ */
 import React, { useState, useEffect } from 'react'
 import {
   View,
@@ -19,7 +29,9 @@ import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
 import { getStorage } from 'firebase/storage'
 
+// Main component
 export default function AddVehicleScreen({ navigation, route }) {
+// --- STATE VARIABLES ---
   const [make, setMake] = useState("")
   const [model, setModel] = useState("")
   const [year, setYear] = useState("")
@@ -29,7 +41,7 @@ export default function AddVehicleScreen({ navigation, route }) {
   const [isModalVisible, setModalVisible] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const fromRedirect = route?.params?.fromRedirect || false
-
+// --- EFFECT: Show/hide keyboard awareness ---
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true))
     const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false))
@@ -38,7 +50,7 @@ export default function AddVehicleScreen({ navigation, route }) {
       hideSub.remove()
     }
   }, [])
-
+// --- Select image from library ---
   const pickImageFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -49,7 +61,7 @@ export default function AddVehicleScreen({ navigation, route }) {
       setImage(result.assets[0].uri)
     }
   }
-
+// --- Take a photo with camera ---
   const takePhotoWithCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync()
     if (!permission.granted) {
@@ -64,21 +76,21 @@ export default function AddVehicleScreen({ navigation, route }) {
       setImage(result.assets[0].uri)
     }
   }
-
+// --- Remove selected image ---
   const removeImage = () => {
     setImage(null)
   }
-
+// --- Save vehicle info to Firestore ---
   const handleSave = async () => {
     if (isSaving) return
     setIsSaving(true)
-
+// Validate input fields
     if (!make.trim() || !model.trim() || !year.trim() || !licensePlate.trim()) {
       Alert.alert('Error', 'All fields are required.')
       setIsSaving(false)
       return
     }
-
+// Validate year range
     if (
       isNaN(year) ||
       year.length !== 4 ||
@@ -93,6 +105,7 @@ export default function AddVehicleScreen({ navigation, route }) {
     let imageUrl = null
 
     try {
+       // Upload image to Firebase Storage if selected
       if (image) {
         const fileInfo = await FileSystem.getInfoAsync(image)
         if (fileInfo.size > 5 * 1024 * 1024) {
@@ -152,7 +165,7 @@ export default function AddVehicleScreen({ navigation, route }) {
       setIsSaving(false)
     }
   }
-
+ // --- JSX Render ---
   return (
     <View style={styles.rootContainer}>
       <View style={styles.header}>
@@ -232,7 +245,11 @@ export default function AddVehicleScreen({ navigation, route }) {
     </View>
   )
 }
-
+/**
+ * Stylesheet for AddVehicleScreen
+ * Contains layout, color, and font styling for the screen UI elements.
+ * Applies consistent branding (e.g., UNLV red), spacing, and responsive sizing.
+ */
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,

@@ -1,3 +1,28 @@
+/**
+ * ParkingMap Component (SVG Layout Version)
+ * -----------------------------------------
+ * This component visually displays parking spots using SVG rectangles inside a scrollable view.
+ * Users can select or randomly assign a parking spot, and it uses Firebase to reserve and track spot status.
+ *
+ * Props:
+ * - parkingLot (string): Name of the parking lot (e.g., "Tropicana Parking", "Gateway Parking")
+ *
+ * Features:
+ * - Real-time updates via Firestore's `onSnapshot`
+ * - Visual layout using `react-native-svg`
+ * - Colored indicators for spot status: green (available), yellow (held), red (occupied), blue (selected)
+ * - Spot filtering (student, staff, accessible)
+ * - Random spot assignment
+ * - SVG car icons shown on occupied/held spots
+ * - Firebase reservation logic and 30-minute expiration handling
+ *
+ * Dependencies:
+ * - Firebase Firestore and Auth
+ * - react-native-svg for visual rendering
+ * - Uses `SvgImage` with an icon overlay for occupied/held spots
+ */
+
+
 import React, { useState, useEffect } from 'react'
 import {
   View,

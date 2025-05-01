@@ -1,16 +1,20 @@
 /**
  * ParkingScreen Component
  *
- * This screen displays a map of the parking garage using the `ParkingMap` component.
- * It includes a title at the top of the screen and renders the map below it.
+ * Displays a map of a parking garage using the `ParkingMap` component.
+ * Includes a screen title and renders the interactive parking layout.
  *
  * Features:
- * - Displays a title: "Parking Garage Map".
- * - Renders the `ParkingMap` component to show the parking garage layout.
+ * - Title: "Parking Garage Map"
+ * - Uses `ParkingMap` to show layout and status of parking spots.
+ *
+ * Props:
+ * - navigation: Passed from React Navigation for screen transitions.
  *
  * Dependencies:
- * - `ParkingMap` component: Handles the rendering and functionality of the parking garage map.
+ * - ParkingMap: Custom component that renders the garage layout and handles user interaction.
  */
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import ParkingMap from "../src/components/ParkingMap/ParkingMap";

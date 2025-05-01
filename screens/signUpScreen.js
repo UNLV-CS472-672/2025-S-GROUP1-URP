@@ -1,3 +1,24 @@
+/**
+ * SignUpScreen Component
+ * ------------------------
+ * This screen enables new users to create an account using their email and password.
+ * It integrates Firebase Authentication to register users and supports a built-in terms and conditions agreement.
+ *
+ * Features:
+ * - Input fields for email and password.
+ * - Password visibility toggle.
+ * - Modal display for Terms and Conditions.
+ * - Checkbox to agree to Terms before signup.
+ * - Firebase Authentication integration for user creation and auto-login.
+ * - Navigation to Tutorial screen after successful registration.
+ *
+ * Dependencies:
+ * - Firebase Authentication (`auth`) for account creation.
+ * - Expo Image Picker for UI consistency.
+ * - React Navigation for navigating between screens.
+ */
+
+
 import React, { useState } from "react";
 import {
   View,

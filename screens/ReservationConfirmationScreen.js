@@ -1,3 +1,17 @@
+/**
+ * ReservationConfirmationScreen
+ * ------------------------------
+ * This screen confirms a user's parking reservation and provides a reminder
+ * about the one-hour window to arrive and park in the reserved spot.
+ *
+ * Features:
+ * - Displays confirmation message and time constraint
+ * - Provides a button to return to the Home screen
+ *
+ * Dependencies:
+ * - React Navigation for navigation between screens
+ */
+
 import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'

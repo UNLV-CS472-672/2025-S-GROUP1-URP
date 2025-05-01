@@ -1,15 +1,22 @@
 /**
- * RemoveVehicleScreen Component
- *
+ * RemoveVehicleScreen
+ * ---------------------
  * This screen allows users to remove a vehicle from their account.
- * Users can select a vehicle from a list, confirm the removal, and update the Firestore database.
+ * Users can:
+ * - Select a vehicle from the list of registered vehicles
+ * - Confirm deletion with a prompt
+ * - Automatically delete associated images from Firebase Storage
+ * - Update the Firestore database with the remaining vehicles
  *
  * Features:
- * - Displays a list of vehicles associated with the user.
- * - Allows the user to select a vehicle for removal.
- * - Confirmation dialog to confirm the removal.
- * - Updates Firestore with the updated list of vehicles after removal.
+ * - Highlights selected vehicle for confirmation
+ * - Handles Firestore and Storage updates
+ * - Navigates back to MyAccountScreen after deletion
  *
+ * Dependencies:
+ * - Firebase Firestore for vehicle data
+ * - Firebase Storage to delete associated vehicle images
+ * - Firebase Authentication to identify the current user
  */
 
 import React, { useState } from 'react'
