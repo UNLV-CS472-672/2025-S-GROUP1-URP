@@ -288,13 +288,14 @@ const ParkingMap = ({ parkingLot = 'Gateway Parking' }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
-        <Text style={{ fontSize: 16, color: 'blue' }}>← Back</Text>
-      </TouchableOpacity>
+    <View style={styles.header}>
+      <Text style={styles.headerText}>{parkingLot}</Text>
+    </View>
 
-      <View style={styles.header}>
-        <Text style={styles.headerText}>{parkingLot}</Text>
-      </View>
+    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backWrapper}>
+      <Text style={styles.backText}>← Back</Text>
+    </TouchableOpacity>
+
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.filterContainer}>
@@ -307,10 +308,18 @@ const ParkingMap = ({ parkingLot = 'Gateway Parking' }) => {
         </View>
 
         <View style={styles.legendContainer}>
-          {['green', 'yellow', 'red', 'blue'].map((color, i) => (
+          {['green', 'yellow'].map((color, i) => (
             <View style={styles.legendItem} key={i}>
               <View style={[styles.legendBox, { backgroundColor: color }]} />
-              <Text style={styles.legendText}>{['Open', 'Reserved', 'Occupied', 'Selected'][i]}</Text>
+              <Text style={styles.legendText}>{['Open', 'Reserved'][i]}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={styles.legendContainer}>
+          {['red', 'blue'].map((color, i) => (
+            <View style={styles.legendItem} key={i + 2}>
+              <View style={[styles.legendBox, { backgroundColor: color }]} />
+              <Text style={styles.legendText}>{['Occupied', 'Selected'][i]}</Text>
             </View>
           ))}
         </View>
@@ -371,7 +380,7 @@ const ParkingMap = ({ parkingLot = 'Gateway Parking' }) => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white', paddingTop: 40 },
+  container: { flex: 1, backgroundColor: 'white', paddingTop: 50 },
   scrollContent: { alignItems: 'center' },
   mapWrapper: {
     width: screenWidth,
@@ -415,8 +424,20 @@ const styles = StyleSheet.create({
   filterOption: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 },
   checkbox: { fontSize: 20, marginRight: 5 },
   filterLabel: { fontSize: 16 },
-  legendContainer: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' },
-  legendItem: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    paddingVertical: 2,
+    width: '50%',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    flex: 1,
+    justifyContent: 'center',
+  },
   legendBox: { width: 20, height: 20, marginRight: 5 },
   legendText: { fontSize: 16, fontWeight: 'bold' },
   header: {
@@ -424,9 +445,7 @@ const styles = StyleSheet.create({
     height: 80,
     backgroundColor: '#CC0000',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30
+    alignItems: 'center'
   },
   headerText: {
     fontSize: 27,
@@ -435,7 +454,18 @@ const styles = StyleSheet.create({
     textShadowColor: 'black',
     textShadowOffset: { width: 3, height: 1 },
     textShadowRadius: 5
-  }
+  },
+  backWrapper: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginLeft: 15,
+    marginBottom: 5,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#CC0000',
+  },
+  
 })
 
 export default ParkingMap
