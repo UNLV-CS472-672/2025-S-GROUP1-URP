@@ -52,30 +52,21 @@ export default function ReservationStatusScreen({ navigation }) {
           const resDoc = querySnapshot.docs[0];
           const resData = resDoc.data();
           setReservation({ id: resDoc.id, ...resData });
+          setGarageName(resData.garage || "Unknown Garage");
+
 
           const startTime = resData.startTime.toDate();
           const endTime = resData.endTime.toDate();
           updateTimer(startTime, endTime);
 
+          
           const spotId = resData.spotId;
           const collections = [
+            { name: "parkingSpotsCottage", displayName: "Cottage Grove Garage" },
             { name: "parkingSpotsTrop", displayName: "Tropicana Garage" },
             { name: "parkingSpotsGateway", displayName: "Gateway Garage" },
-            { name: "parkingSpotsCottage", displayName: "Cottage Grove Garage" },
+            
           ];
-
-          for (const col of collections) {
-            try {
-              const spotRef = doc(db, col.name, spotId);
-              const spotSnap = await getDoc(spotRef);
-              if (spotSnap.exists()) {
-                setGarageName(col.displayName);
-                break;
-              }
-            } catch (error) {
-              console.error(`Error checking collection ${col.name}:`, error);
-            }
-          }
         } else {
           setReservation(null);
         }

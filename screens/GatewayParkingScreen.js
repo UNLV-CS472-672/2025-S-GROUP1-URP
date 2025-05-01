@@ -172,6 +172,7 @@ const ParkingMap = ({ parkingLot = 'Gateway Parking' }) => {
       await setDoc(doc(db, 'Reservations', reservationId), {
         userID: user.uid,
         spotId: selectedSpot,
+        garage: parkingLot,
         status: 'held',
         startTime: now,
         endTime: holdExpires,
