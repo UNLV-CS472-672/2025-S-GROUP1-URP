@@ -25,6 +25,7 @@ import { getAuth } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/native'
 import { GestureDetector, Gesture } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import { getDoc } from "firebase/firestore";
 
 // Replace this with your layout image
 import cottageMap from '../assets/cottage_map.png'
@@ -151,7 +152,35 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
     return () => unsubscribe()
   }, [collectionName])
 
+  const userHasVehicles = async () => {
+    const user = auth.currentUser;
+    if (!user) return false;
+  
+    const vehicleDocRef = doc(db, "vehicles", user.uid);
+    const vehicleSnap = await getDoc(vehicleDocRef);
+    if (vehicleSnap.exists()) {
+      const data = vehicleSnap.data();
+      return data.vehicles && data.vehicles.length > 0;
+    }
+    return false;
+  };
+  
   const handleReserve = async () => {
+    const hasVehicles = await userHasVehicles();
+  if (!hasVehicles) {
+    Alert.alert(
+      "No Vehicle Found",
+      "Please add a vehicle before reserving a parking spot.",
+      [
+        {
+          text: "Add Vehicle",
+          onPress: () => navigation.navigate("AddVehicle"),
+        },
+        { text: "Cancel", style: "cancel" },
+      ]
+    );
+    return;
+  }
     if (selectedSpot === null) {
       Alert.alert('No Spot Selected', 'Please select an available spot first.');
       return;

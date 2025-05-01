@@ -47,16 +47,10 @@ export default function MyAccountScreen({ navigation }) {
           const data = vehicleSnap.data();
           const userVehicles = data.vehicles || [];
           setVehicles(userVehicles);
-          if (userVehicles.length === 0) {
-            setTimeout(() => {
-              navigation.replace("AddVehicle");
-            }, 1000);
-          }
         } else {
-          setTimeout(() => {
-            navigation.replace("AddVehicle");
-          }, 1000);
+          setVehicles([]); // Optionally keep this to ensure empty state is handled
         }
+        
 
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
@@ -143,7 +137,7 @@ export default function MyAccountScreen({ navigation }) {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate("Home")}
         >
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
