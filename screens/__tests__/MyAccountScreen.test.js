@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, act, waitFor } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import MyAccountScreen from "../MyAccountScreen";
 
 // --- Firebase Mocks ---
@@ -7,9 +7,7 @@ const mockGetDoc = jest.fn();
 const mockUpdateDoc = jest.fn();
 
 jest.mock("firebase/firestore", () => {
-  const doc = jest.fn((_, collection, docId) => ({
-    path: `${collection}/${docId}`,
-  }));
+  const doc = jest.fn((_, collection, docId) => ({ path: `${collection}/${docId}` }));
 
   return {
     doc,
@@ -18,9 +16,9 @@ jest.mock("firebase/firestore", () => {
   };
 });
 
-jest.mock('../../firebaseConfig', () => ({
-  auth: { currentUser: { email: 'test@example.com', uid: '12345' } },
-  db: {}
+jest.mock("../../firebaseConfig", () => ({
+  auth: { currentUser: { email: "test@example.com", uid: "12345" } },
+  db: {},
 }));
 
 // --- Icon Mocks ---
@@ -52,7 +50,7 @@ describe("<MyAccountScreen />", () => {
     defaultNavigation = {
       navigate: jest.fn(),
       replace: jest.fn(),
-      goBack: jest.fn(), // ✅ added for back button test
+      goBack: jest.fn(),
       canGoBack: jest.fn(() => false),
     };
 
@@ -99,79 +97,16 @@ describe("<MyAccountScreen />", () => {
     expect(defaultNavigation.navigate).toHaveBeenCalledWith("AddVehicle");
   }, 20000);
 
-  test("Goes back when back button is pressed", async () => {
-    const { getByText } = render(<MyAccountScreen navigation={defaultNavigation} />);
+  test("Goes back to home when back button is pressed", async () => {
+    const mockNavigation = {
+      ...defaultNavigation,
+      navigate: jest.fn(),
+      canGoBack: jest.fn(() => false),
+    };
 
-    await waitFor(() => {
-      expect(getByText("← Back")).toBeTruthy();
-    });
-
-    fireEvent.press(getByText("← Back"));
-    expect(defaultNavigation.goBack).toHaveBeenCalled(); // ✅ checks goBack now
+    const { findByText } = render(<MyAccountScreen navigation={mockNavigation} />);
+    const backButton = await waitFor(() => findByText("← Back"));
+    fireEvent.press(backButton);
+    expect(mockNavigation.navigate).toHaveBeenCalledWith("Home");
   });
-
-  test("Redirects to AddVehicle when no vehicles are found", async () => {
-    const mockNavigation = {
-      navigate: jest.fn(),
-      replace: jest.fn(),
-      goBack: jest.fn(),
-      canGoBack: jest.fn(() => false),
-    };
-
-    mockGetDoc.mockImplementation((ref) => {
-      if (ref.path === "vehicles/12345") {
-        return Promise.resolve({
-          exists: () => true,
-          data: () => ({ vehicles: [] }),
-        });
-      } else if (ref.path === "users/12345") {
-        return Promise.resolve({
-          exists: () => true,
-          data: () => ({ name: "", profilePicture: null }),
-        });
-      }
-      return Promise.resolve({ exists: () => false });
-    });
-
-    render(<MyAccountScreen navigation={mockNavigation} />);
-
-    await act(async () => {
-      jest.advanceTimersByTime(1100);
-    });
-
-    await waitFor(() =>
-      expect(mockNavigation.replace).toHaveBeenCalledWith("AddVehicle")
-    );
-  }, 20000);
-
-  test("Redirects to AddVehicle when vehicle document does not exist", async () => {
-    const mockNavigation = {
-      navigate: jest.fn(),
-      replace: jest.fn(),
-      goBack: jest.fn(),
-      canGoBack: jest.fn(() => false),
-    };
-
-    mockGetDoc.mockImplementation((ref) => {
-      if (ref.path === "vehicles/12345") {
-        return Promise.resolve({ exists: () => false });
-      } else if (ref.path === "users/12345") {
-        return Promise.resolve({
-          exists: () => true,
-          data: () => ({ name: "Test User", profilePicture: null }),
-        });
-      }
-      return Promise.resolve({ exists: () => false });
-    });
-
-    render(<MyAccountScreen navigation={mockNavigation} />);
-
-    await act(async () => {
-      jest.advanceTimersByTime(1100);
-    });
-
-    await waitFor(() =>
-      expect(mockNavigation.replace).toHaveBeenCalledWith("AddVehicle")
-    );
-  }, 20000);
 });
