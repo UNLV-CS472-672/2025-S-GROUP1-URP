@@ -40,8 +40,7 @@ export default function AddVehicleScreen({ navigation, route }) {
   const [image, setImage] = useState(null)
   const [isModalVisible, setModalVisible] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const fromRedirect = route?.params?.fromRedirect || false
-// --- EFFECT: Show/hide keyboard awareness ---
+
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true))
     const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false))
@@ -219,13 +218,10 @@ export default function AddVehicleScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Home' }]
-            })
+            navigation.navigate('My Account')
           }
         >
-          <Text style={styles.backButtonText}>Back to {fromRedirect ? 'Home' : 'My Account'}</Text>
+          <Text style={styles.backButtonText}>Back to My Account</Text>
         </TouchableOpacity>
       )}
 
