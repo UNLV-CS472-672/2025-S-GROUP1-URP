@@ -1,3 +1,25 @@
+/**
+ * TropicanaParkingMap Component
+ * -----------------------------
+ * This screen displays an interactive map of the Tropicana Parking Garage, allowing users
+ * to select and reserve parking spots in real-time. Users can manually select a spot or
+ * request a random available spot of a specific type (student, staff, accessible).
+ *
+ * Features:
+ * - Interactive image-based parking layout with pan and zoom gestures.
+ * - Real-time Firebase updates to spot availability and expiration logic.
+ * - Spot selection and reservation with a 30-minute hold.
+ * - Dynamic filtering by parking spot type (student, staff, accessible).
+ * - Legend and instructions for ease of use.
+ *
+ * Dependencies:
+ * - Firebase Firestore for real-time parking spot data.
+ * - Firebase Auth to associate reservations with users.
+ * - React Native Gesture Handler and Reanimated for gesture-based interaction.
+ * - React Navigation for screen transitions.
+ */
+
+
 import React, { useState, useEffect } from 'react'
 import {
   View,

@@ -1,3 +1,18 @@
+/**
+ * Firebase Configuration File
+ *
+ * This file initializes the Firebase app using the project's configuration.
+ * It sets up Firebase Authentication and exports it for use across the app.
+ *
+ * Features:
+ * - Initializes Firebase App
+ * - Sets up Firebase Authentication
+ * - (Optional) Includes Firebase Analytics for web apps
+ *
+ * Replace the config values with your Firebase project credentials.
+ */
+
+
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getAnalytics } from 'firebase/analytics'

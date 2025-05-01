@@ -1,3 +1,17 @@
+/**
+ * File: ParkingMap.js
+ * Purpose: Interactive parking lot map component for the UNLV Reserved Parking app.
+ * Features:
+ * - Real-time parking space updates from Firebase Firestore.
+ * - Gesture support: pinch-to-zoom and pan via react-native-gesture-handler and Reanimated.
+ * - Allows users to select a specific or random parking spot and reserve it for 30 minutes.
+ * - Reservation information is saved to the Firestore "Reservations" collection.
+ * Dependencies:
+ * - Firebase (Firestore, Auth)
+ * - React Native Gesture Handler and Reanimated
+ * - Image background layout map for visual reference
+ */
+
 import React, { useState, useEffect } from 'react'
 import {
   View,
@@ -9,6 +23,7 @@ import {
   Dimensions,
   ImageBackground
 } from 'react-native'
+// Firebase
 import {
   getFirestore,
   doc,
@@ -22,12 +37,14 @@ import {
   getDocs
 } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
+// Navigation
 import { useNavigation } from '@react-navigation/native'
+// Gesture & Animation
 import { GestureDetector, Gesture } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { getDoc } from "firebase/firestore";
 
-// Replace this with your layout image
+// Layout Map Image
 import cottageMap from '../assets/cottage_map.png'
 
 const db = getFirestore()
@@ -44,6 +61,7 @@ function clamp(val, min, max) {
 
 const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
   const navigation = useNavigation()
+   // State variables
   const [selectedSpot, setSelectedSpot] = useState(null)
   const [parkingSpaces, setParkingSpaces] = useState([])
   const [filter, setFilter] = useState('student')
@@ -55,7 +73,7 @@ const ParkingMap = ({ parkingLot = 'Tropicana Parking' }) => {
   const translationY = useSharedValue(0)
   const prevTranslationX = useSharedValue(0)
   const prevTranslationY = useSharedValue(0)
-
+  // Pinch gesture
   const pinch = Gesture.Pinch()
     .onStart(() => {
       startScale.value = scale.value

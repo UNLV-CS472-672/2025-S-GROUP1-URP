@@ -1,3 +1,15 @@
+/**
+ * EditVehicleScreen
+ * ------------------
+ * This screen allows users to edit a previously saved vehicle's information.
+ * Users can:
+ * - Update text fields (make, model, year, license plate)
+ * - Change or remove a vehicle image
+ * - Save changes to Firestore
+ * 
+ * It also handles validation, Firebase image upload, and image deletion.
+ */
+
 import React, { useState } from 'react'
 import {
   View,

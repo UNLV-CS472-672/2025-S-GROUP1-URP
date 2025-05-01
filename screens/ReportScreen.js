@@ -1,3 +1,28 @@
+/**
+ * ReportScreen
+ * ---------------------
+ * This screen allows users to report parking violations by submitting
+ * details and optionally uploading a photo.
+ *
+ * Users can:
+ * - Enter details like license plate, color, make/model, and comments
+ * - Take or select a photo to include with the report
+ * - Submit the report, which is saved to Firestore with an optional image
+ *
+ * Features:
+ * - Image picker integration using Expo
+ * - Image upload to Firebase Storage
+ * - Size check (limit 5MB) before uploading image
+ * - Form validation for required fields
+ * - Firestore integration with `addDoc` for saving reports
+ *
+ * Dependencies:
+ * - Firebase Firestore for storing report data
+ * - Firebase Storage for image uploads
+ * - Firebase Authentication to identify the submitting user
+ */
+
+
 import React, { useState } from 'react'
 import {
   View,

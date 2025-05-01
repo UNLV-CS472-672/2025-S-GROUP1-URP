@@ -1,19 +1,21 @@
 /**
- * MyAccountScreen Component
- *
- * This screen displays the user's account information, including their email and registered vehicles.
- * If no vehicles are found, the user is automatically redirected to the "AddVehicle" screen after a short delay.
- * Users can also navigate to the "AddVehicle" or "RemoveVehicle" screens manually.
+ * MyAccountScreen
+ * ----------------
+ * This screen allows users to view and manage their account information, including:
+ * - Profile picture and name (editable)
+ * - Email address (read-only)
+ * - A list of registered vehicles (up to 3)
  *
  * Features:
- * - Displays the user's email and registered vehicles.
- * - Automatically redirects to the "AddVehicle" screen if no vehicles are found.
- * - Provides buttons to add another vehicle or remove an existing vehicle.
+ * - Automatically redirects to "AddVehicle" if no vehicles exist
+ * - Users can add, edit, or delete vehicles
+ * - Profile image can be picked from the device's gallery
+ * - Changes are saved to Firebase Firestore
  *
  * Dependencies:
- * - Firebase Firestore to fetch the user's vehicle information.
- * - Firebase Authentication to identify the logged-in user.
- *
+ * - Firebase Authentication for current user info
+ * - Firebase Firestore for profile and vehicle data
+ * - Expo ImagePicker for profile image upload
  */
 
 import React, { useState, useEffect } from 'react'

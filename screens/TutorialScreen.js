@@ -1,3 +1,21 @@
+/**
+ * TutorialScreen Component
+ * ------------------------
+ * This screen displays an onboarding walkthrough for new users using react-native-onboarding-swiper.
+ * It guides users through the core features of the URP (UNLV Reserved Parking) app, including
+ * finding garages, selecting parking spots, using the reservation system, and tracking reservations.
+ *
+ * Features:
+ * - Multi-step onboarding tutorial with images and captions.
+ * - Skippable with immediate navigation to the Home screen.
+ * - Introduces users to core app interactions and navigation.
+ *
+ * Dependencies:
+ * - react-native-onboarding-swiper for slide-based onboarding.
+ * - React Navigation for screen transitions.
+ */
+
+
 import React from 'react';
 import { Image } from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';

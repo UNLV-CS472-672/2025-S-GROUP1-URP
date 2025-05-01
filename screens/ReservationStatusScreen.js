@@ -1,3 +1,22 @@
+/**
+ * ReservationStatusScreen
+ * ------------------------
+ * This screen displays the user's current parking reservation status, including the spot number,
+ * garage name, and a live countdown timer showing how much time remains before the reservation expires.
+ *
+ * Features:
+ * - Automatically fetches the user's current reservation from Firestore.
+ * - Dynamically identifies the garage based on the reserved spot.
+ * - Displays a countdown timer that auto-deletes the reservation if time expires.
+ * - Allows the user to manually cancel the reservation.
+ *
+ * Dependencies:
+ * - Firebase Firestore to fetch and manage reservations.
+ * - Firebase Authentication to identify the logged-in user.
+ * - React Navigation for screen transitions.
+ */
+
+
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { collection, query, where, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore";

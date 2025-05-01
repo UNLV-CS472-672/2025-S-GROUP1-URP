@@ -1,3 +1,16 @@
+/**
+ * Firebase Configuration File
+ *
+ * Initializes and exports Firebase services used in the app:
+ * - Authentication (getAuth)
+ * - Firestore Database (getFirestore)
+ *
+ * Make sure the configuration object uses your project's Firebase credentials.
+ * For additional Firebase services, import and initialize as needed:
+ * https://firebase.google.com/docs/web/setup#available-libraries
+ */
+
+
 // firebaseConfig.js
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'

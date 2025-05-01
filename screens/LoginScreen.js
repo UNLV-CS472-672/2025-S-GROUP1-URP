@@ -1,3 +1,18 @@
+/**
+ * LoginScreen
+ * ------------
+ * This screen allows users to sign in to the UNLV Reserved Parking app.
+ *
+ * Features:
+ * - Input fields for email and password
+ * - Toggle to show/hide password
+ * - Sign-in button that authenticates using Firebase Auth
+ * - Navigation to Sign-Up and Reset Password screens
+ *
+ * Includes keyboard handling for both iOS and Android, and input validation with alert feedback.
+ */
+
+
 import { useState } from "react";
 import {
   View,

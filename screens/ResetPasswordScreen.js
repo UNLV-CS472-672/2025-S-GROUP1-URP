@@ -1,15 +1,19 @@
 /**
  * ResetPasswordScreen Component
- *
- * This screen allows users to reset their password by entering their email address.
- * It uses Firebase Authentication to send a password reset email to the provided email address.
+ * ------------------------------
+ * This screen enables users to reset their account password using their email address.
+ * It utilizes Firebase Authentication to send a password reset email to the provided address.
  *
  * Features:
- * - Input field for the user's email.
- * - Button to trigger the password reset process.
- * - Navigation option to go back to the login screen.
+ * - Text input field for entering a registered email.
+ * - Button to trigger Firebase's password reset email.
+ * - Navigation back to the login screen.
  *
+ * Dependencies:
+ * - Firebase Auth for password reset functionality.
+ * - React Navigation for screen transitions.
  */
+
 import { useState } from 'react'
 import { View, TextInput, Text, Alert, TouchableOpacity, StyleSheet } from 'react-native'
 import { sendPasswordResetEmail } from 'firebase/auth'
