@@ -21,6 +21,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { collection, query, where, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
+import { updateDoc } from "firebase/firestore";
 
 const TIMER_DURATION_MINUTES = 30;
 
@@ -125,7 +126,7 @@ export default function ReservationStatusScreen({ navigation }) {
       console.log("Reservation already expired or does not exist.");
       return;
     }
-
+  
     Alert.alert(
       "Cancel Reservation",
       "Are you sure you want to cancel your current reservation?",
@@ -139,9 +140,34 @@ export default function ReservationStatusScreen({ navigation }) {
           text: "Yes",
           onPress: async () => {
             try {
+              // Delete the reservation first
               await deleteDoc(doc(db, "Reservations", reservation.id));
-              setReservation(null);
               console.log("Reservation canceled and deleted");
+  
+              // Now update the corresponding parking spot
+              const spotId = reservation.spotId;
+  
+              // Find the correct parking collection based on spotId or garage name
+              const collections = ["parkingSpotsCottage", "parkingSpotsTrop", "parkingSpotsGateway"];
+  
+              let updated = false;
+              for (const collectionName of collections) {
+                const spotRef = doc(db, collectionName, spotId);
+                const spotDoc = await getDoc(spotRef);
+  
+                if (spotDoc.exists()) {
+                  await updateDoc(spotRef, { status: "available", heldBy: "", holdExpiresAt: null });
+                  console.log(`Updated ${collectionName}/${spotId} to available.`);
+                  updated = true;
+                  break; // Stop once found
+                }
+              }
+  
+              if (!updated) {
+                console.warn("Spot document not found in any garage collections.");
+              }
+  
+              setReservation(null);
             } catch (error) {
               console.error("Error canceling reservation:", error);
             }
@@ -151,6 +177,7 @@ export default function ReservationStatusScreen({ navigation }) {
       { cancelable: false }
     );
   };
+  
 
   return (
     <View style={styles.screen}>
